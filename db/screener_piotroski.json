@@ -1,0 +1,515 @@
+{
+  "TCS.NS": {
+    "screen_name": "piotroski",
+    "symbol": "TCS.NS",
+    "score": 5.0,
+    "max_score": 9.0,
+    "pct": 55.6,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 26.98
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 520940000000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 26.98,
+        "roa_pri_pct": 30.42
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 28.56,
+        "ni_ta_pct": 26.98
+      },
+      "f5_leverage_declining": {
+        "score": 0,
+        "lev_cur_pct": null,
+        "lev_pri_pct": null
+      },
+      "f6_liquidity_improving": {
+        "score": 0,
+        "cr_cur": 2.23,
+        "cr_pri": 2.32
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 3618087518.0,
+        "shares_pri": 3618087518.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 40.31,
+        "gm_pri_pct": 38.34
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 1.464,
+        "at_pri": 1.599
+      }
+    },
+    "computed_at": "2026-04-21T06:37:00.592615+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "HCLTECH.NS": {
+    "screen_name": "piotroski",
+    "symbol": "HCLTECH.NS",
+    "score": 7.0,
+    "max_score": 9.0,
+    "pct": 77.8,
+    "label": "Good",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 16.48
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 222610000000.0
+      },
+      "f3_roa_improving": {
+        "score": 1,
+        "roa_cur_pct": 16.48,
+        "roa_pri_pct": 15.74
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 21.09,
+        "ni_ta_pct": 16.48
+      },
+      "f5_leverage_declining": {
+        "score": 1,
+        "lev_cur_pct": 0.07,
+        "lev_pri_pct": 2.23
+      },
+      "f6_liquidity_improving": {
+        "score": 0,
+        "cr_cur": 2.22,
+        "cr_pri": 2.61
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 2708910993.0,
+        "shares_pri": 2707990517.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 0,
+        "gm_cur_pct": 40.34,
+        "gm_pri_pct": 40.89
+      },
+      "f9_asset_turnover_improving": {
+        "score": 1,
+        "at_cur": 1.109,
+        "at_pri": 1.102
+      }
+    },
+    "computed_at": "2026-04-21T06:41:35.118915+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "INFY.NS": {
+    "screen_name": "piotroski",
+    "symbol": "INFY.NS",
+    "score": 5.0,
+    "max_score": 9.0,
+    "pct": 55.6,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 18.13
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 4351000000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 18.13,
+        "roa_pri_pct": 19.17
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 24.98,
+        "ni_ta_pct": 18.13
+      },
+      "f5_leverage_declining": {
+        "score": 0,
+        "lev_cur_pct": null,
+        "lev_pri_pct": null
+      },
+      "f6_liquidity_improving": {
+        "score": 0,
+        "cr_cur": 2.27,
+        "cr_pri": 2.31
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 4143607528.0,
+        "shares_pri": 4139950635.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 30.46,
+        "gm_pri_pct": 30.1
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 1.107,
+        "at_pri": 1.123
+      }
+    },
+    "computed_at": "2026-04-21T06:41:35.248452+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "MARUTI.NS": {
+    "screen_name": "piotroski",
+    "symbol": "MARUTI.NS",
+    "score": 6.0,
+    "max_score": 9.0,
+    "pct": 66.7,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 10.99
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 161362000000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 10.99,
+        "roa_pri_pct": 11.69
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 12.23,
+        "ni_ta_pct": 10.99
+      },
+      "f5_leverage_declining": {
+        "score": 0,
+        "lev_cur_pct": null,
+        "lev_pri_pct": null
+      },
+      "f6_liquidity_improving": {
+        "score": 1,
+        "cr_cur": 0.97,
+        "cr_pri": 0.87
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 314402574.0,
+        "shares_pri": 314402574.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 22.95,
+        "gm_pri_pct": 22.62
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 1.117,
+        "at_pri": 1.183
+      }
+    },
+    "computed_at": "2026-04-21T07:54:05.470577+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "EICHERMOT.NS": {
+    "screen_name": "piotroski",
+    "symbol": "EICHERMOT.NS",
+    "score": 6.0,
+    "max_score": 9.0,
+    "pct": 66.7,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 17.42
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 39799200000.0
+      },
+      "f3_roa_improving": {
+        "score": 1,
+        "roa_cur_pct": 17.42,
+        "roa_pri_pct": 17.3
+      },
+      "f4_accruals_quality": {
+        "score": 0,
+        "ocf_ta_pct": 14.65,
+        "ni_ta_pct": 17.42
+      },
+      "f5_leverage_declining": {
+        "score": 1,
+        "lev_cur_pct": 0.68,
+        "lev_pri_pct": 0.71
+      },
+      "f6_liquidity_improving": {
+        "score": 1,
+        "cr_cur": 1.63,
+        "cr_pri": 1.15
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 274164080.0,
+        "shares_pri": 273805630.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 0,
+        "gm_cur_pct": 42.91,
+        "gm_pri_pct": 43.21
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 0.682,
+        "at_pri": 0.702
+      }
+    },
+    "computed_at": "2026-04-21T07:54:08.186955+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "HYUNDAI.NS": {
+    "screen_name": "piotroski",
+    "symbol": "HYUNDAI.NS",
+    "score": 6.0,
+    "max_score": 9.0,
+    "pct": 66.7,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 18.74
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 43449230000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 18.74,
+        "roa_pri_pct": 23.0
+      },
+      "f4_accruals_quality": {
+        "score": 0,
+        "ocf_ta_pct": 14.44,
+        "ni_ta_pct": 18.74
+      },
+      "f5_leverage_declining": {
+        "score": 1,
+        "lev_cur_pct": 1.78,
+        "lev_pri_pct": 2.36
+      },
+      "f6_liquidity_improving": {
+        "score": 1,
+        "cr_cur": 1.42,
+        "cr_pri": 1.24
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 812541100.0,
+        "shares_pri": 812541100.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 26.32,
+        "gm_pri_pct": 24.67
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 2.257,
+        "at_pri": 2.603
+      }
+    },
+    "computed_at": "2026-04-21T07:54:11.761902+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "LINDEINDIA.NS": {
+    "screen_name": "piotroski",
+    "symbol": "LINDEINDIA.NS",
+    "score": 5.0,
+    "max_score": 9.0,
+    "pct": 55.6,
+    "label": "Average",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 8.84
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 5835950000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 8.84,
+        "roa_pri_pct": 9.03
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 11.35,
+        "ni_ta_pct": 8.84
+      },
+      "f5_leverage_declining": {
+        "score": 0,
+        "lev_cur_pct": null,
+        "lev_pri_pct": null
+      },
+      "f6_liquidity_improving": {
+        "score": 0,
+        "cr_cur": 0.97,
+        "cr_pri": 1.87
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 85284223.0,
+        "shares_pri": 85284223.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 76.96,
+        "gm_pri_pct": 64.7
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 0.483,
+        "at_pri": 0.576
+      }
+    },
+    "computed_at": "2026-04-21T07:54:15.646651+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "BERGEPAINT.NS": {
+    "screen_name": "piotroski",
+    "symbol": "BERGEPAINT.NS",
+    "score": 7.0,
+    "max_score": 9.0,
+    "pct": 77.8,
+    "label": "Good",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 12.93
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 12690500000.0
+      },
+      "f3_roa_improving": {
+        "score": 0,
+        "roa_cur_pct": 12.93,
+        "roa_pri_pct": 13.95
+      },
+      "f4_accruals_quality": {
+        "score": 1,
+        "ocf_ta_pct": 13.9,
+        "ni_ta_pct": 12.93
+      },
+      "f5_leverage_declining": {
+        "score": 1,
+        "lev_cur_pct": 0.03,
+        "lev_pri_pct": 0.07
+      },
+      "f6_liquidity_improving": {
+        "score": 1,
+        "cr_cur": 2.05,
+        "cr_pri": 1.83
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 1165894779.0,
+        "shares_pri": 1165796049.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 40.84,
+        "gm_pri_pct": 39.97
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 1.255,
+        "at_pri": 1.326
+      }
+    },
+    "computed_at": "2026-04-21T07:54:19.397371+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "FLUOROCHEM.NS": {
+    "screen_name": "piotroski",
+    "symbol": "FLUOROCHEM.NS",
+    "score": 7.0,
+    "max_score": 9.0,
+    "pct": 77.8,
+    "label": "Good",
+    "passed": true,
+    "breakdown": {
+      "f1_roa_positive": {
+        "score": 1,
+        "roa": 5.15
+      },
+      "f2_ocf_positive": {
+        "score": 1,
+        "ocf": 5452400000.0
+      },
+      "f3_roa_improving": {
+        "score": 1,
+        "roa_cur_pct": 5.15,
+        "roa_pri_pct": 4.71
+      },
+      "f4_accruals_quality": {
+        "score": 0,
+        "ocf_ta_pct": 5.14,
+        "ni_ta_pct": 5.15
+      },
+      "f5_leverage_declining": {
+        "score": 1,
+        "lev_cur_pct": 3.74,
+        "lev_pri_pct": 4.04
+      },
+      "f6_liquidity_improving": {
+        "score": 1,
+        "cr_cur": 1.7,
+        "cr_pri": 1.36
+      },
+      "f7_no_dilution": {
+        "score": 1,
+        "shares_cur": 109850000.0,
+        "shares_pri": 109850000.0
+      },
+      "f8_gross_margin_improving": {
+        "score": 1,
+        "gm_cur_pct": 63.72,
+        "gm_pri_pct": 62.41
+      },
+      "f9_asset_turnover_improving": {
+        "score": 0,
+        "at_cur": 0.435,
+        "at_pri": 0.454
+      }
+    },
+    "computed_at": "2026-04-21T07:54:22.477902+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

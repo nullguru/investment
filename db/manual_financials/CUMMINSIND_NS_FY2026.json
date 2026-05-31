@@ -1,0 +1,131 @@
+{
+  "symbol": "CUMMINSIND.NS",
+  "name": "Cummins India Limited",
+  "fiscal_year": "FY2026",
+  "updated_at": "2026-04-15T00:00:00+05:30",
+  "sources": [
+    {
+      "period": "Q1 FY2026",
+      "date": "2025-08-07",
+      "title": "Cummins India Limited - Results for the quarter ended June 30, 2025",
+      "url": "https://www.cummins.com/news/releases/2025/08/07/cummins-india-limited-results-quarter-ended-june-30-2025"
+    },
+    {
+      "period": "Q2 FY2026",
+      "date": "2025-11-06",
+      "title": "Cummins India Limited - Results for the quarter and half year ended September 30, 2025",
+      "url": "https://www.cummins.com/sites/default/files/india/Legal/signednov6bmoutcomeresults.pdf"
+    },
+    {
+      "period": "Q3 FY2026",
+      "date": "2026-02-04",
+      "title": "Cummins India Limited - Results for the quarter and period ended December 31, 2025",
+      "url": "https://www.cummins.com/news/releases/2026/02/04/cummins-india-limited-results-quarter-and-period-ended-december-31-2025-0"
+    }
+  ],
+  "notes": [
+    "FY2026 for a March year-end company covers quarters ended 2025-06-30, 2025-09-30, and 2025-12-31.",
+    "The Q2 FY2026 half-year report discloses a statement of assets and liabilities as of 2025-09-30; Q1 and Q3 report packs do not disclose a full quarter-end balance sheet.",
+    "Sharia-related derived values below use standalone figures and only compute ratios that are supported by the disclosed report data."
+  ],
+  "periods": [
+    {
+      "report_period": "2025-06-30",
+      "fiscal_period": "Q1 FY2026",
+      "period_type": "quarterly",
+      "source_type": "official quarterly result",
+      "standalone": {
+        "revenue_from_operations": 2858.71,
+        "other_operating_income": 48.11,
+        "other_income": 152.88,
+        "total_income": 3059.7,
+        "profit_before_tax": 769.95,
+        "profit_after_tax": 589.27,
+        "basic_eps": 21.26
+      },
+      "balance_sheet_available": false,
+      "sharia_inputs": {
+        "total_assets": null,
+        "cash_and_short_term_investments": null,
+        "total_receivables": null,
+        "total_revenue": 2858.71,
+        "other_revenue": 152.88,
+        "equity_total": null,
+        "debt_to_equity_ratio": null,
+        "cash_to_assets_pct": null,
+        "other_revenue_to_revenue_pct": 5.35,
+        "receivables_to_assets_pct": null,
+        "partial_sharia_view": "No",
+        "partial_sharia_reason": "Other income / revenue is above the 5% threshold."
+      }
+    },
+    {
+      "report_period": "2025-09-30",
+      "fiscal_period": "Q2 FY2026",
+      "period_type": "quarterly",
+      "source_type": "official quarter-and-half-year result",
+      "standalone": {
+        "revenue_from_operations": 3121.58,
+        "other_operating_income": 48.69,
+        "other_income": 196.37,
+        "total_income": 3366.64,
+        "profit_before_tax": 839.43,
+        "profit_after_tax": 637.69,
+        "basic_eps": 23.0
+      },
+      "balance_sheet_available": true,
+      "standalone_balance_sheet": {
+        "total_assets": 9983.95,
+        "investments": 1604.6,
+        "trade_receivables": 2565.36,
+        "cash_and_cash_equivalents": 214.15,
+        "other_bank_balances": 1546.32,
+        "equity_total": 7338.34
+      },
+      "sharia_inputs": {
+        "total_assets": 9983.95,
+        "cash_and_short_term_investments": 3365.07,
+        "total_receivables": 2565.36,
+        "total_revenue": 3121.58,
+        "other_revenue": 196.37,
+        "equity_total": 7338.34,
+        "debt_to_equity_ratio": null,
+        "cash_to_assets_pct": 33.7,
+        "other_revenue_to_revenue_pct": 6.29,
+        "receivables_to_assets_pct": 25.69,
+        "partial_sharia_view": "No",
+        "partial_sharia_reason": "Cash / assets is above 33% and other income / revenue is above 5%."
+      }
+    },
+    {
+      "report_period": "2025-12-31",
+      "fiscal_period": "Q3 FY2026",
+      "period_type": "quarterly",
+      "source_type": "official quarterly result",
+      "standalone": {
+        "revenue_from_operations": 3006.24,
+        "other_operating_income": 48.68,
+        "other_income": 139.73,
+        "total_income": 3194.65,
+        "profit_before_tax": 592.52,
+        "profit_after_tax": 453.1,
+        "basic_eps": 16.35
+      },
+      "balance_sheet_available": false,
+      "sharia_inputs": {
+        "total_assets": null,
+        "cash_and_short_term_investments": null,
+        "total_receivables": null,
+        "total_revenue": 3006.24,
+        "other_revenue": 139.73,
+        "equity_total": null,
+        "debt_to_equity_ratio": null,
+        "cash_to_assets_pct": null,
+        "other_revenue_to_revenue_pct": 4.65,
+        "receivables_to_assets_pct": null,
+        "partial_sharia_view": "Unknown",
+        "partial_sharia_reason": "Other income / revenue is below 5%, but the report pack does not disclose a full quarter-end balance sheet."
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "FLUOROCHEM.NS": {
+    "screen_name": "magic_formula",
+    "symbol": "FLUOROCHEM.NS",
+    "score": 30.0,
+    "max_score": 100.0,
+    "pct": 30.0,
+    "label": "Weak",
+    "passed": false,
+    "breakdown": {
+      "roce_pct": 10.87,
+      "earnings_yield_pct": 2.24,
+      "ebit": 8389700000.0,
+      "enterprise_value": 375018848256.0,
+      "net_working_capital": 17602700000.0,
+      "net_ppe": 59599300000.0,
+      "invested_capital": 77202000000.0,
+      "roce_score": 20.0,
+      "ey_score": 10.0
+    },
+    "computed_at": "2026-04-21T07:59:04.797555+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

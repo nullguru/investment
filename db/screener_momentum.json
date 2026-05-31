@@ -1,0 +1,164 @@
+{
+  "MARUTI.NS": {
+    "screen_name": "momentum",
+    "symbol": "MARUTI.NS",
+    "score": 53.3,
+    "max_score": 100.0,
+    "pct": 53.3,
+    "label": "Neutral",
+    "passed": false,
+    "breakdown": {
+      "current_price": 13522.0,
+      "high_52w": 17292.0,
+      "low_52w": 11572.74,
+      "discount_from_52w_high_pct": 21.8,
+      "vs_200dma_pct": -8.46,
+      "vs_50dma_pct": -2.45,
+      "rsi_14": 71.81,
+      "dip_opportunity": "False",
+      "sub_scores": {
+        "ma": 5.0,
+        "discount": 15.0,
+        "rsi": 33.3
+      }
+    },
+    "computed_at": "2026-04-21T07:54:05.782886+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "EICHERMOT.NS": {
+    "screen_name": "momentum",
+    "symbol": "EICHERMOT.NS",
+    "score": 83.3,
+    "max_score": 100.0,
+    "pct": 83.3,
+    "label": "Strong Uptrend",
+    "passed": false,
+    "breakdown": {
+      "current_price": 7286.0,
+      "high_52w": 8190.0,
+      "low_52w": 5240.55,
+      "discount_from_52w_high_pct": 11.04,
+      "vs_200dma_pct": 6.92,
+      "vs_50dma_pct": -0.58,
+      "rsi_14": 61.13,
+      "dip_opportunity": false,
+      "sub_scores": {
+        "ma": 33.3,
+        "discount": 25.0,
+        "rsi": 25.0
+      }
+    },
+    "computed_at": "2026-04-21T07:54:08.610447+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "HYUNDAI.NS": {
+    "screen_name": "momentum",
+    "symbol": "HYUNDAI.NS",
+    "score": 38.0,
+    "max_score": 100.0,
+    "pct": 38.0,
+    "label": "Dip Zone",
+    "passed": true,
+    "breakdown": {
+      "current_price": 1893.2,
+      "high_52w": 2809.3,
+      "low_52w": 1645.36,
+      "discount_from_52w_high_pct": 32.61,
+      "vs_200dma_pct": -15.92,
+      "vs_50dma_pct": -5.76,
+      "rsi_14": 57.93,
+      "dip_opportunity": "False",
+      "sub_scores": {
+        "ma": 5.0,
+        "discount": 8.0,
+        "rsi": 25.0
+      }
+    },
+    "computed_at": "2026-04-21T07:54:12.481924+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "LINDEINDIA.NS": {
+    "screen_name": "momentum",
+    "symbol": "LINDEINDIA.NS",
+    "score": 76.3,
+    "max_score": 100.0,
+    "pct": 76.3,
+    "label": "Strong Uptrend",
+    "passed": false,
+    "breakdown": {
+      "current_price": 7061.0,
+      "high_52w": 7574.41,
+      "low_52w": 5695.5,
+      "discount_from_52w_high_pct": 6.78,
+      "vs_200dma_pct": 10.79,
+      "vs_50dma_pct": 2.7,
+      "rsi_14": 47.98,
+      "dip_opportunity": false,
+      "sub_scores": {
+        "ma": 33.3,
+        "discount": 25.0,
+        "rsi": 18.0
+      }
+    },
+    "computed_at": "2026-04-21T07:54:16.447698+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "BERGEPAINT.NS": {
+    "screen_name": "momentum",
+    "symbol": "BERGEPAINT.NS",
+    "score": 53.3,
+    "max_score": 100.0,
+    "pct": 53.3,
+    "label": "Neutral",
+    "passed": false,
+    "breakdown": {
+      "current_price": 480.45,
+      "high_52w": 596.15,
+      "low_52w": 404.5,
+      "discount_from_52w_high_pct": 19.41,
+      "vs_200dma_pct": -7.4,
+      "vs_50dma_pct": 8.11,
+      "rsi_14": 83.64,
+      "dip_opportunity": false,
+      "sub_scores": {
+        "ma": 5.0,
+        "discount": 15.0,
+        "rsi": 33.3
+      }
+    },
+    "computed_at": "2026-04-21T07:54:19.845408+00:00",
+    "data_quality": "full",
+    "error": null
+  },
+  "FLUOROCHEM.NS": {
+    "screen_name": "momentum",
+    "symbol": "FLUOROCHEM.NS",
+    "score": 45.0,
+    "max_score": 100.0,
+    "pct": 45.0,
+    "label": "Neutral",
+    "passed": false,
+    "breakdown": {
+      "current_price": 3283.4,
+      "high_52w": 4029.72,
+      "low_52w": 2980.4,
+      "discount_from_52w_high_pct": 18.52,
+      "vs_200dma_pct": -5.36,
+      "vs_50dma_pct": -0.68,
+      "rsi_14": 67.47,
+      "dip_opportunity": false,
+      "sub_scores": {
+        "ma": 5.0,
+        "discount": 15.0,
+        "rsi": 25.0
+      }
+    },
+    "computed_at": "2026-04-21T07:54:22.948016+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

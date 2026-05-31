@@ -1,0 +1,23 @@
+{
+  "FLUOROCHEM.NS": {
+    "screen_name": "graham_number",
+    "symbol": "FLUOROCHEM.NS",
+    "score": -239.75,
+    "max_score": 100.0,
+    "pct": 0,
+    "label": "Significantly Overvalued",
+    "passed": false,
+    "breakdown": {
+      "graham_number": 966.92,
+      "current_price": 3285.1,
+      "margin_of_safety_pct": -239.75,
+      "eps": 59.87,
+      "bvps": 694.041,
+      "trailing_pe": 54.87,
+      "price_to_book": 4.73
+    },
+    "computed_at": "2026-04-21T07:59:04.976078+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 600: '#0f766e', 700: '#0d9488', 800: '#115e59' },
+            surface: { 50: '#f8fafc', 100: '#f1f5f9', 800: '#1e293b', 900: '#0f172a' }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+  <style>
+    [x-cloak]{display:none !important}
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link.active { background: rgba(15, 118, 110, 0.12); color: #0f766e; border-left: 3px solid #0f766e; }
+    .sidebar-link:hover:not(.active) { background: rgba(15, 23, 42, 0.04); }
+    .card-glow { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05); }
+    .card-glow:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05); }
+    .tabulator { font-size: 0.875rem; }
+    .tabulator .tabulator-header { background: #f8fafc; border-color: #e2e8f0; }
+    .tabulator .tabulator-cell { border-color: #f1f5f9; }
+    .tabulator-row.tabulator-row-even { background: #fafafa; }
+    .tabulator-row.sharia-compliant-row,
+    .tabulator-row.sharia-compliant-row .tabulator-cell { background: #ecfdf5 !important; }
+
+    /* Dark mode overrides */
+    html.dark { color-scheme: dark; }
+    html.dark body { background-color: #0f172a; color: #e2e8f0; }
+    html.dark aside { background-color: #1e293b !important; border-color: #334155 !important; }
+    html.dark .sidebar-link { color: #94a3b8; }
+    html.dark .sidebar-link.active { background: rgba(45,212,191,0.12); color: #2dd4bf; border-left-color: #2dd4bf; }
+    html.dark .sidebar-link:hover:not(.active) { background: rgba(255,255,255,0.05); }
+    html.dark .bg-white { background-color: #1e293b !important; }
+    html.dark .bg-slate-50 { background-color: #0f172a !important; }
+    html.dark .bg-slate-100 { background-color: #1e293b !important; }
+    html.dark .bg-slate-200 { background-color: #334155 !important; }
+    html.dark .border-slate-100, html.dark .border-slate-200 { border-color: #334155 !important; }
+    html.dark .border-slate-300 { border-color: #475569 !important; }
+    html.dark .text-slate-900 { color: #f1f5f9 !important; }
+    html.dark .text-slate-800 { color: #e2e8f0 !important; }
+    html.dark .text-slate-700 { color: #cbd5e1 !important; }
+    html.dark .text-slate-600 { color: #94a3b8 !important; }
+    html.dark .text-slate-500 { color: #64748b !important; }
+    html.dark .hover\:bg-slate-50:hover { background-color: #1e293b !important; }
+    html.dark .hover\:bg-slate-100:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-slate-200:hover { background-color: #475569 !important; }
+    html.dark .hover\:text-slate-700:hover { color: #cbd5e1 !important; }
+    html.dark input:not([type="checkbox"]):not([type="radio"]),
+    html.dark select, html.dark textarea {
+      background-color: #1e293b; border-color: #475569; color: #e2e8f0;
+    }
+    html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b; }
+    html.dark .tabulator { background-color: #1e293b; color: #e2e8f0; border-color: #334155; }
+    html.dark .tabulator .tabulator-header { background: #0f172a !important; border-color: #334155; color: #e2e8f0; }
+    html.dark .tabulator .tabulator-col { background: #0f172a !important; border-color: #334155 !important; }
+    html.dark .tabulator .tabulator-col-title { color: #e2e8f0; }
+    html.dark .tabulator .tabulator-cell { border-color: #334155; color: #e2e8f0; }
+    html.dark .tabulator-row { background-color: #1e293b !important; }
+    html.dark .tabulator-row.tabulator-row-even { background-color: #162032 !important; }
+    html.dark .tabulator-row:hover .tabulator-cell { background-color: #253447 !important; }
+    html.dark .tabulator-row.sharia-compliant-row,
+    html.dark .tabulator-row.sharia-compliant-row .tabulator-cell { background: #064e3b !important; }
+    html.dark .tabulator .tabulator-footer { background-color: #0f172a !important; border-color: #334155; color: #e2e8f0; }
+    html.dark .tabulator-paginator label, html.dark .tabulator-page { color: #e2e8f0; }
+    html.dark .tabulator-page { background-color: #1e293b !important; border-color: #475569 !important; }
+    html.dark .tabulator-page.active { background-color: #0f766e !important; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen" x-data="app()" x-init="init()">
+  <!-- Top navbar -->
+  <header class="h-14 bg-slate-900 text-white shadow-lg sticky top-0 z-20 flex items-center px-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center font-bold text-sm" x-text="market === 'us' ? '$' : '₹'"></div>
+      <span class="font-semibold text-lg tracking-tight">Stock Analysis</span>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <button @click="toggleDarkMode()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition" :title="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+        <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg x-show="darkMode" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+      </button>
+      <span class="text-xs text-slate-400 hidden md:inline">Market</span>
+      <select x-model="market" @change="onMarketChange()"
+              class="bg-slate-800 border border-slate-600 rounded-md px-2 py-1.5 text-sm text-white focus:ring-1 focus:ring-teal-500">
+        <option value="india">🇮🇳 India</option>
+        <option value="us">🇺🇸 US</option>
+      </select>
+      <span class="text-xs text-slate-400 hidden md:inline">Report period</span>
+      <select x-model="period" @change="saveSettings(); fetchCounts(); fetchSymbolsMissing(); onPageChange()"
+              class="bg-slate-800 border border-slate-600 rounded-md px-2 py-1.5 text-sm text-white focus:ring-1 focus:ring-teal-500">
+        <template x-for="p in reportPeriods" :key="p"><option :value="p" x-text="p"></option></template>
+      </select>
+    </div>
+  </header>
+
+  <div class="flex min-h-[calc(100vh-3.5rem)]">
+    <!-- Sidebar -->
+    <aside class="w-56 bg-white border-r border-slate-200 flex-shrink-0 hidden md:block">
+      <nav class="py-4 space-y-0.5">
+        <template x-for="(label, id) in navCards" :key="id">
+          <a :href="'#' + id"
+             :class="['sidebar-link block px-4 py-2.5 text-sm font-medium text-slate-700 transition', page === id ? 'active' : '']"
+             x-text="label"
+             @click.prevent="go(id)"></a>
+        </template>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 overflow-auto p-6 lg:p-8">
+      <!-- Staleness banner -->
+      <div x-show="cacheStatus && cacheStatus.sharia && cacheStatus.sharia.stale && !cacheStatusDismissed"
+           x-cloak
+           class="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 flex items-start gap-3 text-sm max-w-4xl mx-auto">
+        <span class="text-amber-500 mt-0.5 flex-shrink-0">&#9888;</span>
+        <div class="flex-1">
+          <p class="font-medium text-amber-800">Data may be stale</p>
+          <p class="text-amber-700 mt-0.5">
+            Last refreshed <span x-text="cacheStatus?.sharia?.age_hours ? Math.round(cacheStatus.sharia.age_hours) + 'h ago' : 'unknown'"></span>.
+            <span x-text="cacheStatus?.sharia?.symbols_missing ? cacheStatus.sharia.symbols_missing + ' symbols missing.' : ''"></span>
+          </p>
+          <p class="text-amber-600 mt-1 text-xs">
+            Refresh via CLI: <code class="bg-amber-100 px-1 rounded">./cli.py compute sharia --portfolio</code>
+            or use the <code class="bg-amber-100 px-1 rounded">investment</code> skill in Claude Code.
+          </p>
+        </div>
+        <button @click="cacheStatusDismissed = true" class="text-amber-400 hover:text-amber-600 text-lg leading-none">&times;</button>
+      </div>
+
+      <!-- Home -->
+      <div x-show="page === 'home'" x-cloak class="max-w-4xl mx-auto">
+        <!-- Centered search bar -->
+        <div class="flex justify-center mb-10">
+          <div class="w-full max-w-xl space-y-3">
+            <div class="flex gap-2 items-start">
+              <div class="flex-1 relative" x-data x-on:click.outside="symbolPickerState.home.open = false">
+                <input type="text"
+                       x-model="symbolPickerState.home.query"
+                       @focus="symbolPickerState.home.open = true"
+                       @keydown.enter.prevent="symbolPickerCommit('home')"
+                       @keydown.escape="symbolPickerState.home.open = false"
+                       placeholder="Search by symbol or company name..."
+                       class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                <div x-show="symbolPickerState.home.open && (symbolPickerState.home.query.length >= 1 || symbolPickerMatches('home').length)"
+                     x-transition
+                     class="absolute z-20 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                  <template x-for="sym in symbolPickerMatches('home').slice(0, 12)" :key="sym">
+                    <button type="button"
+                            @click="symbolPickerCommit('home', sym)"
+                            class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
+                      <span class="font-medium text-slate-800" x-text="sym"></span>
+                      <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                    </button>
+                  </template>
+                  <p x-show="symbolPickerState.home.query.length >= 1 && symbolPickerMatches('home').length === 0" class="px-4 py-3 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+                </div>
+              </div>
+              <button @click="goToStock()"
+                      class="px-6 py-3 rounded-xl bg-teal-600 text-white font-semibold text-sm hover:bg-teal-700 transition shadow-sm">
+                Open Stock
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 text-center">Same stock picker as Portfolio: search, use arrow-free suggestions, and press Enter to open the symbol.</p>
+          </div>
+        </div>
+
+        <!-- Metric cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <div class="card-glow bg-white rounded-2xl p-6 border border-slate-100 transition">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-lg">📊</div>
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Analysed</span>
+            </div>
+            <p class="text-3xl font-bold text-blue-600" x-text="counts.n_with_data ?? '—'"></p>
+            <p class="text-xs text-slate-400 mt-1">of <span class="font-semibold text-slate-500" x-text="counts.total_universe ?? '—'"></span> <span x-text="period === 'All periods' ? 'stocks screened (latest)' : 'stocks for ' + period"></span></p>
+          </div>
+          <div class="card-glow bg-white rounded-2xl p-6 border border-slate-100 transition">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-lg">✓</div>
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Sharia Compliant</span>
+            </div>
+            <p class="text-3xl font-bold text-emerald-600" x-text="counts.compliant ?? '—'"></p>
+            <p class="text-xs text-slate-400 mt-1">Pass all criteria</p>
+          </div>
+          <div class="card-glow bg-white rounded-2xl p-6 border border-slate-100 transition">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 text-lg">✕</div>
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Non-Compliant</span>
+            </div>
+            <p class="text-3xl font-bold text-rose-600" x-text="counts.non_compliant ?? '—'"></p>
+            <p class="text-xs text-slate-400 mt-1">Outside limits</p>
+          </div>
+          <div class="card-glow bg-white rounded-2xl p-6 border border-slate-100 transition">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-lg">?</div>
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Unknown</span>
+            </div>
+            <p class="text-3xl font-bold text-slate-600" x-text="counts.unknown ?? '—'"></p>
+            <p class="text-xs text-slate-400 mt-1">Insufficient data</p>
+          </div>
+        </div>
+        <!-- Compute Sharia (collapsible) -->
+        <div x-data="{ open: false }" class="bg-white rounded-2xl border border-slate-200 overflow-hidden card-glow">
+          <button @click="open = !open"
+                  class="w-full px-6 py-4 text-left font-medium text-slate-700 hover:bg-slate-50 flex justify-between items-center transition">
+            <span>Compute Sharia data</span>
+            <span class="ml-2 text-xs font-medium text-slate-400"
+                  x-show="(counts.never_screened || 0) + (counts.missing_for_period || 0) > 0"
+                  x-text="((counts.never_screened || 0) + (counts.missing_for_period || 0)) + ' missing'"></span>
+            <span class="text-slate-400" x-text="open ? '▼' : '▶'"></span>
+          </button>
+          <div x-show="open" x-collapse class="px-6 pb-6 border-t border-slate-100">
+            <template x-if="(counts.never_screened || 0) + (counts.missing_for_period || 0) > 0">
+              <div class="text-sm text-slate-600 mt-3 space-y-1">
+                <p x-show="counts.never_screened > 0">
+                  <span class="font-semibold" x-text="counts.never_screened"></span> stocks never screened.
+                </p>
+                <p x-show="counts.missing_for_period > 0">
+                  <span class="font-semibold" x-text="counts.missing_for_period"></span> screened but no data for <span x-text="period"></span>
+                  <span class="text-xs text-slate-400">(Yahoo Finance may not have this period's filings yet)</span>
+                </p>
+                <p class="text-xs text-slate-400">Each compute fetches all available periods from Yahoo Finance. Set N below (0 = all).</p>
+              </div>
+            </template>
+            <p x-show="(counts.never_screened || 0) + (counts.missing_for_period || 0) === 0" class="text-sm text-slate-600 mt-3"
+               x-text="'All ' + counts.total_universe + ' stocks screened' + (period === 'All periods' ? '.' : ' for ' + period + '.') + ' Use below to recompute / refresh.'"></p>
+            <div class="flex flex-wrap gap-4 mt-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Compute for first N symbols</label>
+                <input type="number" x-model.number="computeN" @change="saveSettings()" min="0" class="rounded-lg border border-slate-200 px-3 py-2 w-24 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Parallel workers</label>
+                <input type="number" x-model.number="computeWorkers" @change="saveSettings()" min="1" max="20" class="rounded-lg border border-slate-200 px-3 py-2 w-20 text-sm" />
+              </div>
+              <button @click="runCompute()" :disabled="computeRunning"
+                      class="self-end px-5 py-2 rounded-lg bg-rose-600 text-white font-medium text-sm hover:bg-rose-700 disabled:opacity-50 transition">
+                <span x-text="computeRunning ? 'Computing…' : 'Compute'"></span>
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 mt-2">Lower workers to 3–5 if you see 401 errors.</p>
+            <p x-show="computeMessage" class="mt-2 text-sm" :class="computeError ? 'text-rose-600' : 'text-emerald-600'" x-text="computeMessage"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Stocks -->
+      <div x-show="page === 'all_stocks'" x-cloak class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-semibold text-slate-800">All Stocks</h1>
+          <button x-show="allStocksRows.length" @click="columnModalTable = 'all_stocks'"
+                  class="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition" title="Table columns">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </button>
+        </div>
+        <p x-show="!allStocksRows.length && !loading" class="text-slate-600">No Sharia data yet. Open Compute Sharia data on Home.</p>
+        <div x-show="loading" class="text-slate-500">Loading…</div>
+        <div x-show="allStocksRows.length" class="space-y-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" x-model="tableSearchQuery" @input="applyTableSearch()"
+                   placeholder="Search across all columns…"
+                   class="flex-1 min-w-[200px] max-w-md rounded-lg border border-slate-200 px-3 py-2 text-sm placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+            <button @click="shariaFilterOn = !shariaFilterOn; applyTableSearch()"
+                    :class="['px-4 py-2 rounded-lg text-sm font-medium transition', shariaFilterOn ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200']">
+              Sharia compliant only
+            </button>
+            <!-- Quality score filter controls -->
+            <template x-if="qualityLoaded">
+              <div class="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-lg px-3 py-1.5">
+                <span class="text-xs text-violet-600 font-medium whitespace-nowrap">Min quality:</span>
+                <input type="range" x-model.number="qualityFilterMinScore" min="0" max="100" step="5"
+                       @input="applyTableSearch()" class="w-24 accent-violet-600" />
+                <span class="text-xs font-bold text-violet-700 w-8 text-center" x-text="qualityFilterMinScore || 'All'"></span>
+                <button @click="qualityFilterMinScore = 0; applyTableSearch()" x-show="qualityFilterMinScore > 0"
+                        class="text-violet-400 hover:text-violet-600 text-xs" title="Reset">✕</button>
+              </div>
+            </template>
+            <button x-show="!qualityLoaded && !qualityLoading" @click="fetchQualityScores()"
+                    class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition">
+              <span>✦</span> Load quality scores
+            </button>
+            <span x-show="qualityLoading" class="flex items-center gap-1.5 text-xs text-slate-400">
+              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              Loading scores…
+            </span>
+          </div>
+          <div id="all-stocks-table" class="rounded-xl border border-slate-200 overflow-x-auto overflow-hidden" style="min-width: 600px;"></div>
+        </div>
+
+      </div>
+
+      <!-- Per Stock Research -->
+      <div x-show="page === 'per_stock'" x-cloak class="space-y-4">
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-3 items-end flex-wrap">
+            <div class="flex-1 min-w-[240px] max-w-xl">
+              <label class="block text-xs font-medium text-slate-500 mb-1">Select symbol</label>
+              <div class="relative" x-data x-on:click.outside="symbolPickerState.per_stock.open = false">
+                <input type="text"
+                       x-model="symbolPickerState.per_stock.query"
+                       @focus="symbolPickerState.per_stock.open = true"
+                       @keydown.enter.prevent="symbolPickerCommit('per_stock')"
+                       @keydown.escape="symbolPickerState.per_stock.open = false"
+                       placeholder="Search by symbol or company name..."
+                       class="rounded-lg border border-slate-200 px-3 py-2 pr-9 text-sm w-full focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
+                <div x-show="symbolPickerState.per_stock.open && (symbolPickerState.per_stock.query.length >= 1 || symbolPickerMatches('per_stock').length)"
+                     x-transition
+                     class="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                  <template x-for="sym in symbolPickerMatches('per_stock').slice(0, 12)" :key="sym">
+                    <button type="button"
+                            @click="symbolPickerCommit('per_stock', sym)"
+                            class="w-full text-left px-3 py-2.5 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
+                      <span class="font-medium text-slate-800" x-text="sym"></span>
+                      <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                    </button>
+                  </template>
+                  <p x-show="symbolPickerState.per_stock.query.length >= 1 && symbolPickerMatches('per_stock').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+                </div>
+              </div>
+            </div>
+            <button @click="symbolPickerCommit('per_stock')" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm hover:bg-teal-700">Load Symbol</button>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <span class="text-xs font-medium text-slate-500">Selected:</span>
+            <template x-if="perStockSymbol">
+              <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 text-teal-800 px-3 py-1 text-sm font-medium border border-teal-200">
+                <span x-text="perStockSymbol"></span>
+                <button type="button" @click="clearPerStockSymbol()" class="rounded-full p-0.5 hover:bg-teal-200 text-teal-600 hover:text-teal-800" aria-label="Remove">×</button>
+              </span>
+            </template>
+            <p x-show="!perStockSymbol" class="text-slate-400 text-sm">Search above to load a symbol.</p>
+          </div>
+        </div>
+
+        <!-- Tab navigation — grouped into categories -->
+        <div class="space-y-2 pb-2 border-b border-slate-200">
+          <!-- Category: Core Data (yfinance-backed) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">Data</span>
+            <template x-for="t in ['overview','market','financials','valuation']" :key="t">
+              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
+                      x-text="perStockTabLabels[t]"></button>
+            </template>
+          </div>
+          <!-- Category: Research (web-research-backed) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">Research</span>
+            <template x-for="t in ['thesis','industry','business','management','esg','estimates','revenue','catalysts']" :key="t">
+              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
+                      x-text="perStockTabLabels[t]"></button>
+            </template>
+          </div>
+          <!-- Category: Advanced (future) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">More</span>
+            <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
+              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
+                      x-text="perStockTabLabels[t]"></button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Tab content -->
+        <div class="space-y-6">
+          <!-- Overview -->
+          <div x-show="perStockTab === 'overview'" x-cloak class="space-y-6">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2"><span class="text-slate-500">🏛</span> Company Overview</h2>
+                <button @click="fetchSectionData('overview', true)" :disabled="isSectionLoading('overview')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Refresh">↻</button>
+              </div>
+              <div x-show="isSectionLoading('overview')" class="text-slate-500 text-sm">Loading…</div>
+              <p x-show="!isSectionLoading('overview')" class="text-slate-600 text-sm leading-relaxed bg-slate-50 rounded-lg p-4" x-text="(getSectionData('overview')?.longBusinessSummary) || (perStockRow?.name ? 'Loading company description…' : 'Select a symbol to load company overview.')"></p>
+              <p x-show="getSectionData('overview')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('overview')?.error"></p>
+            </section>
+            <div class="grid md:grid-cols-2 gap-6">
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Corporate Identity</h3>
+                <dl class="space-y-2 text-sm">
+                  <div class="flex justify-between"><dt class="text-slate-500">Founded</dt><dd x-text="(getSectionData('overview')?.founded) || perStockRow?.founded || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Headquarters</dt><dd class="text-right max-w-[60%]" x-text="getSectionData('overview')?.headquarters || [getSectionData('overview')?.city, getSectionData('overview')?.state, getSectionData('overview')?.country].filter(Boolean).join(', ') || perStockRow?.headquarters || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Employees</dt><dd x-text="(getSectionData('overview')?.fullTimeEmployees != null ? getSectionData('overview').fullTimeEmployees.toLocaleString() : null) || perStockRow?.employees || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Fiscal Year End</dt><dd x-text="getSectionData('overview')?.fiscalYearEnd || perStockRow?.fiscal_year_end || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Listing</dt><dd x-text="getSectionData('overview')?.exchange || perStockRow?.listing || 'NSE'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">ISIN</dt><dd x-text="getSectionData('overview')?.isin || perStockRow?.isin || '—'"></dd></div>
+                </dl>
+              </section>
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Promoter & Ownership</h3>
+                <dl class="space-y-2 text-sm">
+                  <div class="flex justify-between"><dt class="text-slate-500">Insiders / Promoter</dt><dd x-text="getSectionData('overview')?.heldPercentInsiders != null ? (getSectionData('overview').heldPercentInsiders + '%') : (perStockRow?.promoter_holding ?? '—')"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Pledged Shares</dt><dd x-text="perStockRow?.pledged_shares ?? '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Institutional</dt><dd x-text="getSectionData('overview')?.heldPercentInstitutions != null ? (getSectionData('overview').heldPercentInstitutions + '%') : (perStockRow?.institutional ?? '—')"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Board Size</dt><dd x-text="perStockRow?.board_size ?? '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Board Independence</dt><dd x-text="perStockRow?.board_independence ?? '—'"></dd></div>
+                  <div class="flex flex-col gap-1"><dt class="text-slate-500">Top holders</dt><dd class="text-slate-600 text-xs" x-show="(getSectionData('overview')?.majorHolders || []).length"><template x-for="h in (getSectionData('overview')?.majorHolders || [])" :key="h.label"><div class="flex justify-between" x-text="h.label + ': ' + (typeof h.value === 'number' && h.value < 10 && h.value > 0 ? (h.value * 100).toFixed(2) + '%' : (typeof h.value === 'number' ? h.value.toLocaleString() : (h.value ?? '—')))"></div></template></dd><dd x-show="!(getSectionData('overview')?.majorHolders || []).length" x-text="perStockRow?.top_holders ?? '—'"></dd></div>
+                </dl>
+              </section>
+            </div>
+            <div x-show="perStockRow" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sharia Status</h3>
+              <p class="text-sm font-medium" x-text="'Sharia: ' + (perStockRow?.Sharia ?? '—')"></p>
+              <div x-show="perStockRow?.debt_to_equity_ratio != null" class="mt-4 pt-4 border-t border-slate-100">
+                <p class="text-xs font-medium text-slate-500 mb-2">Key ratios (latest period)</p>
+                <ul class="text-sm space-y-1"><li>Debt/Equity: <span x-text="perStockRow?.debt_to_equity_ratio"></span></li><li>Cash/Assets %: <span x-text="perStockRow?.cash_to_assets_pct"></span></li><li>Other Rev/Revenue %: <span x-text="perStockRow?.other_revenue_to_revenue_pct"></span></li><li>Receivables/Assets %: <span x-text="perStockRow?.receivables_to_assets_pct"></span></li></ul>
+              </div>
+            </div>
+            <div x-show="perStockPeriodRows.length" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <div class="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">All Periods</h3>
+                <button @click="columnModalTable = 'per_stock_periods'" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" title="Table columns">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+              </div>
+              <div id="per-stock-periods-table" style="min-height: 100px;"></div>
+            </div>
+          </div>
+
+          <!-- Market -->
+          <div x-show="perStockTab === 'market'" x-cloak class="space-y-6">
+            <section>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Market Data</h3>
+                <button @click="fetchSectionData('market', true)" :disabled="isSectionLoading('market')" class="text-slate-400 hover:text-slate-600 p-1 rounded text-xs" title="Refresh">↻</button>
+              </div>
+              <div x-show="isSectionLoading('market')" class="text-slate-500 text-sm mb-2">Loading…</div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.currentPrice != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').currentPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Current Price</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekHigh != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekHigh).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W High</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekLow != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekLow).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W Low</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.beta != null ? Number(getSectionData('market').beta).toFixed(2) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Beta (5Y Monthly)</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.dividendYield != null ? (getSectionData('market').dividendYield + '%') : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Dividend Yield</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.vs200DMA != null ? (getSectionData('market').vs200DMA > 0 ? '+' : '') + getSectionData('market').vs200DMA + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">VS 200 DMA</p></div>
+              </div>
+              <p x-show="getSectionData('market')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('market')?.error"></p>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Technical Positioning & Short Interest</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Short Interest %</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Days to Cover</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">IV Percentile</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 col-span-2 sm:col-span-1"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Relative Strength</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Dividend Quality & Total Shareholder Return</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Yield</h4><p class="text-sm text-slate-600" x-text="getSectionData('market')?.dividendYield != null ? getSectionData('market').dividendYield + '%' : '—'"></p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Payout Ratio</h4><p class="text-sm text-slate-600" x-text="(getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) != null ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) <= 1 ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) * 100).toFixed(1) : (getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio).toFixed(1)) + '%' : '—'"></p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Sustainability</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+              <p class="text-sm text-slate-600 mt-4">Total Capital Return Yield: <span x-text="getSectionData('market')?.dividendYield != null ? getSectionData('market').dividendYield + '%' : '—'"></span></p>
+            </section>
+          </div>
+
+          <!-- Thesis (research-backed) -->
+          <div x-show="perStockTab === 'thesis'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'thesis') fetchSectionDataIfNeeded('thesis'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Investment Thesis</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('thesis')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('thesis')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('thesis', true)" :disabled="isSectionLoading('thesis')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('thesis')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('thesis') && !isSectionLoading('thesis')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section thesis</code>
+              </div>
+              <template x-if="hasResearchData('thesis')">
+                <div>
+                  <p class="text-slate-700 mb-4" x-text="getSectionData('thesis')?.data?.summary"></p>
+                  <div x-show="getSectionData('thesis')?.data?.verdict" class="mb-4">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Verdict:</span>
+                    <span class="ml-1 font-bold" :class="{'text-emerald-600': getSectionData('thesis')?.data?.verdict === 'Buy', 'text-amber-600': getSectionData('thesis')?.data?.verdict === 'Hold', 'text-rose-600': getSectionData('thesis')?.data?.verdict === 'Sell'}" x-text="getSectionData('thesis')?.data?.verdict"></span>
+                  </div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-emerald-500">
+                      <h4 class="text-sm font-semibold text-emerald-600 mb-2">Bull Case (<span x-text="getSectionData('thesis')?.data?.bull_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-emerald-600" x-text="getSectionData('thesis')?.data?.bull_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.bull_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.bull_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-amber-500">
+                      <h4 class="text-sm font-semibold text-amber-700 mb-2">Base Case (<span x-text="getSectionData('thesis')?.data?.base_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-amber-700" x-text="getSectionData('thesis')?.data?.base_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.base_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.base_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-rose-400">
+                      <h4 class="text-sm font-semibold text-rose-600 mb-2">Bear Case (<span x-text="getSectionData('thesis')?.data?.bear_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-rose-600" x-text="getSectionData('thesis')?.data?.bear_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.bear_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.bear_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div><h4 class="text-sm font-semibold text-slate-700 mb-2">Key Drivers</h4><ul class="space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.key_drivers || [])"><li class="text-sm text-slate-600" x-text="'• ' + d"></li></template></ul></div>
+                    <div><h4 class="text-sm font-semibold text-slate-700 mb-2">Key Risks</h4><ul class="space-y-1"><template x-for="r in (getSectionData('thesis')?.data?.key_risks || [])"><li class="text-sm text-slate-600" x-text="'• ' + r"></li></template></ul></div>
+                  </div>
+                  <div x-show="getSectionData('thesis')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100">
+                    <h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4>
+                    <template x-for="s in (getSectionData('thesis')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template>
+                  </div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Financials -->
+          <div x-show="perStockTab === 'financials'" x-cloak class="space-y-6">
+            <section>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Financial Highlights</h3>
+                <button @click="fetchSectionData('financials', true)" :disabled="isSectionLoading('financials')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">↻</button>
+              </div>
+              <div x-show="isSectionLoading('financials')" class="text-slate-500 text-sm mb-2">Loading...</div>
+              <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                      <th class="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase w-1/3">Metric</th>
+                      <th class="text-right px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase w-1/4">Value</th>
+                      <th class="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <!-- Income Statement -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Income Statement</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Revenue</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.revenue != null ? finCurrencySymbol() + (getSectionData('financials').revenue / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Total income from all business activities</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Net Income</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.netIncome != null ? finCurrencySymbol() + (getSectionData('financials').netIncome / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Profit after all expenses and taxes</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Gross Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.grossMargins != null ? (getSectionData('financials').grossMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Revenue minus COGS as % of revenue</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Operating Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.operatingMargins != null ? (getSectionData('financials').operatingMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">After COGS and operating expenses, before interest/taxes</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">EBITDA Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.ebitdaMargins != null ? (getSectionData('financials').ebitdaMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Approximates operating cash profitability</td>
+                    </tr>
+                    <!-- Balance Sheet -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance Sheet</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Cash &amp; Equivalents</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalCash != null ? finCurrencySymbol() + (getSectionData('financials').totalCash / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Cash and short-term liquid assets</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Debt</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalDebt != null ? finCurrencySymbol() + (getSectionData('financials').totalDebt / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">All short-term and long-term borrowings</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Debt / Equity</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.debtToEquity != null ? getSectionData('financials').debtToEquity.toFixed(2) + 'x' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Higher = more leverage and risk</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Current Ratio</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.currentRatio != null ? getSectionData('financials').currentRatio.toFixed(2) + 'x' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">&gt;1 means can cover short-term obligations</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Working Capital</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.workingCapital != null ? finCurrencySymbol() + (getSectionData('financials').workingCapital / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Current assets minus current liabilities</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Assets</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalAssets != null ? finCurrencySymbol() + (getSectionData('financials').totalAssets / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Everything the company owns or controls</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Equity</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalEquity != null ? finCurrencySymbol() + (getSectionData('financials').totalEquity / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net book value owned by shareholders</td>
+                    </tr>
+                    <!-- Cash Flow & Returns -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Cash Flow &amp; Returns</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Operating Cash Flow</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.operatingCashFlow != null ? finCurrencySymbol() + (getSectionData('financials').operatingCashFlow / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Cash from core business operations</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Free Cash Flow</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.freeCashFlow != null ? finCurrencySymbol() + (getSectionData('financials').freeCashFlow / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Operating CF minus capital expenditures</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">CapEx</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.capitalExpenditure != null ? finCurrencySymbol() + (Math.abs(getSectionData('financials').capitalExpenditure) / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Investment in property, plant &amp; equipment</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">ROE</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.returnOnEquity != null ? (getSectionData('financials').returnOnEquity * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net income / shareholders' equity</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">ROA</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.returnOnAssets != null ? (getSectionData('financials').returnOnAssets * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net income / total assets</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p x-show="getSectionData('financials')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('financials')?.error"></p>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Return & Quality Ratios</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnEquity != null ? (getSectionData('financials').returnOnEquity * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROE<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net income ÷ shareholders' equity. Measures profitability relative to equity invested.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnCapital != null ? (getSectionData('financials').returnOnCapital * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROCE<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">EBIT ÷ capital employed. Measures how efficiently capital generates operating profit.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROIC<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net operating profit ÷ invested capital. Includes both debt and equity; a key measure of value creation.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnAssets != null ? (getSectionData('financials').returnOnAssets * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROA<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net income ÷ total assets. Measures how efficiently assets generate profit.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.grossMargins != null ? (getSectionData('financials').grossMargins * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Gross Margin<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Revenue minus cost of goods sold as % of revenue.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.operatingMargins != null ? (getSectionData('financials').operatingMargins * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">EBIT Margin<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Earnings before interest &amp; taxes as % of revenue.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Altman Z-Score<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-52 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Bankruptcy prediction model. &gt;2.99 = safe zone, 1.81–2.99 = grey zone, &lt;1.81 = distress zone.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Piotroski F-Score<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-52 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">0–9 score measuring financial strength across profitability, leverage, and efficiency. &gt;6 = strong, &lt;3 = weak.</span></span></p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Working Capital Efficiency</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">DSO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p><h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">DPO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p><h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">DIO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Working Capital Quality</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Earnings Quality</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Cash Conversion Ratio</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Sloan Accruals Ratio</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Beneish M-Score</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Normalized vs Reported EPS</h4><p class="text-sm text-slate-600">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Non-Recurring Items</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Revenue Recognition</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Tax Analysis</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><dl class="space-y-3 text-sm"><div><dt class="font-medium text-slate-700">Effective Tax Rate</dt><dd class="text-slate-600 mt-1" x-text="getSectionData('financials')?.effectiveTaxRate != null ? (getSectionData('financials').effectiveTaxRate <= 1 ? (getSectionData('financials').effectiveTaxRate * 100).toFixed(1) : getSectionData('financials').effectiveTaxRate) + '%' : '—'"></dd></div><div><dt class="font-medium text-slate-700">Statutory Tax Rate</dt><dd class="text-slate-600 mt-1">—</dd></div><div><dt class="font-medium text-slate-700">Deferred Tax Liability</dt><dd class="text-slate-600 mt-1">—</dd></div></dl></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Rate Gap Explanation</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">International Tax Notes</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Valuation -->
+          <div x-show="perStockTab === 'valuation'" x-cloak class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Trading Multiples</h3>
+                  <button @click="fetchSectionData('valuation', true)" :disabled="isSectionLoading('valuation')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">↻</button>
+                </div>
+                <div x-show="isSectionLoading('valuation')" class="text-slate-500 text-sm mb-2">Loading…</div>
+                <table class="w-full text-sm"><thead><tr class="border-b border-slate-200"><th class="text-left py-2 text-slate-500 font-medium">Metric</th><th class="text-right py-2 text-slate-500 font-medium">Value</th></tr></thead><tbody>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/E TTM</td><td class="text-right" x-text="getSectionData('valuation')?.trailingPE != null ? getSectionData('valuation').trailingPE.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/E NTM (Fwd)</td><td class="text-right" x-text="getSectionData('valuation')?.forwardPE != null ? getSectionData('valuation').forwardPE.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">EV/EBITDA</td><td class="text-right" x-text="getSectionData('valuation')?.enterpriseToEbitda != null ? getSectionData('valuation').enterpriseToEbitda.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">EV/Revenue</td><td class="text-right" x-text="getSectionData('valuation')?.enterpriseToRevenue != null ? getSectionData('valuation').enterpriseToRevenue.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/FCF TTM</td><td class="text-right" x-text="getSectionData('valuation')?.priceToFreeCashFlow != null ? getSectionData('valuation').priceToFreeCashFlow.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/S (TTM)</td><td class="text-right" x-text="getSectionData('valuation')?.priceToSalesTrailing12Months != null ? getSectionData('valuation').priceToSalesTrailing12Months.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">Price/Book</td><td class="text-right" x-text="getSectionData('valuation')?.priceToBook != null ? getSectionData('valuation').priceToBook.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">PEG Ratio</td><td class="text-right" x-text="getSectionData('valuation')?.pegRatio != null ? getSectionData('valuation').pegRatio.toFixed(1) : '—'"></td></tr>
+                  <tr><td class="py-2">Earnings Yield</td><td class="text-right text-emerald-600" x-text="getSectionData('valuation')?.earningsYield != null ? (getSectionData('valuation').earningsYield + '%') : '—'"></td></tr>
+                </tbody></table>
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-slate-700">Qualitative commentary: —</div>
+                <p class="text-xs text-slate-500 mt-2">Peers: —</p>
+                <p x-show="getSectionData('valuation')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('valuation')?.error"></p>
+              </section>
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-4">DCF - Intrinsic Value</h3>
+                <dl class="space-y-2 text-sm">
+                  <div class="flex justify-between"><dt>Current Market Price</dt><dd class="font-bold" x-text="getSectionData('valuation')?.currentPrice != null ? '₹' + Number(getSectionData('valuation').currentPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></dd></div>
+                  <div class="flex justify-between"><dt>Target Mean Price</dt><dd x-text="getSectionData('valuation')?.targetMeanPrice != null ? '₹' + Number(getSectionData('valuation').targetMeanPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></dd></div>
+                  <div class="flex justify-between"><dt>Market Cap</dt><dd x-text="getSectionData('valuation')?.marketCap != null ? (getSectionData('valuation').marketCap / 1e12).toFixed(2) + ' T' : '—'"></dd></div>
+                  <div class="flex justify-between"><dt>Enterprise Value</dt><dd x-text="getSectionData('valuation')?.enterpriseValue != null ? (getSectionData('valuation').enterpriseValue / 1e12).toFixed(2) + ' T' : '—'"></dd></div>
+                  <div class="flex justify-between"><dt>Dividend Yield</dt><dd x-text="getSectionData('valuation')?.dividendYield != null ? ((getSectionData('valuation').dividendYield <= 1 ? getSectionData('valuation').dividendYield * 100 : getSectionData('valuation').dividendYield) + '%') : '—'"></dd></div>
+                  <div class="flex justify-between"><dt>Payout Ratio</dt><dd x-text="getSectionData('valuation')?.payoutRatio != null ? (getSectionData('valuation').payoutRatio * 100).toFixed(1) + '%' : '—'"></dd></div>
+                </dl>
+                <h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">Methodology</h4>
+                <p class="text-sm text-slate-600">—</p>
+              </section>
+            </div>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Sum-of-the-Parts (SOTP) Valuation</h3>
+              <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                <table class="w-full text-sm"><thead><tr class="bg-slate-50 border-b border-slate-200"><th class="text-left py-3 px-4 font-medium text-slate-600">Segment</th><th class="text-right py-3 px-4 font-medium text-slate-600">Revenue (USD M)</th><th class="text-right py-3 px-4 font-medium text-slate-600">EBITDA (USD M)</th><th class="text-right py-3 px-4 font-medium text-slate-600">Multiple</th><th class="text-right py-3 px-4 font-medium text-slate-600">EV (USD M)</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td></tr></tbody></table>
+              </div>
+              <div class="grid md:grid-cols-3 gap-4 mt-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-2xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">SOTP Value / Share</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-2xl font-bold text-rose-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Discount / Premium to Market</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Key Assumptions</h4><ol class="text-sm text-slate-600 list-decimal list-inside space-y-1">—</ol></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Scenario Analysis</h3>
+              <p class="text-sm text-slate-600 mb-4">Prob-Weighted Target: (Bear × P<sub>bear</sub>) + (Base × P<sub>base</sub>) + (Bull × P<sub>bull</sub>) = —</p>
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-rose-400"><h4 class="text-sm font-semibold text-rose-600 mb-2">Bear Case (20% prob)</h4><p class="text-2xl font-bold text-rose-600">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-amber-500"><h4 class="text-sm font-semibold text-amber-700 mb-2">Base Case (60% prob)</h4><p class="text-2xl font-bold text-amber-700">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-emerald-500"><h4 class="text-sm font-semibold text-emerald-600 mb-2">Bull Case (20% prob)</h4><p class="text-2xl font-bold text-emerald-600">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Industry (research-backed) -->
+          <div x-show="perStockTab === 'industry'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'industry') fetchSectionDataIfNeeded('industry'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Industry Analysis</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('industry')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('industry')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('industry', true)" :disabled="isSectionLoading('industry')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('industry')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('industry') && !isSectionLoading('industry')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section industry</code>
+              </div>
+              <template x-if="hasResearchData('industry')">
+                <div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Industry</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.industry_name || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Market Size</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.market_size || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Growth Rate</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.growth_rate || '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.data?.trends?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Industry Trends</h4>
+                    <div class="space-y-2"><template x-for="t in (getSectionData('industry')?.data?.trends || [])"><div class="bg-slate-50 rounded p-3"><span class="font-medium text-sm text-slate-800" x-text="t.title"></span><p class="text-xs text-slate-600 mt-1" x-text="t.description"></p></div></template></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.data?.competitive_landscape?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Competitive Landscape</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Company</th><th class="pb-2">Market Share</th><th class="pb-2">Notes</th></tr></thead><tbody><template x-for="c in (getSectionData('industry')?.data?.competitive_landscape || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="c.company"></td><td class="py-2" x-text="c.market_share"></td><td class="py-2 text-slate-600" x-text="c.notes"></td></tr></template></tbody></table>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div x-show="getSectionData('industry')?.data?.barriers_to_entry?.length"><h4 class="text-sm font-semibold text-slate-700 mb-2">Barriers to Entry</h4><ul class="space-y-1"><template x-for="b in (getSectionData('industry')?.data?.barriers_to_entry || [])"><li class="text-sm text-slate-600" x-text="'• ' + b"></li></template></ul></div>
+                    <div x-show="getSectionData('industry')?.data?.regulatory_environment"><h4 class="text-sm font-semibold text-slate-700 mb-2">Regulatory Environment</h4><p class="text-sm text-slate-600" x-text="getSectionData('industry')?.data?.regulatory_environment"></p></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('industry')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Business (research-backed) -->
+          <div x-show="perStockTab === 'business'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'business') fetchSectionDataIfNeeded('business'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Business Model</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('business')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('business')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('business', true)" :disabled="isSectionLoading('business')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('business')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('business') && !isSectionLoading('business')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section business</code>
+              </div>
+              <template x-if="hasResearchData('business')">
+                <div>
+                  <p class="text-slate-700 mb-4" x-text="getSectionData('business')?.data?.model_summary"></p>
+                  <div class="flex items-center gap-3 mb-4">
+                    <span x-show="getSectionData('business')?.data?.moat_type" class="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700" x-text="'Moat: ' + getSectionData('business')?.data?.moat_type"></span>
+                    <span x-show="getSectionData('business')?.data?.pricing_power" class="px-3 py-1 rounded-full text-xs font-semibold" :class="{'bg-emerald-100 text-emerald-700': getSectionData('business')?.data?.pricing_power === 'High', 'bg-amber-100 text-amber-700': getSectionData('business')?.data?.pricing_power === 'Medium', 'bg-rose-100 text-rose-700': getSectionData('business')?.data?.pricing_power === 'Low'}" x-text="'Pricing Power: ' + getSectionData('business')?.data?.pricing_power"></span>
+                  </div>
+                  <div x-show="getSectionData('business')?.data?.moat_description" class="mb-4 bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-700" x-text="getSectionData('business')?.data?.moat_description"></p></div>
+                  <div x-show="getSectionData('business')?.data?.revenue_streams?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Revenue Streams</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Stream</th><th class="pb-2">% Revenue</th><th class="pb-2">Growth</th><th class="pb-2">Description</th></tr></thead><tbody><template x-for="rs in (getSectionData('business')?.data?.revenue_streams || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="rs.name"></td><td class="py-2" x-text="rs.pct_of_revenue ? rs.pct_of_revenue + '%' : '—'"></td><td class="py-2" x-text="rs.growth || '—'"></td><td class="py-2 text-slate-600" x-text="rs.description"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('business')?.data?.competitive_advantages?.length" class="mb-4"><h4 class="text-sm font-semibold text-slate-700 mb-2">Competitive Advantages</h4><ul class="space-y-1"><template x-for="a in (getSectionData('business')?.data?.competitive_advantages || [])"><li class="text-sm text-slate-600" x-text="'• ' + a"></li></template></ul></div>
+                  <p x-show="getSectionData('business')?.data?.customer_concentration" class="text-sm text-slate-600"><span class="font-medium">Customer Concentration:</span> <span x-text="getSectionData('business')?.data?.customer_concentration"></span></p>
+                  <div x-show="getSectionData('business')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('business')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Management (research-backed) -->
+          <div x-show="perStockTab === 'management'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'management') fetchSectionDataIfNeeded('management'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Management</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('management')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('management')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('management', true)" :disabled="isSectionLoading('management')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('management')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('management') && !isSectionLoading('management')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section management</code>
+              </div>
+              <template x-if="hasResearchData('management')">
+                <div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <template x-for="exec in [getSectionData('management')?.data?.ceo, getSectionData('management')?.data?.cfo].filter(Boolean)">
+                      <div class="bg-slate-50 rounded-lg p-4">
+                        <p class="text-lg font-bold text-slate-800" x-text="exec.name"></p>
+                        <p class="text-xs text-teal-600 font-semibold uppercase" x-text="exec === getSectionData('management')?.data?.ceo ? 'CEO' : 'CFO'"></p>
+                        <p x-show="exec.since" class="text-xs text-slate-500 mt-1" x-text="'Since ' + exec.since"></p>
+                        <p class="text-sm text-slate-600 mt-2" x-text="exec.background"></p>
+                        <p x-show="exec.compensation" class="text-xs text-slate-500 mt-1" x-text="'Compensation: ' + exec.compensation"></p>
+                      </div>
+                    </template>
+                  </div>
+                  <div x-show="getSectionData('management')?.data?.other_key_executives?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Other Key Executives</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Name</th><th class="pb-2">Title</th><th class="pb-2">Since</th><th class="pb-2">Background</th></tr></thead><tbody><template x-for="e in (getSectionData('management')?.data?.other_key_executives || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.name"></td><td class="py-2" x-text="e.title"></td><td class="py-2" x-text="e.since || '—'"></td><td class="py-2 text-slate-600" x-text="e.background"></td></tr></template></tbody></table>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-50 rounded-lg p-3 text-center"><p class="text-xs text-slate-500">Board Independence</p><p class="text-lg font-bold" x-text="getSectionData('management')?.data?.board_independence_pct != null ? getSectionData('management')?.data?.board_independence_pct + '%' : '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-3 text-center"><p class="text-xs text-slate-500">Insider Ownership</p><p class="text-lg font-bold" x-text="getSectionData('management')?.data?.insider_ownership_pct != null ? getSectionData('management')?.data?.insider_ownership_pct + '%' : '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('management')?.data?.track_record" class="mb-4"><h4 class="text-sm font-semibold text-slate-700 mb-2">Track Record</h4><p class="text-sm text-slate-600" x-text="getSectionData('management')?.data?.track_record"></p></div>
+                  <div x-show="getSectionData('management')?.data?.red_flags?.length" class="mb-4"><h4 class="text-sm font-semibold text-rose-600 mb-2">Red Flags</h4><ul class="space-y-1"><template x-for="f in (getSectionData('management')?.data?.red_flags || [])"><li class="text-sm text-rose-600" x-text="'• ' + f"></li></template></ul></div>
+                  <div x-show="getSectionData('management')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('management')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- ESG (research-backed) -->
+          <div x-show="perStockTab === 'esg'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'esg') fetchSectionDataIfNeeded('esg'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">ESG</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('esg')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('esg')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('esg', true)" :disabled="isSectionLoading('esg')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('esg')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('esg') && !isSectionLoading('esg')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section esg</code>
+              </div>
+              <template x-if="hasResearchData('esg')">
+                <div>
+                  <div class="flex items-center gap-4 mb-6">
+                    <div class="bg-teal-50 rounded-lg px-4 py-3 text-center"><p class="text-xs text-slate-500">Overall Rating</p><p class="text-2xl font-bold text-teal-700" x-text="getSectionData('esg')?.data?.overall_rating || '—'"></p><p class="text-xs text-slate-500" x-text="getSectionData('esg')?.data?.rating_provider || ''"></p></div>
+                  </div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <template x-for="pillar in ['environmental', 'social', 'governance']">
+                      <div class="bg-slate-50 rounded-lg p-4">
+                        <h4 class="text-sm font-semibold text-slate-700 capitalize mb-2" x-text="pillar"></h4>
+                        <p x-show="getSectionData('esg')?.data?.[pillar]?.score" class="text-lg font-bold text-slate-800 mb-2" x-text="getSectionData('esg')?.data?.[pillar]?.score"></p>
+                        <div x-show="getSectionData('esg')?.data?.[pillar]?.highlights?.length"><p class="text-xs font-semibold text-emerald-600 mb-1">Highlights</p><ul><template x-for="h in (getSectionData('esg')?.data?.[pillar]?.highlights || [])"><li class="text-xs text-slate-600" x-text="'• ' + h"></li></template></ul></div>
+                        <div x-show="getSectionData('esg')?.data?.[pillar]?.controversies?.length" class="mt-2"><p class="text-xs font-semibold text-rose-600 mb-1">Controversies</p><ul><template x-for="c in (getSectionData('esg')?.data?.[pillar]?.controversies || [])"><li class="text-xs text-rose-600" x-text="'• ' + c"></li></template></ul></div>
+                      </div>
+                    </template>
+                  </div>
+                  <div x-show="getSectionData('esg')?.data?.notable_initiatives?.length"><h4 class="text-sm font-semibold text-slate-700 mb-2">Notable Initiatives</h4><ul class="space-y-1"><template x-for="i in (getSectionData('esg')?.data?.notable_initiatives || [])"><li class="text-sm text-slate-600" x-text="'• ' + i"></li></template></ul></div>
+                  <div x-show="getSectionData('esg')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('esg')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Estimates (research-backed) -->
+          <div x-show="perStockTab === 'estimates'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'estimates') fetchSectionDataIfNeeded('estimates'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Analyst Estimates</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('estimates')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('estimates')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('estimates', true)" :disabled="isSectionLoading('estimates')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('estimates')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('estimates') && !isSectionLoading('estimates')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section estimates</code>
+              </div>
+              <template x-if="hasResearchData('estimates')">
+                <div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Consensus</p><p class="text-xl font-bold" :class="{'text-emerald-600': getSectionData('estimates')?.data?.consensus_rating === 'Buy', 'text-amber-600': getSectionData('estimates')?.data?.consensus_rating === 'Hold', 'text-rose-600': getSectionData('estimates')?.data?.consensus_rating === 'Sell'}" x-text="getSectionData('estimates')?.data?.consensus_rating || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Analysts</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('estimates')?.data?.analyst_count || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Price Target</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('estimates')?.data?.price_target?.mean || '—'"></p><p class="text-xs text-slate-500" x-text="getSectionData('estimates')?.data?.price_target ? getSectionData('estimates')?.data?.price_target?.low + ' — ' + getSectionData('estimates')?.data?.price_target?.high : ''"></p></div>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.eps_estimates?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">EPS Estimates</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Period</th><th class="pb-2">Consensus</th><th class="pb-2">Low</th><th class="pb-2">High</th></tr></thead><tbody><template x-for="e in (getSectionData('estimates')?.data?.eps_estimates || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.period"></td><td class="py-2" x-text="e.consensus"></td><td class="py-2 text-slate-500" x-text="e.low"></td><td class="py-2 text-slate-500" x-text="e.high"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.revenue_estimates?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Revenue Estimates</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Period</th><th class="pb-2">Consensus</th><th class="pb-2">Low</th><th class="pb-2">High</th></tr></thead><tbody><template x-for="e in (getSectionData('estimates')?.data?.revenue_estimates || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.period"></td><td class="py-2" x-text="e.consensus"></td><td class="py-2 text-slate-500" x-text="e.low"></td><td class="py-2 text-slate-500" x-text="e.high"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.estimate_revisions"><h4 class="text-sm font-semibold text-slate-700 mb-1">Estimate Revisions</h4><p class="text-sm text-slate-600" x-text="getSectionData('estimates')?.data?.estimate_revisions?.detail || getSectionData('estimates')?.data?.estimate_revisions?.direction"></p></div>
+                  <div x-show="getSectionData('estimates')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('estimates')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Revenue (research-backed) -->
+          <div x-show="perStockTab === 'revenue'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'revenue') fetchSectionDataIfNeeded('revenue'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Revenue Breakdown</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('revenue')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('revenue')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('revenue', true)" :disabled="isSectionLoading('revenue')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('revenue')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('revenue') && !isSectionLoading('revenue')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section revenue</code>
+              </div>
+              <template x-if="hasResearchData('revenue')">
+                <div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Total Revenue</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('revenue')?.data?.total_revenue || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Recurring Revenue</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('revenue')?.data?.recurring_pct != null ? getSectionData('revenue')?.data?.recurring_pct + '%' : '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('revenue')?.data?.by_segment?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">By Segment</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Segment</th><th class="pb-2">Revenue</th><th class="pb-2">%</th><th class="pb-2">YoY Growth</th></tr></thead><tbody><template x-for="seg in (getSectionData('revenue')?.data?.by_segment || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="seg.name"></td><td class="py-2" x-text="seg.revenue || '—'"></td><td class="py-2" x-text="seg.pct != null ? seg.pct + '%' : '—'"></td><td class="py-2" x-text="seg.yoy_growth || '—'"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('revenue')?.data?.by_geography?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">By Geography</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Region</th><th class="pb-2">Revenue</th><th class="pb-2">%</th><th class="pb-2">YoY Growth</th></tr></thead><tbody><template x-for="geo in (getSectionData('revenue')?.data?.by_geography || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="geo.region"></td><td class="py-2" x-text="geo.revenue || '—'"></td><td class="py-2" x-text="geo.pct != null ? geo.pct + '%' : '—'"></td><td class="py-2" x-text="geo.yoy_growth || '—'"></td></tr></template></tbody></table>
+                  </div>
+                  <p x-show="getSectionData('revenue')?.data?.revenue_quality" class="text-sm text-slate-600"><span class="font-medium">Revenue Quality:</span> <span x-text="getSectionData('revenue')?.data?.revenue_quality"></span></p>
+                  <div x-show="getSectionData('revenue')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('revenue')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Catalysts (research-backed) -->
+          <div x-show="perStockTab === 'catalysts'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'catalysts') fetchSectionDataIfNeeded('catalysts'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Catalysts</h2>
+                <div class="flex items-center gap-2">
+                  <span x-show="hasResearchData('catalysts')" class="text-xs text-slate-400" x-text="'Updated ' + new Date(getSectionData('catalysts')?.updated_at).toLocaleDateString()"></span>
+                  <button @click="fetchSectionData('catalysts', true)" :disabled="isSectionLoading('catalysts')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">&#8635;</button>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('catalysts')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('catalysts') && !isSectionLoading('catalysts')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section catalysts</code>
+              </div>
+              <template x-if="hasResearchData('catalysts')">
+                <div>
+                  <div x-show="getSectionData('catalysts')?.data?.upcoming?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Upcoming Events</h4>
+                    <div class="space-y-2"><template x-for="ev in (getSectionData('catalysts')?.data?.upcoming || [])">
+                      <div class="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                        <div class="text-xs text-slate-500 min-w-[80px] font-mono" x-text="ev.date || ''"></div>
+                        <div class="flex-1"><p class="text-sm font-medium text-slate-800" x-text="ev.event"></p><p class="text-xs text-slate-600 mt-1" x-text="ev.description"></p></div>
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold" :class="{'bg-rose-100 text-rose-700': ev.impact === 'High', 'bg-amber-100 text-amber-700': ev.impact === 'Medium', 'bg-slate-200 text-slate-600': ev.impact === 'Low'}" x-text="ev.impact"></span>
+                      </div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.data?.recent?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Recent Events</h4>
+                    <div class="space-y-2"><template x-for="ev in (getSectionData('catalysts')?.data?.recent || [])">
+                      <div class="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                        <div class="text-xs text-slate-500 min-w-[80px] font-mono" x-text="ev.date || ''"></div>
+                        <div class="flex-1"><p class="text-sm font-medium text-slate-800" x-text="ev.event"></p><p class="text-xs text-slate-600 mt-1" x-text="ev.description"></p></div>
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold" :class="{'bg-rose-100 text-rose-700': ev.impact === 'High', 'bg-amber-100 text-amber-700': ev.impact === 'Medium', 'bg-slate-200 text-slate-600': ev.impact === 'Low'}" x-text="ev.impact"></span>
+                      </div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.data?.long_term?.length">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Long-Term Catalysts</h4>
+                    <div class="space-y-2"><template x-for="cat in (getSectionData('catalysts')?.data?.long_term || [])">
+                      <div class="bg-slate-50 rounded-lg p-3"><p class="text-sm font-medium text-slate-800" x-text="cat.catalyst"></p><p class="text-xs text-slate-500" x-text="cat.timeframe"></p><p class="text-xs text-slate-600 mt-1" x-text="cat.description"></p></div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('catalysts')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Remaining placeholder tabs (M&A, Value, FAQ, Credit, Geo/FX, Capital, Forensic, IP & R&D, Supply Chain) -->
+          <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
+            <div x-show="perStockTab === t" x-cloak>
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4" x-text="perStockTabLabels[t]"></h3>
+                <p class="text-slate-500 text-sm">Placeholder for <span x-text="perStockTabLabels[t]"></span>. API data coming soon.</p>
+              </section>
+            </div>
+          </template>
+        </div>
+
+        <p x-show="page === 'per_stock' && !perStockRow && !loading && perStockSymbol" class="text-slate-500">Load Sharia data for this symbol to see overview.</p>
+      </div>
+
+      <!-- Stock Comparison -->
+      <div x-show="page === 'comparison'" x-cloak class="space-y-4">
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-3 items-end flex-wrap">
+            <div class="flex-1 max-w-md">
+              <label class="block text-xs font-medium text-slate-500 mb-1">Add stocks to compare</label>
+              <div class="relative" x-data x-on:click.outside="symbolPickerState.comparison.open = false">
+                <input type="text"
+                       x-model="symbolPickerState.comparison.query"
+                       @focus="symbolPickerState.comparison.open = true"
+                       @keydown.enter.prevent="symbolPickerCommit('comparison')"
+                       @keydown.escape="symbolPickerState.comparison.open = false"
+                       placeholder="Search by symbol or name..."
+                       class="rounded-lg border border-slate-200 px-3 py-2 pr-9 text-sm w-full focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
+                <div x-show="symbolPickerState.comparison.open && (symbolPickerState.comparison.query.length >= 1 || symbolPickerMatches('comparison').length)"
+                     x-transition
+                     class="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                  <template x-for="sym in symbolPickerMatches('comparison').slice(0, 12)" :key="sym">
+                    <button type="button"
+                            @click="symbolPickerCommit('comparison', sym)"
+                            class="w-full text-left px-3 py-2.5 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
+                      <span class="font-medium text-slate-800" x-text="sym"></span>
+                      <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                    </button>
+                  </template>
+                  <p x-show="symbolPickerState.comparison.query.length >= 1 && symbolPickerMatches('comparison').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches. Press Enter to add as-is.</p>
+                </div>
+              </div>
+            </div>
+            <button @click="fetchCompare()" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm hover:bg-teal-700">Compare</button>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            <span class="text-xs font-medium text-slate-500">Selected:</span>
+            <template x-for="sym in compareSymbolsList" :key="sym">
+              <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 text-teal-800 px-3 py-1 text-sm font-medium border border-teal-200">
+                <span x-text="sym"></span>
+                <button type="button" @click="removeCompareSymbol(sym)" class="rounded-full p-0.5 hover:bg-teal-200 text-teal-600 hover:text-teal-800" aria-label="Remove">×</button>
+              </span>
+            </template>
+            <p x-show="!compareSymbolsList.length" class="text-slate-400 text-sm">No symbols yet. Search above to add up to 10.</p>
+          </div>
+        </div>
+        <div x-show="compareRows.length" class="space-y-2">
+          <div class="flex justify-end">
+            <button @click="columnModalTable = 'compare'" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition" title="Table columns">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+          </div>
+          <div id="compare-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 200px;"></div>
+        </div>
+        <p x-show="page === 'comparison' && !compareRows.length && !loading" class="text-slate-500">Select symbols to compare.</p>
+      </div>
+
+      <!-- Portfolio -->
+      <div x-show="page === 'portfolio'" x-cloak class="space-y-6">
+        <h1 class="text-xl font-semibold text-slate-800">Portfolio</h1>
+
+        <!-- Section 1: Holdings Builder -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 class="text-lg font-semibold text-slate-800">Holdings</h2>
+              <p class="text-sm text-slate-500 mt-0.5">Your current holdings. <span class="text-slate-400">Avg buy price is optional — enables P&L and cost-basis analysis.</span></p>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <button @click="computePortfolioAll(false)" :disabled="computeRunning || !personalIndexInputRows.length"
+                      title="Fetch missing/outdated Sharia periods from Yahoo Finance"
+                      class="px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-medium hover:bg-teal-700 disabled:opacity-50 transition">
+                <span x-show="!computeRunning">Update Sharia Data</span><span x-show="computeRunning">Fetching…</span>
+              </button>
+              <button @click="computePortfolioAll(true)" :disabled="computeRunning || !personalIndexInputRows.length"
+                      title="Re-fetch all periods from Yahoo Finance even if cached"
+                      class="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 disabled:opacity-50 transition">
+                <span x-show="!computeRunning">Force Refresh</span><span x-show="computeRunning">Fetching…</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add holding bar — outside overflow-hidden so the dropdown is never clipped -->
+          <div class="px-6 py-3 border-b border-slate-100 flex flex-wrap items-center gap-2">
+            <div class="flex-1 relative min-w-[220px] max-w-[340px]" x-data x-on:click.outside="symbolPickerState.portfolio.open = false">
+              <input type="text"
+                     x-model="symbolPickerState.portfolio.query"
+                     @focus="symbolPickerState.portfolio.open = true"
+                     @keydown.enter.prevent="symbolPickerCommit('portfolio')"
+                     @keydown.escape="symbolPickerState.portfolio.open = false"
+                     placeholder="Search by symbol or company name..."
+                     class="w-full rounded-lg border border-slate-200 px-3 py-2 pr-9 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+              <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
+              <div x-show="symbolPickerState.portfolio.open && (symbolPickerState.portfolio.query.length >= 1 || symbolPickerMatches('portfolio').length)"
+                   x-transition
+                   class="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                <template x-for="sym in symbolPickerMatches('portfolio').slice(0, 12)" :key="sym">
+                  <button type="button"
+                          @click="symbolPickerCommit('portfolio', sym)"
+                          class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
+                    <span class="font-medium text-slate-800" x-text="sym"></span>
+                    <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                  </button>
+                </template>
+                <p x-show="symbolPickerState.portfolio.query.length >= 1 && symbolPickerMatches('portfolio').length === 0"
+                   class="px-4 py-3 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+              </div>
+            </div>
+            <input type="number" x-model.number="holdingDraftUnits" min="0" step="0.0001" placeholder="Units"
+                   class="w-24 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500" />
+            <input type="number" x-model.number="holdingDraftAvgPrice" min="0" step="0.01" placeholder="Avg buy price (opt.)"
+                   class="w-44 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500" />
+            <button @click="addHoldingRow()"
+                    class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition">
+              + Add
+            </button>
+          </div>
+
+          <!-- Holdings table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[900px]">
+              <thead>
+                <tr class="border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th class="text-left px-4 py-2.5">Symbol</th>
+                  <th class="text-right px-4 py-2.5">Units</th>
+                  <th class="text-right px-4 py-2.5">Avg Buy Price <span class="text-slate-400 normal-case font-normal">(opt.)</span></th>
+                  <th class="text-right px-4 py-2.5">Current Price</th>
+                  <th class="text-right px-4 py-2.5">Current Value</th>
+                  <th class="text-right px-4 py-2.5">Cost Basis</th>
+                  <th class="text-right px-4 py-2.5">Unrealised P&L</th>
+                  <th class="text-right px-4 py-2.5">Weight</th>
+                  <th class="text-center px-4 py-2.5">Sharia</th>
+                  <th class="px-2 py-2.5"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <template x-for="(row, idx) in personalIndexInputRows" :key="row.symbol + '-' + idx">
+                  <tr class="hover:bg-slate-50/60 transition">
+                    <td class="px-4 py-2.5 min-w-[120px]">
+                      <p class="font-medium text-slate-800" x-text="row.symbol"></p>
+                      <p class="text-xs text-slate-400 truncate max-w-[150px]" x-text="symbolOptionSecondaryLabel(row.symbol)"></p>
+                    </td>
+                    <td class="px-4 py-2.5 text-right">
+                      <input type="number" min="0" step="0.0001"
+                             :value="row.units"
+                             @change="updatePersonalIndexHolding(idx, 'units', $event.target.value)"
+                             class="w-24 text-right rounded-lg border border-slate-200 px-2 py-1 text-sm focus:ring-1 focus:ring-teal-500 focus:border-teal-500" />
+                    </td>
+                    <td class="px-4 py-2.5 text-right">
+                      <input type="number" min="0" step="0.01"
+                             :value="row.price || ''"
+                             @change="updatePersonalIndexHolding(idx, 'price', $event.target.value)"
+                             class="w-28 text-right rounded-lg border border-slate-200 px-2 py-1 text-sm focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                             placeholder="—" />
+                    </td>
+                    <td class="px-4 py-2.5 text-right text-slate-600"
+                        x-text="holdingCurrentPrice(row.symbol) != null ? '₹' + holdingCurrentPrice(row.symbol).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></td>
+                    <td class="px-4 py-2.5 text-right font-medium text-slate-800"
+                        x-text="holdingCurrentValue(row) != null ? '₹' + holdingCurrentValue(row).toLocaleString(undefined,{maximumFractionDigits:0}) : '—'"></td>
+                    <td class="px-4 py-2.5 text-right text-slate-500"
+                        x-text="holdingCostBasis(row) != null ? '₹' + holdingCostBasis(row).toLocaleString(undefined,{maximumFractionDigits:0}) : '—'"></td>
+                    <td class="px-4 py-2.5 text-right">
+                      <template x-if="holdingPnL(row) != null">
+                        <span :class="holdingPnL(row) >= 0 ? 'text-emerald-600 font-medium' : 'text-rose-600 font-medium'"
+                              x-text="(holdingPnL(row) >= 0 ? '+' : '') + '₹' + Math.abs(holdingPnL(row)).toLocaleString(undefined,{maximumFractionDigits:0}) + ' (' + holdingPnLPct(row) + ')'">
+                        </span>
+                      </template>
+                      <span x-show="holdingPnL(row) == null" class="text-slate-400">—</span>
+                    </td>
+                    <td class="px-4 py-2.5 text-right text-slate-500" x-text="holdingWeight(row)"></td>
+                    <td class="px-4 py-2.5 text-center">
+                      <span class="text-xs px-2 py-0.5 rounded-full"
+                            :class="holdingSharia(row.symbol) === 'Yes' ? 'bg-emerald-100 text-emerald-700' : holdingSharia(row.symbol) === 'No' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500'"
+                            x-text="holdingSharia(row.symbol) || '—'"></span>
+                    </td>
+                    <td class="px-2 py-2.5">
+                      <button @click="removePersonalIndexHolding(idx)" title="Remove"
+                              class="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+
+              </tbody>
+            </table>
+            <div x-show="!personalIndexInputRows.length" class="px-6 py-10 text-center text-sm text-slate-400">
+              No holdings yet — search for a symbol in the bar above and click + Add.
+            </div>
+          </div>
+
+          <!-- Totals footer -->
+          <div x-show="personalIndexInputRows.length" class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex flex-wrap gap-5 text-sm">
+            <span class="text-slate-500"><span class="font-semibold text-slate-700" x-text="personalIndexInputRows.length"></span> holdings</span>
+            <span x-show="portfolioTotalCurrentValue() > 0" class="text-slate-500">
+              Current value: <span class="font-semibold text-slate-700" x-text="'₹' + portfolioTotalCurrentValue().toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+            </span>
+            <span x-show="portfolioTotalCostBasis() > 0" class="text-slate-500">
+              Cost basis: <span class="font-semibold text-slate-700" x-text="'₹' + portfolioTotalCostBasis().toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+            </span>
+            <span x-show="portfolioTotalPnL() != null">
+              Total P&L:
+              <span :class="portfolioTotalPnL() >= 0 ? 'font-semibold text-emerald-600' : 'font-semibold text-rose-600'"
+                    x-text="(portfolioTotalPnL() >= 0 ? '+' : '') + '₹' + Math.abs(portfolioTotalPnL()).toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+            </span>
+            <span x-show="portfolioMissing.length" class="text-amber-600">
+              No Sharia data for: <span x-text="portfolioMissing.join(', ')"></span>
+              <button @click="computePortfolioMissing()" :disabled="computeRunning" class="ml-1 text-xs underline hover:no-underline disabled:opacity-50">Fetch now</button>
+            </span>
+          </div>
+        </section>
+
+        <!-- Section 2: Portfolio Period Snapshot -->
+        <section x-show="portfolioPivot.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-800">Period Snapshot</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Sharia compliance across all cached reporting periods for your holdings</p>
+          </div>
+          <div class="p-4">
+            <div id="portfolio-pivot-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 200px;"></div>
+          </div>
+        </section>
+        <!-- Section 3: Personal Sharia Index Analysis -->
+        <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-semibold text-slate-800">Sharia Index Analysis</h2>
+              <p class="text-sm text-slate-500 mt-1">Benchmark your holdings against a Sharia-filtered index. Default mode avoids selling compliant names and uses new money to rebalance.</p>
+            </div>
+            <!-- Two analysis mode buttons -->
+            <div class="flex flex-col gap-2 items-end">
+              <div class="flex gap-2 flex-wrap justify-end">
+                <button @click="analyzePersonalIndex(true, 'units')" :disabled="personalIndexLoading || !personalIndexInputRows.length"
+                        title="Weights by live market prices — ignores avg buy price"
+                        class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 disabled:opacity-50 transition">
+                  <span x-show="!personalIndexLoading">Analyse by Market Value</span>
+                  <span x-show="personalIndexLoading">Analysing…</span>
+                </button>
+                <button @click="analyzePersonalIndex(true, 'cost_basis')"
+                        :disabled="personalIndexLoading || !personalIndexInputRows.length || !personalIndexInputRows.some(r => r.price > 0)"
+                        title="Weights by your avg buy price (cost basis) — requires at least one avg price"
+                        class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-40 transition">
+                  <span x-show="!personalIndexLoading">Analyse by Cost Basis</span>
+                  <span x-show="personalIndexLoading">Analysing…</span>
+                </button>
+              </div>
+              <p class="text-xs text-slate-400 text-right">
+                Cost basis uses your avg buy price to weight holdings.
+                <span x-show="!personalIndexInputRows.some(r => r.price > 0)" class="text-amber-500"> Add avg buy price to at least one holding to enable.</span>
+              </p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Benchmark</label>
+              <select x-model="personalIndexBenchmark" @change="saveSettings()"
+                      class="rounded-lg border border-slate-200 px-3 py-2 text-sm w-full">
+                <template x-for="b in (personalIndexOptions.benchmarks || [])" :key="b.id">
+                  <option :value="b.id" x-text="b.name"></option>
+                </template>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">New SIP / Cash to Deploy (₹)</label>
+              <input type="number" min="0" step="100"
+                     x-model.number="personalIndexSipAmount"
+                     @change="saveSettings()"
+                     class="rounded-lg border border-slate-200 px-3 py-2 text-sm w-full"
+                     placeholder="0" />
+            </div>
+            <div class="flex items-end">
+              <label class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 w-full cursor-pointer">
+                <input type="checkbox" x-model="personalIndexStrictNoSell" @change="saveSettings()" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500" />
+                <span>No-sell mode: only exit non-Sharia holdings</span>
+              </label>
+            </div>
+          </div>
+          <p x-show="personalIndexError" class="text-sm text-rose-600" x-text="personalIndexError"></p>
+          <template x-if="personalIndexSummary">
+            <div class="space-y-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Value</p>
+                  <p class="mt-2 text-2xl font-bold text-slate-800" x-text="fmtMoney(personalIndexSummary.total_value)"></p>
+                </div>
+                <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Compliant Holdings</p>
+                  <p class="mt-2 text-2xl font-bold text-emerald-700" x-text="personalIndexSummary.compliant_count ?? '—'"></p>
+                  <p class="text-xs text-emerald-700 mt-1" x-text="'Value: ' + fmtPct(personalIndexSummary.sharia_compliant_value_pct)"></p>
+                </div>
+                <div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-rose-700">Non-Sharia Holdings</p>
+                  <p class="mt-2 text-2xl font-bold text-rose-700" x-text="personalIndexSummary.non_compliant_count ?? '—'"></p>
+                  <p class="text-xs text-rose-700 mt-1" x-text="'Value: ' + fmtPct(personalIndexSummary.non_sharia_value_pct)"></p>
+                </div>
+                <div class="rounded-xl border border-teal-200 bg-teal-50 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-teal-700">Benchmark Aligned</p>
+                  <p class="mt-2 text-2xl font-bold text-teal-700" x-text="fmtPct(personalIndexSummary.benchmark_aligned_value_pct)"></p>
+                  <p class="text-xs text-teal-700 mt-1" x-text="personalIndexSummary.benchmark || '—'"></p>
+                </div>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-sm font-medium text-slate-800" x-text="personalIndexSummary.guidance"></p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Weight method:
+                  <span x-text="personalIndexSummary.benchmark_weight_method || 'proxy_market_cap'"></span>
+                  <span x-show="personalIndexBenchmarkMeta?.as_of"> • benchmark snapshot as of <span x-text="personalIndexBenchmarkMeta?.as_of"></span></span>
+                </p>
+              </div>
+              <div x-show="personalIndexMissingSymbols.length || personalIndexMissingPrices.length" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 space-y-1">
+                <p x-show="personalIndexMissingSymbols.length">Symbols not found in cache: <span x-text="personalIndexMissingSymbols.join(', ')"></span></p>
+                <p x-show="personalIndexMissingPrices.length">Prices unavailable for: <span x-text="personalIndexMissingPrices.join(', ')"></span></p>
+              </div>
+              <div x-show="personalIndexHoldingsRows.length" class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <div><h3 class="text-sm font-semibold text-slate-700">Holdings Analysis</h3><span class="text-xs text-slate-400">Current compliance, benchmark fit, and suggested action</span></div>
+                  <button @click="columnModalTable = 'personal_index_holdings'" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" title="Table columns"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+                </div>
+                <div id="personal-index-holdings-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 220px;"></div>
+              </div>
+              <div x-show="personalIndexBuyPlan.length" class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <div><h3 class="text-sm font-semibold text-slate-700">Rebalance Buy Plan</h3><span class="text-xs text-slate-400">Fresh money only; dip candidates are prioritized</span></div>
+                  <button @click="columnModalTable = 'personal_index_buy_plan'" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" title="Table columns"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+                </div>
+                <div id="personal-index-buy-plan-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 220px;"></div>
+              </div>
+              <div x-show="personalIndexSellPlan.length" class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <div><h3 class="text-sm font-semibold text-slate-700">Exit Candidates</h3><span class="text-xs text-slate-400">Only populated when holdings are currently non-Sharia</span></div>
+                  <button @click="columnModalTable = 'personal_index_sell_plan'" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" title="Table columns"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+                </div>
+                <div id="personal-index-sell-plan-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 140px;"></div>
+              </div>
+            </div>
+          </template>
+        </section>
+      </div>
+
+      <!-- Watchlist -->
+      <div x-show="page === 'watchlist'" x-cloak class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-semibold text-slate-800">Watchlist</h1>
+          <button x-show="watchlistRows.length" @click="columnModalTable = 'watchlist'" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition" title="Table columns">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </button>
+        </div>
+        <div class="flex gap-2 items-end">
+          <div class="flex-1 max-w-md">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Add symbols (comma-separated)</label>
+            <input type="text" x-model="watchlistText" @change="saveSettings(); fetchWatchlist()" placeholder="TCS, INFY, RELIANCE" class="rounded-lg border border-slate-200 px-3 py-2 text-sm w-full" />
+          </div>
+          <button @click="fetchWatchlist()" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm hover:bg-teal-700">Update</button>
+        </div>
+        <div x-show="watchlistRows.length" id="watchlist-table" class="rounded-xl border border-slate-200 overflow-hidden" style="min-height: 300px;"></div>
+        <p x-show="page === 'watchlist' && !watchlistRows.length && !loading" class="text-slate-500">Add symbols to track.</p>
+      </div>
+
+      <!-- Mobile nav (when sidebar hidden) -->
+      <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-2 flex gap-1 overflow-x-auto z-10">
+        <template x-for="(label, id) in navCards" :key="id">
+          <a :href="'#' + id" @click.prevent="go(id)"
+             :class="['flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition', page === id ? 'bg-teal-100 text-teal-700' : 'text-slate-600 hover:bg-slate-100']"
+             x-text="label"></a>
+        </template>
+      </div>
+      <div class="h-16 md:hidden"></div>
+
+      <!-- Reusable Column Selection Modal (shared by all tables) -->
+      <div x-show="columnModalTable" x-cloak
+           class="fixed inset-0 z-50 flex items-center justify-center p-4"
+           x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+           x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div @click.self="columnModalTable = null" class="absolute inset-0 bg-slate-900/50"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col"
+             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Table columns</h2>
+            <button @click="columnModalTable = null" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">✕</button>
+          </div>
+          <div class="px-6 py-4 overflow-y-auto flex-1">
+            <p class="text-sm text-slate-500 mb-4">Show or hide columns in the table below.</p>
+            <div class="space-y-2">
+              <template x-for="col in getColumnDefs(columnModalTable)" :key="col.field">
+                <label class="flex items-center gap-3 cursor-pointer py-2 px-3 rounded-lg hover:bg-slate-50 group">
+                  <input type="checkbox"
+                         :checked="(tableColumns[columnModalTable] || {})[col.field] !== false"
+                         @change="toggleTableColumn(columnModalTable, col.field)"
+                         class="rounded border-slate-300 text-teal-600 focus:ring-teal-500 flex-shrink-0" />
+                  <span class="text-sm text-slate-700" x-text="col.title"></span>
+                </label>
+              </template>
+            </div>
+          </div>
+          <div class="px-6 py-4 border-t border-slate-200 flex justify-end">
+            <button @click="columnModalTable = null" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700">Done</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const API = '/api';
+
+    function app() {
+      return {
+        page: 'home',
+        period: '31st March 2025',
+        market: 'india',
+        reportPeriods: ['All periods', '31st March 2025'],
+        counts: {},
+        tickers: [],
+        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Per Stock Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', watchlist: 'Watchlist' },
+        tabulators: {},
+        loading: false,
+        allStocksRows: [],
+        shariaFilterOn: false,
+        qualityFilterMinScore: 0,
+        qualityLoaded: false,
+        qualityLoading: false,
+        perStockQuality: null,
+        perStockQualityLoading: false,
+        perStockSymbol: '',
+        perStockRow: null,
+        perStockPeriodRows: [],
+        perStockTab: 'overview',
+        perStockTabs: ['overview', 'market', 'thesis', 'financials', 'valuation', 'industry', 'business', 'management', 'esg', 'ma', 'value', 'faq', 'credit', 'estimates', 'revenue', 'geofx', 'capital', 'forensic', 'iprd', 'supply_chain', 'catalysts'],
+        perStockTabLabels: { overview: 'Overview', market: 'Market', thesis: 'Thesis', financials: 'Financials', valuation: 'Valuation', industry: 'Industry', business: 'Business', management: 'Management', esg: 'ESG', ma: 'M&A', value: 'Value', faq: 'FAQ', credit: 'Credit', estimates: 'Estimates', revenue: 'Revenue', geofx: 'Geo/FX', capital: 'Capital', forensic: 'Forensic', iprd: 'IP & R&D', supply_chain: 'Supply Chain', catalysts: 'Catalysts' },
+        perStockSectionData: {},
+        perStockSectionLoading: {},
+        yfSections: ['overview', 'market', 'financials', 'valuation'],
+        researchSections: ['thesis', 'industry', 'business', 'management', 'esg', 'estimates', 'revenue', 'catalysts'],
+        compareSymbolsText: '',
+        compareSymbolsList: [],
+        compareRows: [],
+        portfolioPivot: [],
+        portfolioRows: [],
+        portfolioRowsBySymbol: {},
+        portfolioMissing: [],
+        portfolioOptions: { symbols: [], labels: {} },
+        symbolPickerState: {
+          home: { query: '', open: false },
+          per_stock: { query: '', open: false },
+          comparison: { query: '', open: false },
+          portfolio: { query: '', open: false },
+          personal_index: { query: '', open: false }
+        },
+        personalIndexHoldingsText: 'TCS 10\nINFY 8\nHCLTECH 6',
+        personalIndexInputRows: [],
+        holdingDraftUnits: 1,
+        holdingDraftAvgPrice: '',
+        personalIndexBenchmark: 'nifty50',
+        personalIndexSipAmount: 0,
+        personalIndexStrictNoSell: true,
+        personalIndexOptions: { benchmarks: [], notes: [], example_lines: [] },
+        personalIndexSummary: null,
+        personalIndexBenchmarkMeta: null,
+        personalIndexHoldingsRows: [],
+        personalIndexBuyPlan: [],
+        personalIndexSellPlan: [],
+        personalIndexMissingSymbols: [],
+        personalIndexMissingPrices: [],
+        personalIndexLoading: false,
+        personalIndexError: '',
+        watchlistText: '',
+        watchlistRows: [],
+        tableColumns: {},
+        columnModalTable: null,
+        tableSearchQuery: '',
+        symbolsMissing: { symbols: [], total_missing: 0 },
+        computeN: 50,
+        computeWorkers: 5,
+        computeRunning: false,
+        computeMessage: '',
+        computeError: false,
+        cacheStatus: null,
+        cacheStatusDismissed: false,
+        darkMode: false,
+
+        toggleDarkMode() {
+          this.darkMode = !this.darkMode;
+          document.documentElement.classList.toggle('dark', this.darkMode);
+          localStorage.setItem('darkMode', this.darkMode ? '1' : '0');
+        },
+
+        async init() {
+          const saved = localStorage.getItem('darkMode');
+          this.darkMode = saved ? saved === '1' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', this.darkMode);
+          const hash = (location.hash || '#home').slice(1);
+          if (hash === 'sharia') { location.hash = 'all_stocks'; this.page = 'all_stocks'; }
+          else this.page = hash in this.navCards ? hash : 'home';
+          window.addEventListener('hashchange', () => {
+            const h = (location.hash || '#home').slice(1);
+            if (h === 'sharia') { location.hash = 'all_stocks'; this.page = 'all_stocks'; }
+            else this.page = h in this.navCards ? h : 'home';
+            this.onPageChange();
+          });
+          await this.fetchSettings();
+          await this.fetchReportPeriods();
+          await this.fetchUniverse();
+          await this.fetchSymbolOptions();
+          await this.fetchCounts();
+          await this.fetchSymbolsMissing();
+          await this.fetchCacheStatus();
+          this.onPageChange();
+        },
+        async fetchSettings() {
+          try {
+            const r = await fetch(API + '/settings').then(x => x.json());
+            if (r.period) this.period = r.period;
+            if (r.market) this.market = r.market;
+            if (r.portfolioSymbolsText != null) {
+              this.portfolioSymbolsText = r.portfolioSymbolsText;
+            }
+            if (r.compareSymbolsText != null) {
+              this.compareSymbolsText = r.compareSymbolsText;
+              this.compareSymbolsList = this.parseSymbolsText(r.compareSymbolsText).slice(0, 10);
+            }
+            if (r.watchlistText != null) this.watchlistText = r.watchlistText;
+            if (r.personalIndexHoldingsText != null) this.personalIndexHoldingsText = r.personalIndexHoldingsText;
+            if (r.personalIndexBenchmark != null) this.personalIndexBenchmark = r.personalIndexBenchmark;
+            if (r.personalIndexSipAmount != null) this.personalIndexSipAmount = r.personalIndexSipAmount;
+            if (r.personalIndexStrictNoSell != null) this.personalIndexStrictNoSell = r.personalIndexStrictNoSell;
+            if (r.tableColumns && Object.keys(r.tableColumns).length) this.tableColumns = r.tableColumns;
+            else if (r.shariaVisibleColumns && Object.keys(r.shariaVisibleColumns).length) this.tableColumns = { all_stocks: r.shariaVisibleColumns };
+            if (r.computeN != null) this.computeN = r.computeN;
+            if (r.computeWorkers != null) this.computeWorkers = r.computeWorkers;
+          } catch (_) {}
+          this.syncPersonalIndexRowsFromText();
+        },
+        async saveSettings() {
+          try {
+            await fetch(API + '/settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                tableColumns: this.tableColumns,
+                period: this.period,
+                market: this.market,
+                compareSymbolsText: this.compareSymbolsText,
+                watchlistText: this.watchlistText,
+                personalIndexHoldingsText: this.personalIndexHoldingsText,
+                personalIndexBenchmark: this.personalIndexBenchmark,
+                personalIndexSipAmount: this.personalIndexSipAmount,
+                personalIndexStrictNoSell: this.personalIndexStrictNoSell,
+                computeN: this.computeN,
+                computeWorkers: this.computeWorkers
+              })
+            });
+          } catch (_) {}
+        },
+        go(id) { location.hash = id; this.page = id; this.onPageChange(); },
+        destroyTabulator(key) {
+          if (this.tabulators[key]) { this.tabulators[key].destroy(); delete this.tabulators[key]; }
+        },
+        destroyAllTabulators() {
+          Object.keys(this.tabulators).forEach(k => this.destroyTabulator(k));
+        },
+        buildColumns(data, opts = {}) {
+          if (!data || !data[0]) return [];
+          const { visibleColumns = null, minWidth = 100, columnOrder = null } = opts;
+          const numericFields = ['total_assets', 'cash_and_short_term_investments', 'total_receivables', 'other_revenue', 'total_revenue', 'debt_to_equity_ratio', 'cash_to_assets_pct', 'other_revenue_to_revenue_pct', 'receivables_to_assets_pct', 'market_cap', 'units', 'price_override', 'current_price', 'value', 'current_weight', 'benchmark_target_weight', 'weight_gap', 'allocation_share', 'invest_amount', 'suggested_units', 'vs200DMA', 'total_score', 'profitability_score', 'cash_generation_score', 'financial_strength_score', 'valuation_score', 'peg_ratio', 'roe', 'operating_margin', 'gross_margin', 'fcf_conversion', 'debt_to_equity', 'current_ratio', 'trailing_pe', 'forward_pe'];
+          let fields = columnOrder || Object.keys(data[0]);
+          if (visibleColumns) fields = fields.filter(f => visibleColumns[f] !== false);
+          return fields.map(field => {
+            const sample = data[0][field];
+            const isNum = numericFields.includes(field) || (typeof sample === 'number' && !isNaN(sample));
+            return {
+              title: field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              field,
+              minWidth,
+              sorter: isNum ? 'number' : 'string',
+              headerFilter: false,
+              formatter: isNum ? (cell) => { const v = cell.getValue(); if (v == null || v === '') return '—'; return typeof v === 'number' ? v.toLocaleString(undefined, { maximumFractionDigits: 2 }) : v; } : undefined
+            };
+          });
+        },
+        initTable(key, elId, data, opts = {}) {
+          this.destroyTabulator(key);
+          const el = document.getElementById(elId);
+          if (!el || !data || !data.length) return;
+          const { visibleColumns = null, minWidth = 120, columnOrder = null } = opts;
+          const columns = this.buildColumns(data, { visibleColumns, minWidth, columnOrder });
+          const tab = new Tabulator(el, {
+            data,
+            columns,
+            layout: 'fitColumns',
+            pagination: true,
+            paginationSize: 25,
+            paginationSizeSelector: [10, 25, 50, 100, 500],
+            maxHeight: '500px',
+            ...opts
+          });
+          this.tabulators[key] = tab;
+          this.$nextTick(() => this.applyTableSearch());
+        },
+        applyTableSearch() {
+          if (this.page !== 'all_stocks') return;
+          const tab = this.tabulators.all_stocks;
+          if (!tab) return;
+          const q = (this.tableSearchQuery || '').toLowerCase().trim();
+          const shariaOnly = !!this.shariaFilterOn;
+          const minScore = this.qualityFilterMinScore || 0;
+          if (!q && !shariaOnly && !minScore) { tab.clearFilter(); return; }
+          tab.setFilter(function(data) {
+            if (shariaOnly && (data.Sharia || data.sharia) !== 'Yes') return false;
+            if (minScore > 0 && (data.total_score == null || data.total_score < minScore)) return false;
+            if (!q) return true;
+            return Object.values(data).some(v => String(v ?? '').toLowerCase().includes(q));
+          });
+        },
+        onPageChange() {
+          this.destroyAllTabulators();
+          if (this.page === 'all_stocks') this.fetchAllStocks();
+          else if (this.page === 'per_stock') {
+            this.perStockTab = 'overview';
+            if (!this.perStockSymbol) this.perStockSymbol = this.symbolSearchUniverse()[0] || this.tickers[0] || '';
+            this.fetchPerStock();
+          }
+          else if (this.page === 'comparison') this.fetchCompare();
+          else if (this.page === 'portfolio') Promise.all([this.fetchPersonalIndexOptions()]).then(() => { this.fetchPortfolioData(); this.analyzePersonalIndex(false); });
+          else if (this.page === 'watchlist') this.fetchWatchlist();
+        },
+        fmtPct(v, digits = 1) { return v == null || isNaN(v) ? '—' : (Number(v) * 100).toFixed(digits) + '%'; },
+        fmtMoney(v) { return v == null || isNaN(v) ? '—' : '₹' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }); },
+        parseSymbolsText(raw) {
+          const seen = new Set();
+          return (raw || '')
+            .replace(/,/g, '\n')
+            .split(/\s+/)
+            .map(s => s.trim())
+            .filter(Boolean)
+            .filter(s => {
+              const key = s.toUpperCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+        },
+        symbolSearchUniverse() {
+          // Use the full universe from /api/universe.
+          // Labels (company names) come from portfolioOptions.labels separately.
+          return this.tickers || [];
+        },
+        symbolOptionLabel(sym) {
+          return (this.portfolioOptions.labels || {})[sym] || sym;
+        },
+        symbolOptionSecondaryLabel(sym) {
+          const label = this.symbolOptionLabel(sym);
+          const prefix = sym + ' — ';
+          return label.startsWith(prefix) ? label.slice(prefix.length) : label;
+        },
+        symbolPickerSelection(key) {
+          if (key === 'comparison') return this.compareSymbolsList || [];
+          if (key === 'portfolio') return (this.personalIndexInputRows || []).map(r => r.symbol).filter(Boolean);
+          if (key === 'personal_index') return (this.personalIndexInputRows || []).map(row => row.symbol).filter(Boolean);
+          if (key === 'per_stock') return this.perStockSymbol ? [this.perStockSymbol] : [];
+          return [];
+        },
+        symbolPickerMatches(key) {
+          const q = ((this.symbolPickerState[key] || {}).query || '').trim().toLowerCase();
+          const selected = new Set(this.symbolPickerSelection(key).map(s => s.toUpperCase()));
+          return this.symbolSearchUniverse().filter(sym => {
+            if (selected.has(sym.toUpperCase())) return false;
+            if (!q) return true;
+            const label = this.symbolOptionLabel(sym).toLowerCase();
+            return sym.toLowerCase().includes(q) || label.includes(q);
+          }).slice(0, 15);
+        },
+        async resolveSymbolInput(raw) {
+          const q = (raw || '').trim();
+          if (!q) return '';
+          const exact = this.symbolSearchUniverse().find(sym => sym.toUpperCase() === q.toUpperCase());
+          if (exact) return exact;
+          try {
+            const r = await fetch(API + '/resolve?q=' + encodeURIComponent(q) + '&market=' + encodeURIComponent(this.market)).then(r => r.json());
+            if (r.ticker) return r.ticker;
+          } catch (_) {}
+          return q.toUpperCase();
+        },
+        async openPerStockSymbol(raw, navigate = false) {
+          const resolved = await this.resolveSymbolInput(raw);
+          if (!resolved) return;
+          this.perStockSymbol = resolved;
+          this.perStockTab = 'overview';
+          this.symbolPickerState.home.query = '';
+          this.symbolPickerState.home.open = false;
+          this.symbolPickerState.per_stock.query = '';
+          this.symbolPickerState.per_stock.open = false;
+          if (navigate) this.go('per_stock');
+          else await this.fetchPerStock();
+        },
+        async goToStock() {
+          await this.symbolPickerCommit('home');
+        },
+        async symbolPickerCommit(key, explicitSymbol = null) {
+          const query = (explicitSymbol || this.symbolPickerMatches(key)[0] || ((this.symbolPickerState[key] || {}).query || '')).trim();
+          if (!query) return;
+          if (key === 'home') {
+            await this.openPerStockSymbol(query, true);
+            return;
+          }
+          if (key === 'per_stock') {
+            await this.openPerStockSymbol(query, false);
+            return;
+          }
+          if (key === 'comparison') {
+            this.addCompareSymbol(query);
+          } else if (key === 'portfolio') {
+            // addHoldingRow is async and clears picker state itself — just call it
+            await this.addHoldingRow(query);
+            return;
+          }
+          if (this.symbolPickerState[key]) {
+            this.symbolPickerState[key].query = '';
+            this.symbolPickerState[key].open = false;
+          }
+        },
+        clearPerStockSymbol() {
+          this.perStockSymbol = '';
+          this.perStockRow = null;
+          this.perStockPeriodRows = [];
+          this.perStockQuality = null;
+          this.symbolPickerState.per_stock.query = '';
+          this.symbolPickerState.per_stock.open = false;
+        },
+        parsePersonalIndexHoldingsText(raw) {
+          return (raw || '').split(/\n+/).map(line => {
+            const normalized = line.trim().replace(/,/g, ' ').replace(/:/g, ' ');
+            const parts = normalized.split(/\s+/).filter(Boolean);
+            if (parts.length < 2) return null;
+            const symbol = parts[0].trim().toUpperCase();
+            const units = Number(parts[1]);
+            if (!symbol || !Number.isFinite(units) || units <= 0) return null;
+            const price = parts.length >= 3 ? Number(parts[2]) : null;
+            return {
+              symbol,
+              units,
+              price: Number.isFinite(price) && price > 0 ? price : ''
+            };
+          }).filter(Boolean);
+        },
+        syncPersonalIndexRowsFromText(raw = this.personalIndexHoldingsText) {
+          this.personalIndexInputRows = this.parsePersonalIndexHoldingsText(raw);
+        },
+        serializePersonalIndexRows(mode = 'units') {
+          // mode 'units'      → omit price (backend uses live market price for weighting)
+          // mode 'cost_basis' → include avg buy price as price_override (weights by cost basis)
+          return (this.personalIndexInputRows || [])
+            .map(row => {
+              const symbol = (row.symbol || '').trim().toUpperCase();
+              const units = Number(row.units);
+              if (!symbol || !Number.isFinite(units) || units <= 0) return null;
+              const price = row.price === '' || row.price == null ? null : Number(row.price);
+              const includePrice = mode === 'cost_basis' && Number.isFinite(price) && price > 0;
+              return `${symbol} ${units}${includePrice ? ' ' + price : ''}`;
+            })
+            .filter(Boolean)
+            .join('\n');
+        },
+        /* --- Portfolio holding computed helpers --- */
+        holdingCurrentPrice(sym) {
+          const row = (this.personalIndexHoldingsRows || []).find(r => r.symbol === sym);
+          return row?.current_price ?? null;
+        },
+        holdingSharia(sym) {
+          const row = (this.personalIndexHoldingsRows || []).find(r => r.symbol === sym);
+          return row?.Sharia ?? null;
+        },
+        holdingCurrentValue(row) {
+          const price = this.holdingCurrentPrice(row.symbol);
+          if (price == null) return null;
+          return row.units * price;
+        },
+        holdingCostBasis(row) {
+          const price = row.price === '' || row.price == null ? null : Number(row.price);
+          if (!price || price <= 0) return null;
+          return row.units * price;
+        },
+        holdingPnL(row) {
+          const cv = this.holdingCurrentValue(row);
+          const cb = this.holdingCostBasis(row);
+          if (cv == null || cb == null) return null;
+          return cv - cb;
+        },
+        holdingPnLPct(row) {
+          const pnl = this.holdingPnL(row);
+          const cb = this.holdingCostBasis(row);
+          if (pnl == null || !cb) return '';
+          return (pnl / cb * 100).toFixed(1) + '%';
+        },
+        holdingWeight(row) {
+          const total = this.portfolioTotalCurrentValue();
+          const cv = this.holdingCurrentValue(row);
+          if (!total || cv == null) return '—';
+          return (cv / total * 100).toFixed(1) + '%';
+        },
+        portfolioTotalCurrentValue() {
+          return (this.personalIndexInputRows || []).reduce((sum, row) => {
+            const v = this.holdingCurrentValue(row);
+            return sum + (v ?? 0);
+          }, 0);
+        },
+        portfolioTotalCostBasis() {
+          return (this.personalIndexInputRows || []).reduce((sum, row) => {
+            const v = this.holdingCostBasis(row);
+            return sum + (v ?? 0);
+          }, 0);
+        },
+        portfolioTotalPnL() {
+          const tv = this.portfolioTotalCurrentValue();
+          const tb = this.portfolioTotalCostBasis();
+          if (!tv || !tb) return null;
+          return tv - tb;
+        },
+        /* --- Add holding row from picker --- */
+        async addHoldingRow(explicitSymbol = null) {
+          const query = (explicitSymbol || this.symbolPickerState.portfolio.query || '').trim();
+          if (!query) return;
+          const units = Number(this.holdingDraftUnits);
+          const price = this.holdingDraftAvgPrice === '' || this.holdingDraftAvgPrice == null ? null : Number(this.holdingDraftAvgPrice);
+          if (!Number.isFinite(units) || units <= 0) {
+            this.personalIndexError = 'Enter units greater than 0.';
+            return;
+          }
+          const symbol = await this.resolveSymbolInput(query);
+          if (!symbol) return;
+          const existing = this.personalIndexInputRows.findIndex(r => (r.symbol || '').toUpperCase() === symbol.toUpperCase());
+          if (existing >= 0) {
+            this.personalIndexInputRows[existing].units = Number(this.personalIndexInputRows[existing].units || 0) + units;
+            if (Number.isFinite(price) && price > 0) this.personalIndexInputRows[existing].price = price;
+            this.personalIndexInputRows = [...this.personalIndexInputRows];
+          } else {
+            this.personalIndexInputRows = [
+              ...this.personalIndexInputRows,
+              { symbol, units, price: Number.isFinite(price) && price > 0 ? price : '' }
+            ];
+          }
+          this.holdingDraftUnits = 1;
+          this.holdingDraftAvgPrice = '';
+          this.symbolPickerState.portfolio.query = '';
+          this.symbolPickerState.portfolio.open = false;
+          this.personalIndexError = '';
+          this.syncPersonalIndexTextFromRows(true);
+          this.fetchPortfolioData();
+        },
+        syncPersonalIndexTextFromRows(save = false) {
+          // Always persist prices so they survive page reloads.
+          // 'cost_basis' mode includes price when present; analysis mode is chosen at run time.
+          this.personalIndexHoldingsText = this.serializePersonalIndexRows('cost_basis');
+          if (save) this.saveSettings();
+        },
+        resetPersonalIndexDraft() {
+          this.symbolPickerState.personal_index.query = '';
+          this.symbolPickerState.personal_index.open = false;
+          this.personalIndexDraftUnits = 1;
+          this.personalIndexDraftPrice = '';
+        },
+        async selectPersonalIndexDraftSymbol(explicitSymbol = null) {
+          const query = (explicitSymbol || this.symbolPickerMatches('personal_index')[0] || this.symbolPickerState.personal_index.query || '').trim();
+          if (!query) return;
+          const resolved = await this.resolveSymbolInput(query);
+          if (!resolved) return;
+          this.symbolPickerState.personal_index.query = resolved;
+          this.symbolPickerState.personal_index.open = false;
+        },
+        async addPersonalIndexHolding() {
+          const rawSymbol = (this.symbolPickerState.personal_index.query || '').trim();
+          const units = Number(this.personalIndexDraftUnits);
+          const price = this.personalIndexDraftPrice === '' || this.personalIndexDraftPrice == null ? null : Number(this.personalIndexDraftPrice);
+          if (!rawSymbol) {
+            this.personalIndexError = 'Choose a symbol before adding a holding.';
+            return;
+          }
+          if (!Number.isFinite(units) || units <= 0) {
+            this.personalIndexError = 'Enter units greater than 0.';
+            return;
+          }
+          const symbol = await this.resolveSymbolInput(rawSymbol);
+          if (!symbol) {
+            this.personalIndexError = 'Unable to resolve that symbol.';
+            return;
+          }
+          const existingIndex = this.personalIndexInputRows.findIndex(row => (row.symbol || '').toUpperCase() === symbol.toUpperCase());
+          if (existingIndex >= 0) {
+            const existing = this.personalIndexInputRows[existingIndex];
+            existing.units = Number(existing.units || 0) + units;
+            if (Number.isFinite(price) && price > 0) existing.price = price;
+            this.personalIndexInputRows = [...this.personalIndexInputRows];
+          } else {
+            this.personalIndexInputRows = [
+              ...this.personalIndexInputRows,
+              { symbol, units, price: Number.isFinite(price) && price > 0 ? price : '' }
+            ];
+          }
+          this.personalIndexError = '';
+          this.syncPersonalIndexTextFromRows(true);
+          this.resetPersonalIndexDraft();
+          this.analyzePersonalIndex(false);
+        },
+        updatePersonalIndexHolding(index, field, value) {
+          const row = this.personalIndexInputRows[index];
+          if (!row) return;
+          if (field === 'units') {
+            const units = Number(value);
+            row.units = Number.isFinite(units) && units > 0 ? units : '';
+          } else if (field === 'price') {
+            const price = value === '' || value == null ? null : Number(value);
+            row.price = Number.isFinite(price) && price > 0 ? price : '';
+          }
+          this.personalIndexInputRows = [...this.personalIndexInputRows];
+          this.personalIndexError = '';
+          this.syncPersonalIndexTextFromRows(true);
+          this.analyzePersonalIndex(false);
+        },
+        removePersonalIndexHolding(index) {
+          this.personalIndexInputRows = this.personalIndexInputRows.filter((_, idx) => idx !== index);
+          this.personalIndexError = '';
+          this.syncPersonalIndexTextFromRows(true);
+          this.analyzePersonalIndex(false);
+        },
+        async onMarketChange() {
+          await this.saveSettings();
+          await this.fetchUniverse();
+          await this.fetchReportPeriods();
+          await this.fetchCounts();
+          await this.fetchSymbolsMissing();
+          this.onPageChange();
+        },
+        async fetchReportPeriods() { const r = await fetch(API + '/report-periods').then(r => r.json()); this.reportPeriods = r && r.length ? r : ['All periods', '31st March 2025']; if (!this.reportPeriods.includes(this.period)) this.period = this.reportPeriods[0]; },
+        async fetchUniverse() { const r = await fetch(API + '/universe?market=' + encodeURIComponent(this.market)).then(r => r.json()); this.tickers = r.tickers || []; },
+        async fetchCounts() { this.loading = true; try { const r = await fetch(API + '/counts?period=' + encodeURIComponent(this.period) + '&market=' + encodeURIComponent(this.market)).then(r => r.json()); this.counts = r; } finally { this.loading = false; } },
+        async fetchAllStocks() {
+          this.loading = true;
+          try {
+            const r = await fetch(API + '/sharia?period=' + encodeURIComponent(this.period) + '&market=' + encodeURIComponent(this.market)).then(r => r.json());
+            this.allStocksRows = r.rows || [];
+            // Merge any already-loaded quality scores back in
+            if (this.qualityLoaded) this._mergeQualityIntoRows();
+            if (this.allStocksRows.length && !this.tableColumns.all_stocks)
+              this.tableColumns.all_stocks = Object.fromEntries(Object.keys(this.allStocksRows[0]).map(k => [k, true]));
+            this.$nextTick(() => {
+              if (this.page === 'all_stocks' && this.allStocksRows.length)
+                this.initTableWithColumns('all_stocks', 'all-stocks-table', this.allStocksRows);
+            });
+          } finally { this.loading = false; }
+        },
+        async fetchQualityScores() {
+          this.qualityLoading = true;
+          try {
+            const r = await fetch(API + '/screener?sharia_only=false&market=' + encodeURIComponent(this.market)).then(r => r.json());
+            const scoreMap = {};
+            (r.rows || []).forEach(row => { scoreMap[row.symbol] = row; });
+            this._qualityScoreMap = scoreMap;
+            this._mergeQualityIntoRows();
+            this.qualityLoaded = true;
+            this.$nextTick(() => {
+              if (this.page === 'all_stocks' && this.allStocksRows.length)
+                this.initTableWithColumns('all_stocks', 'all-stocks-table', this.allStocksRows);
+            });
+          } catch(e) { console.error('Quality scores failed:', e); }
+          finally { this.qualityLoading = false; }
+        },
+        _mergeQualityIntoRows() {
+          const scoreMap = this._qualityScoreMap || {};
+          this.allStocksRows = this.allStocksRows.map(row => {
+            const q = scoreMap[row.symbol];
+            if (!q) return row;
+            return {
+              ...row,
+              total_score: q.total_score ?? null,
+              quality_label: q.label ?? null,
+              profitability_score: q.profitability_score ?? null,
+              cash_generation_score: q.cash_generation_score ?? null,
+              financial_strength_score: q.financial_strength_score ?? null,
+              valuation_score: q.valuation_score ?? null,
+              roe: q.roe ?? null,
+              operating_margin: q.operating_margin ?? null,
+              peg_ratio: q.peg_ratio ?? null,
+              trailing_pe: q.trailing_pe ?? null,
+              forward_pe: q.forward_pe ?? null,
+            };
+          });
+        },
+        async fetchQualityScore(symbol) {
+          const sym = symbol || this.perStockSymbol;
+          if (!sym) return;
+          this.perStockQualityLoading = true;
+          try {
+            const r = await fetch(API + '/symbol/' + encodeURIComponent(sym) + '/quality').then(r => r.json());
+            this.perStockQuality = r.error ? null : r;
+          } catch(e) { this.perStockQuality = null; }
+          finally { this.perStockQualityLoading = false; }
+        },
+        /* --- Reusable table + column selection system --- */
+        tableRegistry: {
+          all_stocks:                { elId: 'all-stocks-table',               dataKey: 'allStocksRows' },
+          compare:                   { elId: 'compare-table',                  dataKey: 'compareRows' },
+          per_stock_periods:         { elId: 'per-stock-periods-table',        dataKey: 'perStockPeriodRows',         opts: { pagination: false } },
+          watchlist:                 { elId: 'watchlist-table',                 dataKey: 'watchlistRows' },
+          personal_index_holdings:   { elId: 'personal-index-holdings-table',  dataKey: 'personalIndexHoldingsRows',  opts: { pagination: false } },
+          personal_index_buy_plan:   { elId: 'personal-index-buy-plan-table',  dataKey: 'personalIndexBuyPlan',       opts: { pagination: false } },
+          personal_index_sell_plan:  { elId: 'personal-index-sell-plan-table', dataKey: 'personalIndexSellPlan',       opts: { pagination: false } },
+        },
+        getTableData(tableKey) {
+          const reg = this.tableRegistry[tableKey];
+          return reg ? this[reg.dataKey] : [];
+        },
+        getTableOpts(tableKey) {
+          const reg = this.tableRegistry[tableKey];
+          const opts = { ...(reg?.opts || {}) };
+          if (this.tableColumns[tableKey]) opts.visibleColumns = this.tableColumns[tableKey];
+          if (tableKey === 'all_stocks') {
+            opts.minWidth = 130;
+            opts.rowFormatter = (row) => {
+              const d = row.getData();
+              if ((d.Sharia || d.sharia) === 'Yes') {
+                const el = row.getElement();
+                el.classList.add('sharia-compliant-row');
+                el.style.backgroundColor = '#ecfdf5';
+              }
+            };
+          }
+          return opts;
+        },
+        initTableWithColumns(tableKey, elId, data, extraOpts = {}) {
+          const opts = { ...this.getTableOpts(tableKey), ...extraOpts };
+          elId = elId || this.tableRegistry[tableKey]?.elId;
+          data = data || this.getTableData(tableKey);
+          if (!data || !data.length) return;
+          // Auto-init column visibility if not set
+          if (!this.tableColumns[tableKey]) {
+            this.tableColumns[tableKey] = Object.fromEntries(Object.keys(data[0]).map(k => [k, true]));
+          }
+          this.initTable(tableKey, elId, data, opts);
+        },
+        toggleTableColumn(tableKey, field) {
+          if (!this.tableColumns[tableKey]) return;
+          this.tableColumns[tableKey][field] = !this.tableColumns[tableKey][field];
+          const data = this.getTableData(tableKey);
+          if (data && data.length) {
+            const reg = this.tableRegistry[tableKey];
+            if (reg) this.initTableWithColumns(tableKey, reg.elId, data);
+          }
+          this.saveSettings();
+        },
+        getColumnDefs(tableKey) {
+          const data = this.getTableData(tableKey);
+          if (!data || !data[0]) return [];
+          return Object.keys(data[0]).map(field => ({ field, title: field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }));
+        },
+        async fetchPerStock() {
+          if (!this.perStockSymbol) return;
+          this.loading = true;
+          try {
+            this.perStockRow = await fetch(API + '/symbol/' + encodeURIComponent(this.perStockSymbol)).then(r => r.ok ? r.json() : null);
+            // Fetch all period rows for the periods table
+            const pr = await fetch(API + '/symbol/' + encodeURIComponent(this.perStockSymbol) + '/periods').then(r => r.ok ? r.json() : { rows: [] });
+            this.perStockPeriodRows = pr.rows || [];
+            this.$nextTick(() => {
+              this.fetchSectionDataIfNeeded(this.perStockTab);
+              if (this.perStockPeriodRows.length) {
+                this.initTableWithColumns('per_stock_periods');
+              }
+            });
+          } catch { this.perStockRow = null; this.perStockPeriodRows = []; }
+          finally { this.loading = false; }
+        },
+        getSectionData(section) { const sym = this.perStockSymbol; if (!sym) return null; return (this.perStockSectionData[sym] || {})[section] || null; },
+        hasResearchData(section) { const d = this.getSectionData(section); return d && d.data && !d.error; },
+        finCurrencySymbol() { const s={INR:'₹',USD:'$',EUR:'€',GBP:'£',JPY:'¥',CNY:'¥',HKD:'HK$',SGD:'S$',AUD:'A$',CAD:'C$'}; const c=this.getSectionData('financials')?.financialCurrency; return s[c]||(c?c+' ':''); },
+        isSectionLoading(section) { return !!this.perStockSectionLoading[section]; },
+        fetchSectionDataIfNeeded(section) {
+          if (!this.perStockSymbol) return;
+          const isYf = this.yfSections.includes(section);
+          const isResearch = this.researchSections.includes(section);
+          if (!isYf && !isResearch) return;
+          const sym = this.perStockSymbol;
+          const cached = (this.perStockSectionData[sym] || {})[section];
+          if (cached && !cached.error && !cached.error_not_found) return;
+          this.fetchSectionData(section, false);
+        },
+        async fetchSectionData(section, force) {
+          if (!this.perStockSymbol) return;
+          const isYf = this.yfSections.includes(section);
+          const isResearch = this.researchSections.includes(section);
+          if (!isYf && !isResearch) return;
+          const sym = this.perStockSymbol;
+          if (!force && (this.perStockSectionData[sym] || {})[section] && !(this.perStockSectionData[sym][section].error)) return;
+          this.perStockSectionLoading = { ...this.perStockSectionLoading, [section]: true };
+          try {
+            let url;
+            if (isResearch) {
+              url = API + '/symbol/' + encodeURIComponent(sym) + '/research/' + section;
+            } else {
+              url = API + '/symbol/' + encodeURIComponent(sym) + '/section/' + section + (force ? '?force=true' : '');
+            }
+            const r = await fetch(url).then(x => x.json());
+            if (!this.perStockSectionData[sym]) this.perStockSectionData[sym] = {};
+            this.perStockSectionData[sym][section] = r;
+          } catch (e) {
+            if (!this.perStockSectionData[sym]) this.perStockSectionData[sym] = {};
+            this.perStockSectionData[sym][section] = { error: e.message };
+          } finally {
+            this.perStockSectionLoading = { ...this.perStockSectionLoading, [section]: false };
+          }
+        },
+        async fetchCompare() {
+          const syms = (this.compareSymbolsList && this.compareSymbolsList.length ? this.compareSymbolsList : this.parseSymbolsText(this.compareSymbolsText)).slice(0, 10);
+          this.compareSymbolsList = syms;
+          this.syncCompareTextFromList();
+          if (!syms.length) { this.compareRows = []; return; }
+          this.loading = true;
+          try {
+            const r = await fetch(API + '/compare?symbols=' + encodeURIComponent(syms.join(',')) + '&market=' + encodeURIComponent(this.market)).then(r => r.json());
+            this.compareRows = r.rows || [];
+            this.$nextTick(() => { if (this.page === 'comparison' && this.compareRows.length) this.initTableWithColumns('compare'); });
+          } finally { this.loading = false; }
+        },
+        async fetchSymbolOptions() {
+          const r = await fetch(API + '/portfolio-options?market=' + encodeURIComponent(this.market)).then(r => r.json());
+          this.portfolioOptions = r;
+        },
+        async fetchPersonalIndexOptions() {
+          try {
+            const r = await fetch(API + '/personal-index/options').then(r => r.json());
+            this.personalIndexOptions = r;
+            if ((!this.personalIndexBenchmark || this.personalIndexBenchmark === '') && r.benchmarks && r.benchmarks.length) {
+              this.personalIndexBenchmark = r.benchmarks[0].id;
+            }
+          } catch (_) {}
+        },
+        syncCompareTextFromList() { this.compareSymbolsText = (this.compareSymbolsList || []).join('\n'); },
+        addCompareSymbol(sym) {
+          const s = (sym || '').trim();
+          if (!s) return;
+          const key = s.toUpperCase();
+          if (this.compareSymbolsList.some(x => x.toUpperCase() === key)) return;
+          this.compareSymbolsList = [...this.compareSymbolsList, s].slice(0, 10);
+          this.syncCompareTextFromList();
+          this.saveSettings();
+          this.fetchCompare();
+        },
+        removeCompareSymbol(sym) {
+          const key = (sym || '').toUpperCase();
+          this.compareSymbolsList = this.compareSymbolsList.filter(x => x.toUpperCase() !== key);
+          this.syncCompareTextFromList();
+          this.saveSettings();
+          this.fetchCompare();
+        },
+        debouncedFetchPortfolio() {
+          clearTimeout(this._portfolioTimer);
+          this._portfolioTimer = setTimeout(() => this.fetchPortfolioData(), 300);
+        },
+        async computePortfolioMissing() {
+          if (!this.portfolioMissing.length) return;
+          this.computeRunning = true;
+          try {
+            const res = await fetch(API + '/compute-sharia', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ symbols: this.portfolioMissing, max_workers: this.computeWorkers, market: this.market })
+            });
+            if (res.ok) {
+              await this.fetchPortfolioData();
+              await this.fetchCounts();
+              await this.fetchCacheStatus();
+            }
+          } catch (_) {}
+          finally { this.computeRunning = false; }
+        },
+        async computePortfolioAll(force = false) {
+          const syms = (this.personalIndexInputRows || []).map(r => r.symbol).filter(Boolean);
+          if (!syms.length) return;
+          this.computeRunning = true;
+          try {
+            const res = await fetch(API + '/compute-sharia', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ symbols: syms, max_workers: this.computeWorkers, force, market: this.market })
+            });
+            if (res.ok) {
+              await this.fetchPortfolioData();
+              await this.fetchCounts();
+              await this.fetchCacheStatus();
+            }
+          } catch (_) {}
+          finally { this.computeRunning = false; }
+        },
+        async fetchPortfolioData() {
+          const raw = (this.personalIndexInputRows || []).map(r => r.symbol).filter(Boolean);
+          if (!raw.length) return;
+          this.loading = true;
+          try {
+            const r = await fetch(API + '/portfolio-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbols: raw, period: 'All periods' }) }).then(r => r.json());
+            this.portfolioPivot = r.pivot || [];
+            this.portfolioRows = r.rows || [];
+            this.portfolioMissing = r.missing || [];
+            // Group rows by symbol
+            const bySymbol = {};
+            for (const row of this.portfolioRows) {
+              const sym = row.symbol || 'Unknown';
+              if (!bySymbol[sym]) bySymbol[sym] = [];
+              bySymbol[sym].push(row);
+            }
+            this.portfolioRowsBySymbol = bySymbol;
+            const pivotColOrder = r.pivot_columns ? ['symbol'].concat(r.pivot_columns) : null;
+            // Exclude symbol/name from per-symbol tables since they're in the header
+            const symTableCols = (this.portfolioRows[0] ? Object.keys(this.portfolioRows[0]) : []).filter(k => k !== 'symbol' && k !== 'name');
+            this.$nextTick(() => {
+              if (this.page === 'portfolio') {
+                if (this.portfolioPivot.length) this.initTable('portfolio_pivot', 'portfolio-pivot-table', this.portfolioPivot, { columnOrder: pivotColOrder });
+                for (const sym of Object.keys(bySymbol)) {
+                  const elId = 'portfolio-sym-table-' + sym.replace(/\./g, '-');
+                  this.initTable('portfolio_sym_' + sym, elId, bySymbol[sym], {
+                    columnOrder: symTableCols,
+                    pagination: false,
+                  });
+                }
+              }
+            });
+          } finally { this.loading = false; }
+        },
+        async analyzePersonalIndex(saveFirst = true, mode = 'units') {
+          // Always persist with cost_basis so avg buy prices are never stripped on save.
+          const holdingsToSave = this.serializePersonalIndexRows('cost_basis');
+          // For the API request, use the requested mode (units = live market price weighting,
+          // cost_basis = user's avg buy price weighting).
+          const holdingsText = mode === 'cost_basis' ? holdingsToSave : this.serializePersonalIndexRows('units');
+          if (!holdingsText.trim()) {
+            this.personalIndexSummary = null;
+            this.personalIndexBenchmarkMeta = null;
+            this.personalIndexHoldingsRows = [];
+            this.personalIndexBuyPlan = [];
+            this.personalIndexSellPlan = [];
+            this.personalIndexMissingSymbols = [];
+            this.personalIndexMissingPrices = [];
+            this.personalIndexError = '';
+            return;
+          }
+          if (saveFirst) {
+            this.personalIndexHoldingsText = holdingsToSave;   // always save cost_basis version
+            this.saveSettings();
+          }
+          this.personalIndexLoading = true;
+          this.personalIndexError = '';
+          try {
+            const res = await fetch(API + '/personal-index/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                holdings_text: holdingsText,
+                benchmark: this.personalIndexBenchmark,
+                sip_amount: Number(this.personalIndexSipAmount || 0),
+                strict_no_sell: !!this.personalIndexStrictNoSell,
+                max_buy_suggestions: 10
+              })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              this.personalIndexError = data.detail || data.error || 'Failed to analyze portfolio.';
+              this.personalIndexSummary = null;
+              this.personalIndexHoldingsRows = [];
+              this.personalIndexBuyPlan = [];
+              this.personalIndexSellPlan = [];
+              return;
+            }
+            this.personalIndexSummary = data.summary || null;
+            this.personalIndexBenchmarkMeta = data.benchmark || null;
+            this.personalIndexHoldingsRows = data.holdings || [];
+            this.personalIndexBuyPlan = data.buy_plan || [];
+            this.personalIndexSellPlan = data.sell_plan || [];
+            this.personalIndexMissingSymbols = data.missing_symbols || [];
+            this.personalIndexMissingPrices = data.missing_prices || [];
+            this.$nextTick(() => {
+              if (this.page === 'portfolio') {
+                if (this.personalIndexHoldingsRows.length) this.initTableWithColumns('personal_index_holdings');
+                if (this.personalIndexBuyPlan.length) this.initTableWithColumns('personal_index_buy_plan');
+                if (this.personalIndexSellPlan.length) this.initTableWithColumns('personal_index_sell_plan');
+              }
+            });
+          } catch (e) {
+            this.personalIndexError = e.message || 'Failed to analyze portfolio.';
+          } finally {
+            this.personalIndexLoading = false;
+          }
+        },
+        async fetchWatchlist() { const syms = (this.watchlistText || '').split(/[\s,]+/).filter(Boolean); if (!syms.length) { this.watchlistRows = []; return; } this.loading = true; try { const r = await fetch(API + '/compare?symbols=' + encodeURIComponent(syms.join(',')) + '&market=' + encodeURIComponent(this.market)).then(r => r.json()); this.watchlistRows = r.rows || []; this.$nextTick(() => { if (this.page === 'watchlist' && this.watchlistRows.length) this.initTableWithColumns('watchlist'); }); } finally { this.loading = false; } },
+        async runCompute() {
+          const r = await fetch(API + '/symbols-missing?limit=' + (this.computeN || 0)).then(r => r.json());
+          const toFetch = (this.computeN && this.computeN > 0) ? (r.symbols || []).slice(0, this.computeN) : (r.symbols || []);
+          if (!toFetch.length) { this.computeMessage = 'Choose N > 0.'; this.computeError = true; return; }
+          this.computeRunning = true; this.computeMessage = ''; this.computeError = false;
+          try {
+            const res = await fetch(API + '/compute-sharia', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbols: toFetch, max_workers: this.computeWorkers, market: this.market }) });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) { this.computeMessage = data.detail || res.statusText; this.computeError = true; return; }
+            this.computeMessage = 'Computed ' + (data.computed || 0) + ' symbols.';
+            await this.fetchReportPeriods(); await this.fetchCounts(); await this.fetchSymbolsMissing();
+          } catch (e) { this.computeMessage = e.message || 'Failed'; this.computeError = true; }
+          finally { this.computeRunning = false; }
+        },
+        async fetchSymbolsMissing() { const r = await fetch(API + '/symbols-missing?limit=5000&period=' + encodeURIComponent(this.period) + '&market=' + encodeURIComponent(this.market)).then(r => r.json()); this.symbolsMissing = r; },
+        async fetchCacheStatus() {
+          try {
+            const r = await fetch(API + '/cache-status?market=' + encodeURIComponent(this.market)).then(x => x.json());
+            this.cacheStatus = r;
+          } catch (_) { this.cacheStatus = null; }
+        }
+      };
+    }
+  </script>
+</body>
+</html>

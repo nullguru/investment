@@ -1,0 +1,50 @@
+{
+  "TCS.NS": {
+    "screen_name": "beneish_m",
+    "symbol": "TCS.NS",
+    "score": -2.311,
+    "max_score": -1.78,
+    "pct": 35.4,
+    "label": "Clean",
+    "passed": true,
+    "breakdown": {
+      "dsri": 1.099,
+      "gmi": 0.9512,
+      "aqi": 1.3252,
+      "sgi": 1.0458,
+      "depi": 1.0433,
+      "sgai": null,
+      "tata": -0.0158,
+      "lvgi": null,
+      "m_score": -2.311,
+      "vars_computed": 6
+    },
+    "computed_at": "2026-04-21T06:37:00.842224+00:00",
+    "data_quality": "partial",
+    "error": null
+  },
+  "FLUOROCHEM.NS": {
+    "screen_name": "beneish_m",
+    "symbol": "FLUOROCHEM.NS",
+    "score": -2.044,
+    "max_score": -1.78,
+    "pct": 17.6,
+    "label": "Gray Zone",
+    "passed": true,
+    "breakdown": {
+      "dsri": 1.2884,
+      "gmi": 0.9794,
+      "aqi": 1.139,
+      "sgi": 1.1004,
+      "depi": 0.8726,
+      "sgai": 0.9293,
+      "tata": 0.0001,
+      "lvgi": 0.8836,
+      "m_score": -2.044,
+      "vars_computed": 8
+    },
+    "computed_at": "2026-04-21T07:59:04.672068+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

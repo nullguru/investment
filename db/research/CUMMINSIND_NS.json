@@ -1,0 +1,91 @@
+{
+  "industry": {
+    "section": "industry",
+    "symbol": "CUMMINSIND.NS",
+    "updated_at": "2026-04-14T19:00:00Z",
+    "sources": [
+      {
+        "title": "Mordor Intelligence - India Diesel Generator Market",
+        "url": "https://www.mordorintelligence.com/industry-reports/india-diesel-generator-market"
+      },
+      {
+        "title": "IMARC Group - India Diesel Engine Market 2033",
+        "url": "https://www.imarcgroup.com/india-diesel-engine-market"
+      },
+      {
+        "title": "Renub Research - India Diesel Engine Market",
+        "url": "https://www.renub.com/india-diesel-engine-market-p.php"
+      },
+      {
+        "title": "6W Research - India Diesel Genset Market",
+        "url": "https://www.6wresearch.com/industry-report/india-diesel-genset-generator-market-2019-2025-kva-rating-applications-regions-competitive-landscape"
+      },
+      {
+        "title": "EPR Magazine - Diesel Genset Market at a Crossroads",
+        "url": "https://www.eprmagazine.com/market-report/diesel-genset-market-in-india-is-at-a-crossroads/"
+      }
+    ],
+    "data": {
+      "industry_name": "Diesel Engines & Power Generation (India)",
+      "market_size": "USD 9.23B (diesel engines, 2025) / USD 1.24B (gensets, 2025)",
+      "growth_rate": "4.2% CAGR (engines to 2034) / 7.2% CAGR (gensets to 2031)",
+      "trends": [
+        {
+          "title": "CPCB IV+ Emission Compliance",
+          "description": "Since July 2024, CPCB IV+ standards require SCR, DPF, and advanced injectors — raising factory prices 15-20% and favoring large OEMs like Cummins with certified emission-control technology."
+        },
+        {
+          "title": "Data Center Boom",
+          "description": "Hyperscale data center investments in India expected to exceed USD 10B by 2025. India projected to have 100+ data centers by end of 2025, driving demand for high-kVA gensets (750+ kVA) where Cummins leads."
+        },
+        {
+          "title": "Hybrid & Renewable Integration",
+          "description": "Growing adoption of hybrid diesel-solar-battery systems across sectors. Storage tenders totaling 6.1 GW in Q1 2025 signal utilities viewing batteries as economic substitute for peaking diesel fleets."
+        },
+        {
+          "title": "Infrastructure-Led Demand",
+          "description": "India construction industry expanding at 6.2% CAGR (2023-2028). Autonomous power needs at construction sites, along with 85% of smaller-city households still facing 2-4 hour daily outages, sustain genset demand."
+        },
+        {
+          "title": "Premiumization Wave",
+          "description": "CPCB IV+ compliance costs are consolidating the market toward larger, well-capitalized OEMs and away from smaller unorganized players who cannot afford the technology upgrades."
+        }
+      ],
+      "competitive_landscape": [
+        {
+          "company": "Cummins India",
+          "market_share": "28-32% (medium-high kVA); >35% (above 1000 kVA)",
+          "notes": "Market leader in 750-2000 kVA. CPCB IV+ compliant gensets up to 800 kVA. 200+ dealer touchpoints, 6000+ technicians. Exports to 60+ countries."
+        },
+        {
+          "company": "Kirloskar Oil Engines (KOEL)",
+          "market_share": "~15-18%",
+          "notes": "Strong in sub-500 kVA segment. Domestic manufacturing base. Joint ventures for technology."
+        },
+        {
+          "company": "Caterpillar",
+          "market_share": "~10-12%",
+          "notes": "Global leader entering India via local assembly. Strong in mining, oil & gas, and large infrastructure projects."
+        },
+        {
+          "company": "Mahindra Powerol",
+          "market_share": "~8-10%",
+          "notes": "Leverages Mahindra distribution network. Strong in residential and small commercial segment."
+        },
+        {
+          "company": "Greaves Cotton",
+          "market_share": "~5-7%",
+          "notes": "Focus on lower kVA range. Transitioning toward cleaner energy solutions alongside diesel."
+        }
+      ],
+      "barriers_to_entry": [
+        "CPCB IV+ compliance requires SCR/DPF technology — significant R&D and capex (15-20% price increase per unit)",
+        "Nationwide service network needed (Cummins has 200+ dealer points and 6000+ technicians)",
+        "OEM relationships with data centers and hyperscalers require proven track record and SLA guarantees",
+        "Parent company technology transfer (Cummins India benefits from Cummins Inc global R&D)",
+        "Emission certification process is lengthy and capital-intensive for new entrants"
+      ],
+      "regulatory_environment": "CPCB IV+ emission standards (effective July 2024) are the most significant regulatory driver — requiring SCR, DPF, and advanced fuel injection systems. Delhi NCR imposes additional seasonal bans and 3-meter stack height requirements. BS-VI norms for on-road diesel engines since 2020. The regulatory direction is clearly tightening, which favors incumbents with emission-control technology (Cummins, Caterpillar) and pressures smaller unorganized players. Long-term risk: government push toward renewable energy and battery storage (6.1 GW storage tenders in Q1 2025) could substitute diesel peaking capacity over 5-10 years."
+    }
+  }
+}

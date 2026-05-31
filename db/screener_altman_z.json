@@ -1,0 +1,46 @@
+{
+  "TCS.NS": {
+    "screen_name": "altman_z",
+    "symbol": "TCS.NS",
+    "score": 10.791,
+    "max_score": 8.0,
+    "pct": 100,
+    "label": "Safe",
+    "passed": true,
+    "breakdown": {
+      "z_score": 10.791,
+      "zone": "safe",
+      "x1_working_capital_ratio": 0.4101,
+      "x2_retained_earnings_ratio": null,
+      "x3_ebit_ratio": 0.3658,
+      "x4_market_to_liabilities": 12.7373,
+      "x5_asset_turnover": 1.4642,
+      "components_available": 4
+    },
+    "computed_at": "2026-04-21T06:37:00.711257+00:00",
+    "data_quality": "partial",
+    "error": null
+  },
+  "FLUOROCHEM.NS": {
+    "screen_name": "altman_z",
+    "symbol": "FLUOROCHEM.NS",
+    "score": 7.839,
+    "max_score": 8.0,
+    "pct": 98.0,
+    "label": "Safe",
+    "passed": true,
+    "breakdown": {
+      "z_score": 7.839,
+      "zone": "safe",
+      "x1_working_capital_ratio": 0.1659,
+      "x2_retained_earnings_ratio": 0.2903,
+      "x3_ebit_ratio": 0.0791,
+      "x4_market_to_liabilities": 10.9025,
+      "x5_asset_turnover": 0.435,
+      "components_available": 5
+    },
+    "computed_at": "2026-04-21T07:59:03.949640+00:00",
+    "data_quality": "full",
+    "error": null
+  }
+}

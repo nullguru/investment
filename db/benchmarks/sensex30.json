@@ -1,0 +1,42 @@
+{
+  "id": "sensex30",
+  "name": "Sensex 30",
+  "as_of": "2026-03-12",
+  "weight_method": "proxy_market_cap",
+  "source": {
+    "title": "Smart Investing - Sensex 30 list and weights",
+    "url": "https://www.smart-investing.in/sensex-companies/"
+  },
+  "symbols": [
+    "RELIANCE.NS",
+    "HDFCBANK.NS",
+    "BHARTIARTL.NS",
+    "SBIN.NS",
+    "ICICIBANK.NS",
+    "TCS.NS",
+    "BAJFINANCE.NS",
+    "LT.NS",
+    "INFY.NS",
+    "HINDUNILVR.NS",
+    "SUNPHARMA.NS",
+    "MARUTI.NS",
+    "M&M.NS",
+    "AXISBANK.NS",
+    "ITC.NS",
+    "KOTAKBANK.NS",
+    "NTPC.NS",
+    "TITAN.NS",
+    "HCLTECH.NS",
+    "ULTRACEMCO.NS",
+    "BEL.NS",
+    "ADANIPORTS.NS",
+    "BAJAJFINSV.NS",
+    "POWERGRID.NS",
+    "TATASTEEL.NS",
+    "ETERNAL.NS",
+    "ASIANPAINT.NS",
+    "INDIGO.NS",
+    "TECHM.NS",
+    "TRENT.NS"
+  ]
+}
