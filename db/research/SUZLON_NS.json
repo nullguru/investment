@@ -1,0 +1,932 @@
+{
+  "thesis": {
+    "current": {
+      "section": "thesis",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://powerline.net.in/2026/05/27/suzlon-energy-reports-rs-31-63-billion-net-profit-in-2025-26/",
+        "https://tradebrains.in/suzlon-reports-54-revenue-growth-as-annual-deliveries-hit-record-2456-mw/",
+        "https://in.marketscreener.com/quote/stock/SUZLON-ENERGY-LIMITED-9059353/consensus/"
+      ],
+      "data": {
+        "verdict": "Buy",
+        "summary": "Suzlon Energy is India's largest wind turbine manufacturer and renewable energy solutions provider, riding a multi-year upcycle in Indian wind energy. The company has completed a remarkable debt-free turnaround (net cash of Rs 833 crore as of Mar 2025), recorded FY26 revenue of Rs 16,842 crore (+53% YoY) and net profit of Rs 3,163 crore (+52.6% YoY), and holds a record order book of ~5.9-6.4 GW. With India targeting 100 GW of wind capacity by 2030 (current: ~51.6 GW), Suzlon is structurally positioned as the dominant domestic player. Analysts maintain a Buy consensus with average price target of ~Rs 76.",
+        "bull_case": [
+          "Record order book of 5.9-6.4 GW (~3.6x FY25 execution), providing multi-year earnings visibility",
+          "India wind energy upcycle: government targeting 100 GW by 2030 from current ~51.6 GW requiring ~48 GW additions",
+          "Debt-free balance sheet with net cash; zero-debt status avoids SEBI large corporate framework",
+          "Flagship S144 3MW turbine dominant with ~9 GW cumulative orders since launch; 40-43% higher generation vs prior model",
+          "Vertical integration (4,500 MW annual manufacturing capacity) and 29-30% cumulative domestic market share",
+          "Strong OMS (Operations & Maintenance Services) business managing 15 GW; provides recurring revenue",
+          "ESG leader: Top 10 in Global 100 Most Sustainable Corporations 2026; first Indian energy company in RE100",
+          "Export opportunity to Southeast Asia and Africa with new 3-3.5 MW turbines; management targeting 10% of global demand by FY30"
+        ],
+        "bear_case": [
+          "Accrual ratio of 0.38 in FY26; free cash flow of Rs 6.3 billion well below reported profit of Rs 31.6 billion",
+          "One-off tax benefit of Rs 7.4 billion boosted FY26 profit; underlying earnings could be lower",
+          "Execution risk: scaling from 2.5 GW to 3.2 GW delivery targets requires significant operational ramp",
+          "Competition intensifying from Inox Wind, Envision, and international OEMs entering India",
+          "Historically debt-laden balance sheet legacy; investors cautious about capital discipline",
+          "Market share under pressure: expected to settle at 24-26% vs historic 29-30%"
+        ],
+        "key_risks": [
+          "Policy risk: change in RPO mandates, ISTS waivers, or government procurement slowdown",
+          "Execution risk: order delivery delays due to logistics, land acquisition, or grid connection issues",
+          "Competitive risk: loss of market share to Envision, Inox Wind, or new entrants",
+          "Working capital risk: high receivables; cash conversion cycle elongation",
+          "Earnings quality risk: accrual ratio signals potential gap between profits and cash flows",
+          "Raw material cost inflation: steel and carbon fiber price escalation impacting margins",
+          "Interest rate risk: higher rates increase cost of project finance for customers, slowing orders"
+        ],
+        "time_horizon": "12-24 months"
+      }
+    },
+    "versions": []
+  },
+  "industry": {
+    "current": {
+      "section": "industry",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://images.assettype.com/bloombergquint/2025-07-08/p4q6shbv/Anand_Rathi___Suzlon_Energy_Initiating_Coverage_Note.pdf",
+        "https://rkwindmast.com/c/top-12-wind-turbine-manufacturers-in-india-as-of-2025.html",
+        "https://www.mercomindia.com/suzlons-revenue-jumps-55-on-higher-wind-turbine-sales-in-q1-fy-2026"
+      ],
+      "data": {
+        "overview": "India's wind energy sector is in a structural upcycle, targeting 100 GW of installed capacity by 2030 from approximately 51.6 GW currently. The sector needs to add ~48 GW over five years, with 25.5 GW under construction and fresh government auctions accelerating. India is the fourth-largest wind market globally. Government targets 10 GW annual wind additions through 2030 under Panchamrit commitments (500 GW non-fossil fuel by 2030). The Renewable Purchase Obligation (RPO) of 43.3% for new plants, ISTS waiver until 2028, and the National Repowering Policy (2023) covering 25.4 GW of sub-2MW turbines create sustained demand.",
+        "trends": [
+          {
+            "title": "Shift to Larger Turbines",
+            "description": "Industry moving from 2MW to 3MW+ turbines (e.g., Suzlon S144 at 3-3.15 MW) enabling low-wind site viability and 40-43% higher generation; hub heights increasing to 140-160m."
+          },
+          {
+            "title": "Hybrid Projects",
+            "description": "Wind-solar hybrid projects gaining traction, supported by government policy allowing combined bids; improves PLF and grid stability."
+          },
+          {
+            "title": "C&I Segment Growth",
+            "description": "Commercial & Industrial (C&I) customers now account for 59-66% of order books as corporates pursue green energy procurement for ESG mandates."
+          },
+          {
+            "title": "Repowering Opportunity",
+            "description": "National Repowering Policy (2023) enables replacement of ~25.4 GW of legacy sub-2MW turbines with modern, efficient models."
+          },
+          {
+            "title": "Export Potential",
+            "description": "India targeting wind turbine exports to Southeast Asia and Africa; Suzlon management estimates 10% of global demand by FY30."
+          }
+        ],
+        "competitive_landscape": [
+          {
+            "company": "Suzlon Energy",
+            "market_share": "~29-30% cumulative",
+            "notes": "Largest domestic player; 15.1 GW installed base; dominant S144 platform with ~9 GW orders"
+          },
+          {
+            "company": "Envision Group",
+            "market_share": "~20-25%",
+            "notes": "Chinese OEM; currently holds largest new-order market share in India"
+          },
+          {
+            "company": "Inox Wind",
+            "market_share": "~15-20%",
+            "notes": "Fast-growing domestic player backed by Inox Group; strong C&I focus"
+          },
+          {
+            "company": "GE Vernova (GE Wind)",
+            "market_share": "~10%",
+            "notes": "International OEM with strong brand; focus on large utility projects"
+          },
+          {
+            "company": "Windworld / Others",
+            "market_share": "<10%",
+            "notes": "Various smaller domestic and international players with limited scale"
+          }
+        ],
+        "regulatory_environment": "Strong policy tailwinds: RPO of 43.3% for new plants mandating renewable energy purchase; ISTS waivers for wind projects until 2028 (reducing by 25% annually); Production Linked Incentive (PLI) scheme for solar and renewables manufacturing; RLMM (Revised List of Models and Manufacturers) protecting domestic manufacturers from Chinese imports; National Repowering Policy enabling turbine upgrades; Ministry of Power tariff competitive bidding guidelines amended in February 2025.",
+        "growth_drivers": [
+          "Government target of 100 GW wind capacity by 2030 requiring ~48 GW additions from current ~51.6 GW",
+          "Renewable Purchase Obligation (RPO) of 43.3% driving utility and corporate demand",
+          "ISTS charge waivers reducing project costs and improving viability",
+          "C&I segment corporate green energy procurement for ESG compliance",
+          "National Repowering Policy creating 25.4 GW replacement opportunity",
+          "Falling wind turbine costs and improving PLFs (Plant Load Factors) with larger rotors",
+          "India's green hydrogen ambitions requiring renewable energy base",
+          "Export opportunity to emerging markets in Southeast Asia and Africa"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "business": {
+    "current": {
+      "section": "business",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/in-en/about-suzlon/corporate-profile",
+        "https://tradebrains.in/features/suzlon-energy-revenue-split-of-suzlon-energy-from-each-of-its-business-segment/",
+        "https://www.saurenergy.com/solar-energy-news/fy25-results-suzlon-fy25-revenue-jumps-67-to-%E2%82%B910851-cr"
+      ],
+      "data": {
+        "overview": "Suzlon Energy Limited is India's largest renewable energy solutions provider and wind turbine manufacturer, founded in 1995 by Tulsi Tanti. The company offers end-to-end wind energy solutions including turbine design, manufacturing, supply, installation, commissioning, and lifetime asset management (OMS). It has 21+ GW of installed wind energy capacity across 17 countries and 6 continents, with 15.1 GW in India alone. Annual domestic manufacturing capacity stands at 4,500 MW. The company is vertically integrated, manufacturing blades, nacelles, towers, generators, control panels, and other key components in-house.",
+        "revenue_streams": [
+          {
+            "name": "Wind Turbine Generator (WTG) Business",
+            "pct_of_revenue": 78.0,
+            "growth": "~118% YoY in FY25 (volume); revenue up 67% to Rs 10,851 crore in FY25",
+            "description": "Design, manufacture and supply of wind turbine generators including EPC services. Flagship S144 3MW platform with ~9 GW cumulative orders. FY25 deliveries hit record 1,550 MW (FY24: 710 MW). FY26 deliveries targeted at 2,456 MW (+58% YoY)."
+          },
+          {
+            "name": "Operations & Maintenance Services (OMS)",
+            "pct_of_revenue": 13.0,
+            "growth": "Stable recurring growth ~15% YoY",
+            "description": "Manages 15 GW of installed wind energy capacity across India, representing over USD 10 billion in renewable energy assets under management. SCADA-enabled remote monitoring of 10,000+ turbines. Provides predictable recurring revenue stream."
+          },
+          {
+            "name": "Foundry & Forging",
+            "pct_of_revenue": 4.0,
+            "growth": "Moderate",
+            "description": "Manufactures castings and forgings for wind turbines and third-party industrial customers. Provides component supply security."
+          },
+          {
+            "name": "Other / Solar & Services",
+            "pct_of_revenue": 5.0,
+            "growth": "Emerging",
+            "description": "Solar energy solutions and ancillary services. Growing segment as company diversifies into solar-wind hybrids."
+          }
+        ],
+        "competitive_advantages": [
+          "Vertical integration: manufactures blades, nacelles, towers, generators in-house - reduces costs and ensures quality",
+          "Dominant installed base of 15.1 GW in India creates massive OMS recurring revenue moat",
+          "S144 3MW turbine platform: India's first lowest carbon wind turbine, 40-43% higher generation than prior model, ~9 GW cumulative orders",
+          "SCADA-enabled remote monitoring of 10,000+ turbines - deep operational data and predictive maintenance",
+          "4,500 MW annual manufacturing capacity with 14 facilities across India, USA, China",
+          "29-30% cumulative market share in India with trusted brand and established customer relationships",
+          "Debt-free balance sheet providing financial flexibility and competitive bidding power",
+          "R&D centers in India, Germany, Netherlands, Denmark - global technology access",
+          "First mover advantage in repowering: positioned to replace 25.4 GW legacy turbines"
+        ],
+        "key_products": [
+          "S144 3.0-3.15 MW Wind Turbine Generator (flagship; 144m rotor; up to 160m hub height)",
+          "S120 2.1 MW Wind Turbine Generator (legacy platform)",
+          "SB 70.5 Carbon Fiber Blade (used in S144)",
+          "Tubular Steel Tower and Precast Concrete Tower",
+          "Nacelle, Generator, Control Panels, Hub Castings",
+          "SCADA System for remote turbine monitoring",
+          "OMS (Operations & Maintenance Services) lifecycle management"
+        ],
+        "business_model": "Suzlon operates as a vertically integrated wind energy solutions provider. Revenue is generated from (1) WTG sales: design-to-delivery of wind turbines including EPC services; (2) OMS contracts: multi-year operations and maintenance agreements for installed turbine fleets generating predictable recurring revenue; (3) Foundry & forging for components supply. The WTG business has high operating leverage - as deliveries scale from 1.5 GW to 3+ GW, fixed manufacturing costs spread further improving margins. OMS business provides stable base earnings. The company benefits from India-first focus with local content of 85-90% in S144 turbines."
+      }
+    },
+    "versions": []
+  },
+  "management": {
+    "current": {
+      "section": "management",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/in-en/about-suzlon/board-of-directors",
+        "https://www.businesstoday.in/markets/stocks/story/suzlon-energy-shares-jump-4-as-rahul-jain-appointed-as-new-cfo-what-management-says-499975-2025-10-29",
+        "https://in.marketscreener.com/quote/stock/SUZLON-ENERGY-LIMITED-9059353/company-governance/"
+      ],
+      "data": {
+        "ceo": {
+          "name": "J.P. Chalasani",
+          "since": "2022",
+          "background": "Group CEO of Suzlon Energy. Previously served as CEO of Sterlite Power, Sterlite Grid and other renewable energy companies. Brings deep expertise in power sector project development and execution."
+        },
+        "board_size": 10,
+        "board_independence_pct": 60.0,
+        "insider_ownership_pct": 22.5,
+        "other_key_executives": [
+          {
+            "name": "Girish Tanti",
+            "title": "Executive Vice Chairman",
+            "since": "Re-appointed Oct 2025 for 5 years till Oct 2030",
+            "background": "Co-founder and Vice Chairman of Suzlon Group. Nearly three decades of experience in renewables and international business. Part of founding Tanti family."
+          },
+          {
+            "name": "Tushar Tanti",
+            "title": "Executive Director",
+            "since": "2015",
+            "background": "Member of promoter Tanti family. Involved in business development and strategic initiatives."
+          },
+          {
+            "name": "Anish Shah",
+            "title": "Independent Non-Executive Chairman",
+            "since": "2023",
+            "background": "Previously MD & CEO of Mahindra & Mahindra. Brings broad corporate governance and conglomerate management experience."
+          },
+          {
+            "name": "Rahul Jain",
+            "title": "Chief Financial Officer",
+            "since": "October 2025",
+            "background": "Appointed CFO in October 2025. Brings expertise in financial transformation, M&A, and fundraising. Appointment seen as positive by markets (shares jumped 4% on announcement)."
+          }
+        ],
+        "governance_score": "B+",
+        "red_flags": [
+          "Promoter family (Tanti family) holds significant influence despite minority ownership - founder family culture",
+          "Historical governance issues during 2012-2020 debt crisis period when company was over-leveraged",
+          "Related party transactions with Suzlon Global Services (merger approved 2025) warrant monitoring",
+          "Executive remuneration transparency could be improved"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "esg": {
+    "current": {
+      "section": "esg",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/sustainability/ratings-reports",
+        "https://www.tribuneindia.com/news/business/suzlon-named-among-the-worlds-top-10-most-sustainable-companies-2-2",
+        "https://www.sustainalytics.com/esg-rating/suzlon-energy-ltd/1019563908",
+        "https://www.spglobal.com/sustainable1/en/scores/results?cid=4235265"
+      ],
+      "data": {
+        "overall_rating": "Top 10 Global 100 Most Sustainable Corporations 2026 (Corporate Knights)",
+        "rating_provider": "Corporate Knights, S&P CSA, Sustainalytics, ISS ESG",
+        "environmental": {
+          "score": "A",
+          "highlights": [
+            "88.51% reduction in emission intensity (Scope 1 & 2) achieved in FY24-25",
+            "90.14% Zero Waste to Landfill achieved in FY24-25",
+            "Committed to Net Zero by 2040",
+            "Zero Waste to Landfill target by 2028",
+            "Water Neutrality target by 2030",
+            "First Indian energy company to join RE100 initiative - 100% renewable energy at all 15 manufacturing facilities by 2030",
+            "S144 turbine certified as India's first lowest carbon wind turbine solution",
+            "Steel usage cut by 2.5x through design optimization; recycled steel used in S144",
+            "21+ GW of wind capacity installed across 17 countries - significant positive environmental impact"
+          ]
+        },
+        "social": {
+          "score": "B+",
+          "highlights": [
+            "Training campuses across India for workforce development",
+            "Community development programs in wind farm host regions",
+            "Workforce of thousands across manufacturing and services",
+            "Safety programs at manufacturing facilities",
+            "Local content of 85-90% in S144 turbines supporting domestic employment"
+          ]
+        },
+        "governance": {
+          "score": "B",
+          "highlights": [
+            "Independent Chairman (Anish Shah, former Mahindra MD) appointed",
+            "~60% board independence",
+            "Strengthened audit, risk and nomination committees",
+            "Debt-free status demonstrates improved financial discipline",
+            "CRISIL A+/Stable credit rating reflects governance improvement"
+          ]
+        },
+        "controversies": [
+          "2012-2020 debt crisis: company accumulated Rs 13,210 crore peak debt due to aggressive global expansion (Senvion acquisition)",
+          "SEBI penalty in focus (recent news, minor regulatory action)",
+          "Historical promoter family control concerns",
+          "Legacy German operations (Senvion) had to be divested under financial stress"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "estimates": {
+    "current": {
+      "section": "estimates",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://in.marketscreener.com/quote/stock/SUZLON-ENERGY-LIMITED-9059353/consensus/",
+        "https://www.alphaspread.com/security/nse/suzlon/analyst-estimates",
+        "https://www.multibagg.ai/market-pulse/articles/suzlon-energy-analyst-price-target-cmnizkkycasfpl00jkoqsd4u5"
+      ],
+      "data": {
+        "consensus": "Buy",
+        "price_target": {
+          "mean": "Rs 76",
+          "low": "Rs 52",
+          "high": "Rs 81"
+        },
+        "num_analysts": 13,
+        "eps_estimates": [
+          {
+            "period": "FY25 (Actual)",
+            "consensus": "Rs 1.95",
+            "low": "Rs 1.80",
+            "high": "Rs 2.10"
+          },
+          {
+            "period": "FY26E",
+            "consensus": "Rs 2.80",
+            "low": "Rs 2.40",
+            "high": "Rs 3.20"
+          },
+          {
+            "period": "FY27E",
+            "consensus": "Rs 3.60",
+            "low": "Rs 3.00",
+            "high": "Rs 4.20"
+          }
+        ],
+        "revenue_estimates": [
+          {
+            "period": "FY25 (Actual)",
+            "consensus": "Rs 10,851 Cr",
+            "low": "Rs 10,500 Cr",
+            "high": "Rs 11,200 Cr"
+          },
+          {
+            "period": "FY26E",
+            "consensus": "Rs 16,842 Cr",
+            "low": "Rs 15,500 Cr",
+            "high": "Rs 18,000 Cr"
+          },
+          {
+            "period": "FY27E",
+            "consensus": "Rs 21,000 Cr",
+            "low": "Rs 18,500 Cr",
+            "high": "Rs 24,000 Cr"
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "revenue": {
+    "current": {
+      "section": "revenue",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://powerline.net.in/2026/05/27/suzlon-energy-reports-rs-31-63-billion-net-profit-in-2025-26/",
+        "https://tradebrains.in/features/suzlon-energy-revenue-split-of-suzlon-energy-from-each-of-its-business-segment/",
+        "https://www.saurenergy.com/solar-energy-news/fy25-results-suzlon-fy25-revenue-jumps-67-to-%E2%82%B910851-cr",
+        "https://stockanalysis.com/quote/nse/SUZLON/financials/metrics/"
+      ],
+      "data": {
+        "total_revenue": "Rs 16,842 crore (FY26); Rs 10,851 crore (FY25)",
+        "growth_yoy": "53% YoY in FY26; 67% YoY in FY25",
+        "recurring_pct": 13.0,
+        "by_segment": [
+          {
+            "name": "Wind Turbine Generator (WTG)",
+            "revenue": "Rs 13,136 Cr (FY26E)",
+            "pct": 78.0,
+            "yoy_growth": "55%"
+          },
+          {
+            "name": "Operations & Maintenance Services (OMS)",
+            "revenue": "Rs 2,189 Cr (FY26E)",
+            "pct": 13.0,
+            "yoy_growth": "15%"
+          },
+          {
+            "name": "Foundry & Forging",
+            "revenue": "Rs 673 Cr (FY26E)",
+            "pct": 4.0,
+            "yoy_growth": "10%"
+          },
+          {
+            "name": "Other/Solar & Services",
+            "revenue": "Rs 842 Cr (FY26E)",
+            "pct": 5.0,
+            "yoy_growth": "20%"
+          }
+        ],
+        "by_geography": [
+          {
+            "region": "India (Domestic)",
+            "revenue": "Rs 16,500 Cr",
+            "pct": 98.0,
+            "yoy_growth": "53%"
+          },
+          {
+            "region": "International",
+            "revenue": "Rs 342 Cr",
+            "pct": 2.0,
+            "yoy_growth": "5%"
+          }
+        ],
+        "key_drivers": [
+          "Record WTG deliveries: FY26 hit 2,456 MW (up 58% from FY25's 1,550 MW)",
+          "S144 platform dominance: 9 GW cumulative orders driving volume ramp",
+          "C&I customer segment: 59-66% of order book from commercial & industrial customers",
+          "PSU orders: large NTPC, GAIL, Tata Power orders adding to order book",
+          "OMS recurring revenue growing as managed fleet expands from 15 GW toward 20+ GW",
+          "Realization improvement: contribution margin expanded to 23% (+360 bps in FY25)"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "catalysts": {
+    "current": {
+      "section": "catalysts",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.constructionworld.in/energy-infrastructure/power-and-renewable-energy/suzlon-secures-306-mw-repeat-wind-order-from-yanara/83304",
+        "https://www.outlookbusiness.com/industry/suzlon-bags-195mw-wind-energy-order-from-sunsure-energy",
+        "https://windinsider.com/2025/03/05/suzlon-secures-204-75-mw-order-from-jindal-renewables",
+        "https://trackk.in/blog/suzlon-energy-share-price-target/"
+      ],
+      "data": {
+        "near_term": [
+          {
+            "event": "FY27 Delivery Guidance",
+            "date": "Q1-Q2 FY27 (Apr-Sep 2026)",
+            "impact": "High",
+            "description": "Company targeting 3.2 GW deliveries in FY27 vs 2.456 GW in FY26. First quarterly results of FY27 will validate execution pace. Beats vs consensus could drive strong re-rating."
+          },
+          {
+            "event": "New Order Announcements",
+            "date": "Ongoing, monthly",
+            "impact": "Medium-High",
+            "description": "Record order book of 5.9-6.4 GW; expected inflows of ~4 GW in FY26 including ~1.5 GW from NTPC. Each large order announcement (100-300 MW) provides positive catalysts."
+          },
+          {
+            "event": "Suzlon Global Services Merger Completion",
+            "date": "H1 FY27 (2026)",
+            "impact": "Medium",
+            "description": "BSE/NSE approved merger of wholly-owned OMS subsidiary Suzlon Global Services. Simplifies corporate structure, improves OMS segment reporting transparency."
+          },
+          {
+            "event": "Q1 FY27 Results",
+            "date": "July-August 2026",
+            "impact": "High",
+            "description": "First quarterly print of new fiscal year will set tone for FY27. Strong delivery volumes and margin expansion key metrics to watch."
+          }
+        ],
+        "medium_term": [
+          {
+            "event": "India Wind Auction Pipeline",
+            "date": "FY27-FY28 (2026-2028)",
+            "impact": "High",
+            "description": "Government expected to auction 10+ GW annually. Suzlon's order book refill from NTPC, SECI, state utilities. Potential for order book to exceed 8-10 GW."
+          },
+          {
+            "event": "Export Market Entry",
+            "date": "FY27-FY28",
+            "impact": "Medium",
+            "description": "Management targeting Southeast Asia and Africa with 3-3.5 MW turbines. First export orders could signal new growth vector beyond India."
+          },
+          {
+            "event": "Repowering Policy Implementation",
+            "date": "FY26-FY28",
+            "impact": "High",
+            "description": "National Repowering Policy enables replacement of 25.4 GW legacy sub-2MW turbines. Suzlon's dominant installed base gives preferential access to repowering contracts."
+          },
+          {
+            "event": "S144 Next Generation (3.5-4 MW)",
+            "date": "FY27-FY28",
+            "impact": "Medium-High",
+            "description": "Expected next-gen turbine platform to compete with global OEMs. Could open utility-scale and export segments."
+          }
+        ],
+        "risks": [
+          {
+            "risk": "Order execution delays",
+            "probability": "Medium",
+            "impact": "High"
+          },
+          {
+            "risk": "Policy reversal or auction slowdown",
+            "probability": "Low",
+            "impact": "Very High"
+          },
+          {
+            "risk": "Raw material cost spike (steel, carbon fiber)",
+            "probability": "Medium",
+            "impact": "Medium"
+          },
+          {
+            "risk": "Competition from Envision/Inox taking market share",
+            "probability": "Medium",
+            "impact": "Medium"
+          },
+          {
+            "risk": "Working capital stress / cash flow deterioration",
+            "probability": "Medium",
+            "impact": "Medium"
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "cyclical": {
+    "current": {
+      "section": "cyclical",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.indian-share-tips.com/2025/12/why-is-suzlon-seeing-renewed-confidence-in-the-wind-energy-cycle.html",
+        "https://www.business-standard.com/markets/news/motilal-oswal-bets-on-india-s-wind-sector-recommends-buying-this-stock-125081200095_1.html",
+        "https://in.investing.com/analysis/suzlon-energy-share-price-target-202530--analysis-200629613"
+      ],
+      "data": {
+        "cyclicality": "Moderate - Structural upcycle with cyclical overlays",
+        "current_cycle_position": "Early-to-mid upcycle. India wind capacity at ~51.6 GW vs 100 GW 2030 target. Multi-year capacity additions required. Order books at record levels. Sector in investment expansion phase.",
+        "cycle_drivers": [
+          "Government renewable energy targets and RPO mandates creating policy-driven demand floor",
+          "India's 500 GW non-fossil fuel by 2030 commitment (Panchamrit targets) - structural not cyclical",
+          "C&I corporate green energy procurement for ESG - structural demand growth",
+          "Repowering of 25.4 GW legacy fleet - multi-year demand addition",
+          "Interest rate environment: lower rates reduce project financing costs and improve wind project IRRs",
+          "Steel and commodity prices affect turbine costs and margins cyclically",
+          "Government auction timing and pace creates short-term lumpy order flows"
+        ],
+        "historical_pattern": "India wind sector saw a severe downturn in 2017-2020 following policy transition from feed-in tariff to competitive auctions. Sector installations fell from ~5.5 GW/year (FY17) to ~1.5-2 GW/year (FY18-FY20). Recovery began FY22 onwards with auction pipeline buildup. FY25 saw 3.7 GW installations nationally. FY26-FY30 expected 7-10 GW/year. Suzlon personally went through extreme debt crisis 2012-2020 during down cycle.",
+        "recommendation": "Current cycle position is favorable - early-to-mid upcycle with structural policy support ensuring a sustained multi-year growth trajectory. Risk is government auction delay or policy change causing temporary slowdown. Buy on dips; maintain core position through the cycle."
+      }
+    },
+    "versions": []
+  },
+  "ma": {
+    "current": {
+      "section": "ma",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://hdfcsky.com/news/suzlon-energy-suzlon-global-merger-gets-bse-nse-approval",
+        "https://mergr.com/suzlon-energy-acquisitions",
+        "https://www.business-standard.com/markets/capital-market-news/board-of-suzlon-energy-approves-modification-in-merger-scheme-124081601432_1.html"
+      ],
+      "data": {
+        "summary": "Suzlon's M&A strategy has evolved dramatically. The company made aggressive global acquisitions in the mid-2000s (notably Senvion for $1.6B in 2007) that led to a severe debt crisis. Post-2020 turnaround, M&A focus has shifted inward - simplifying the corporate structure through subsidiary mergers. The Suzlon Global Services merger (OMS subsidiary) is the primary current transaction. No major external acquisitions planned; focus is organic growth in India.",
+        "recent_deals": [
+          {
+            "year": 2025,
+            "type": "Subsidiary Merger",
+            "target": "Suzlon Global Services Limited (SGSL)",
+            "value": "Internal restructuring - no cash consideration",
+            "rationale": "Merge wholly-owned OMS subsidiary into parent company. Simplifies corporate structure, improves operational efficiency, better integrated service model for PSU and C&I clients. BSE/NSE no-adverse-observation received July 2025."
+          },
+          {
+            "year": 2012,
+            "type": "Divestiture",
+            "target": "Senvion SE (REpower Systems)",
+            "value": "$1B+ (sold to Centerbridge Partners)",
+            "rationale": "Forced divestiture to reduce debt. Senvion was acquired for $1.6B in 2007 to become a global wind OEM but became a financial burden."
+          }
+        ],
+        "strategy": "Asset-light, India-focused organic growth. Current strategy is to grow through order execution rather than acquisitions. Vertical integration maintained through internal manufacturing expansion. OMS fleet growth via turbine deliveries rather than acquisitions.",
+        "pipeline": "No major external acquisitions anticipated in near term. Focus on completing Suzlon Global Services merger and consolidating India market position. Potential bolt-on acquisitions in solar or adjacent renewables possible as balance sheet strengthens."
+      }
+    },
+    "versions": []
+  },
+  "value": {
+    "current": {
+      "section": "value",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.gurufocus.com/term/pe-ratio/NSE:SUZLON",
+        "https://www.gurufocus.com/stock/NSE:SUZLON/dcf",
+        "https://www.alphaspread.com/security/nse/suzlon/dcf-valuation",
+        "https://simplywall.st/stocks/in/capital-goods/nse-suzlon/suzlon-energy-shares/valuation"
+      ],
+      "data": {
+        "summary": "Suzlon trades at ~19x TTM PE (as of Apr 2026) which is 19% below its 10-year median of 23x. Given 53%+ earnings growth in FY26, the PEG ratio appears reasonable. However, DCF models suggest varying outcomes: GuruFocus GF Value implies deep undervaluation (stock at 56% discount to Rs 101 fair value), while AlphaSpread DCF suggests overvaluation (stock at 61% premium to Rs 22 intrinsic value). The wide range reflects high growth expectations embedded in market price. On P/B basis at 9.2x, the stock is expensive on asset basis but justified by ROCE of 30%+.",
+        "intrinsic_value": "Rs 55-101 (wide range across methodologies)",
+        "methodology": "PE band analysis, P/B band, DCF (multiple analyst estimates)",
+        "pe_band": {
+          "current": 18.82,
+          "5yr_avg": 23.2,
+          "premium_discount": "19% discount to 5-year median PE"
+        },
+        "pb_band": {
+          "current": 9.16,
+          "5yr_avg": 6.49
+        },
+        "dcf_value": "Rs 22-101 depending on growth assumptions; central estimate ~Rs 60-70",
+        "margin_of_safety": "Moderate - stock at ~Rs 54-57 range offers upside to analyst consensus of Rs 76 (~35-40% upside)",
+        "valuation_verdict": "Reasonably valued to moderately undervalued on PE basis given growth trajectory. Rich on P/B and DCF under conservative assumptions. Suitable for growth-oriented investors with 2-3 year horizon. Not a deep value play."
+      }
+    },
+    "versions": []
+  },
+  "faq": {
+    "current": {
+      "section": "faq",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/in-en/about-suzlon/corporate-profile",
+        "https://trendlyne.com/fundamentals/financials/1337/SUZLON/suzlon-energy-ltd/",
+        "https://simplywall.st/stocks/in/capital-goods/nse-suzlon/suzlon-energy-shares/news/suzlon-energys-nsesuzlon-earnings-might-be-weaker-than-you-t"
+      ],
+      "data": {
+        "questions": [
+          {
+            "question": "Is Suzlon really debt-free now? What happened to all the debt?",
+            "answer": "Yes. Suzlon achieved consolidated debt-free status as of March 31, 2025, with net cash of Rs 833 crore. The company had peak debt of Rs 13,210 crore in FY20, accumulated through aggressive global acquisitions (notably Senvion for $1.6B in 2007) and capital misallocation. Over 2020-2025, the company divested non-core assets, raised equity, and used operating cash flows to eliminate all borrowings. CRISIL upgraded the rating to A+/Stable."
+          },
+          {
+            "question": "Why is free cash flow so much lower than reported profits?",
+            "answer": "Suzlon's FY26 free cash flow was Rs 6.3 billion vs reported profit of Rs 31.6 billion - an accrual ratio of 0.38. The gap is partly explained by: (1) a one-time tax benefit of Rs 7.4 billion that boosted reported profits but not cash, (2) working capital build-up as revenue scales rapidly (receivables increase with growing order book), (3) capex for manufacturing capacity expansion. Investors should monitor cash conversion carefully as high accruals can signal earnings quality risk."
+          },
+          {
+            "question": "What is the S144 turbine and why does it matter?",
+            "answer": "The S144 is Suzlon's flagship 3.0-3.15 MW wind turbine generator with a 144m rotor diameter and hub heights up to 160m. It delivers 40-43% higher generation than the prior S120 2.1 MW model and makes low-wind sites commercially viable. It uses carbon fiber blades (SB 70.5) and has local content of 85-90%. Since launch, it has accumulated ~9 GW of cumulative orders, making it the dominant platform in the Indian market. India's first lowest carbon wind turbine certification."
+          },
+          {
+            "question": "What is Suzlon's order book and how does it translate to revenue?",
+            "answer": "As of mid-2026, Suzlon's order book stands at approximately 5.9-6.4 GW, the highest in company history. This is approximately 3.6x FY25 execution volume of 1.55 GW. At an average realization of ~Rs 6-7 crore per MW, a 6 GW order book represents Rs 36,000-42,000 crore of potential future revenue. With targeted FY27 deliveries of 3.2 GW, the order book provides 2-year revenue coverage. 59-66% of the order book is from C&I customers."
+          },
+          {
+            "question": "How does Suzlon's OMS business work and why is it valuable?",
+            "answer": "Suzlon's Operations & Maintenance Services (OMS) business manages 15 GW of installed wind capacity for third parties, representing over USD 10 billion in renewable energy assets. Suzlon earns annual service contracts (typically Rs 4-8 lakh per MW per year) for maintenance, monitoring via its SCADA system, and performance optimization. This generates ~Rs 2,000+ crore in annual revenue with ~40% EBITDA margins, providing stable recurring cash flows that cushion the lumpy WTG business. The fleet grows automatically as new turbines are delivered."
+          },
+          {
+            "question": "Who are Suzlon's main competitors and is its market share under threat?",
+            "answer": "Main competitors in India are Envision Group (Chinese OEM, currently holding highest new-order market share), Inox Wind (fast-growing domestic player), and GE Vernova. Suzlon's cumulative installed base of 15.1 GW gives it a 29-30% cumulative market share, but new order market share is expected to settle at 24-26% as competition intensifies. Suzlon's advantages are its OMS moat, local manufacturing, S144 platform dominance, and customer relationships. The RLMM policy protects against Chinese OEM imports."
+          },
+          {
+            "question": "What is Suzlon's dividend policy?",
+            "answer": "Suzlon has not paid dividends since 2008 (last dividend Rs 0.92 per share in September 2008). During the debt crisis years, all cash was directed to debt repayment. Post-debt-free status, the company is likely to initiate a dividend policy, but management has not made specific commitments. Capital is currently being reinvested into manufacturing capacity expansion and working capital for the growth phase. Investors should not expect material dividends in the near term (FY26-FY27)."
+          },
+          {
+            "question": "What are the biggest risks to Suzlon's growth story?",
+            "answer": "Key risks: (1) Policy risk - changes to RPO mandates, ISTS waivers, or government auction slowdown could reduce demand; (2) Execution risk - scaling from 2.5 to 3+ GW deliveries requires flawless manufacturing and logistics; (3) Earnings quality - accrual ratio of 0.38 and one-off tax benefits inflate reported profits vs cash; (4) Competition - Envision and Inox Wind are competitive threats; (5) Working capital - rapid revenue growth strains receivables management; (6) Raw material costs - steel and carbon fiber inflation compresses margins."
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "credit": {
+    "current": {
+      "section": "credit",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.whalesbook.com/corporate-news/English/sebiexchange/Suzlon-Energy-Avoids-SEBI-Large-Corporate-Rules-Due-to-Zero-Debt/69e89cdabca97ee1069f5730",
+        "https://www.crisil.com/mnt/winshare/Ratings/RatingList/RatingDocs/SuzlonEnergyLimited_July%2029_%202025_RR_374635.html",
+        "https://www.icra.in/Rating/GetRationalReportFilePdf?id=136727"
+      ],
+      "data": {
+        "summary": "Suzlon achieved a remarkable financial turnaround from peak debt of Rs 13,210 crore in FY20 to debt-free status as of March 31, 2025. Net cash stood at Rs 833 crore (March 2025) and Rs 1,556 crore (Q3 FY26). The company's CRISIL rating was upgraded to A+/Stable (reaffirmed for FY26). Zero debt status means Suzlon avoids SEBI Large Corporate Framework requirements, providing operational flexibility. Interest coverage is strong at 7x with debt/OPBIDTA of 0.18x.",
+        "credit_rating": "CRISIL A+/Stable (reaffirmed FY26)",
+        "debt_to_equity": 0.05,
+        "interest_coverage": 7.0,
+        "net_cash_position": "Rs 1,556 crore net cash as of Q3 FY26",
+        "debt_maturity_profile": "Near debt-free; residual working capital facilities and NFB limits with encumbered cash of Rs 1,071 crore for margin requirements. No long-term debt obligations.",
+        "liquidity": "Strong. Net cash positive. Rs 1,556 crore net cash as of Q3 FY26, plus undrawn credit facilities. OMS recurring cash flows provide liquidity base. Company can self-fund moderate capex.",
+        "key_covenants": [
+          "Standard non-fund based (NFB) facility margin requirements: Rs 1,071 crore encumbered cash",
+          "Maintaining minimum credit rating for access to working capital facilities",
+          "No specific financial maintenance covenants given debt-free status"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "geofx": {
+    "current": {
+      "section": "geofx",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://tradebrains.in/suzlon-energy-surges-20-in-one-month-as-indias-wind-bridge-strategy-takes-center-stage/",
+        "https://en.wikipedia.org/wiki/Suzlon",
+        "https://www.whalesbook.com/news/English/renewables/Suzlon-Energy-Eyes-Europe-Return-as-Indias-Wind-Market-Surges/69e791b5bca97ee1069ad7bf"
+      ],
+      "data": {
+        "summary": "Suzlon is predominantly an India-focused company with ~98% of revenue from domestic operations. Historical international operations (Senvion in Germany, global presence in 17 countries) have been wound down or divested. Minimal direct FX exposure. Key indirect FX risk: raw materials (steel, copper) priced in global commodity markets; some component imports. Company is actually a beneficiary of geopolitical tensions as they boost India's strategic imperative for domestic renewable energy. Management targeting export re-entry in Southeast Asia and Africa with 3-3.5 MW turbines.",
+        "revenue_by_geography": [
+          {
+            "region": "India (Domestic)",
+            "pct": 98.0
+          },
+          {
+            "region": "International (legacy OMS/services)",
+            "pct": 2.0
+          }
+        ],
+        "fx_exposure": "Minimal direct FX exposure. Suzlon's revenue is almost entirely INR-denominated. Indirect exposure through: (1) imported components - some electronic and mechanical components sourced globally; (2) commodity prices (steel, copper, aluminum) tracked in USD; (3) R&D center costs in Germany, Netherlands, Denmark denominated in EUR. Local content at 85-90% mitigates import dependency.",
+        "key_currencies": [
+          "INR (primary)",
+          "USD (commodity pricing reference)",
+          "EUR (R&D center costs)"
+        ],
+        "geopolitical_risks": [
+          "India-China border tensions: RLMM policy protects against Chinese wind OEM imports but Chinese steel/component suppliers could be impacted",
+          "Middle East tensions (Iran/Strait of Hormuz): Actually positive catalyst - raises strategic cost of fossil fuels for India, boosting renewable energy urgency",
+          "US tariff/trade policy: Minimal direct impact as Suzlon is India-focused; US steel tariffs could affect global steel prices indirectly",
+          "Global supply chain disruptions: Electronic components (chips, sensors) and specialty materials sourced globally",
+          "India-Pakistan border tensions: Could delay projects in border states; generally minimal wind energy project impact"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "capital": {
+    "current": {
+      "section": "capital",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.capitalmarket.com/Company-Information/Corporate-Actions/Dividends/Suzlon-Energy-Ltd/13872",
+        "https://stockinvest.us/dividends/SUZLON.NS",
+        "https://www.saurenergy.com/solar-energy-news/fy25-results-suzlon-fy25-revenue-jumps-67-to-%E2%82%B910851-cr"
+      ],
+      "data": {
+        "summary": "Suzlon's capital allocation has shifted dramatically post debt-free status. Historical capex was minimal during debt repayment years (FY17-FY24). Now expanding manufacturing capacity and working capital to support 3+ GW delivery targets. No dividends since FY08. Share buybacks not a priority. Capital is primarily being reinvested in organic growth - manufacturing capacity from 4,500 MW toward 6,000+ MW and working capital for the revenue ramp. With strong cash generation expected in FY27-FY28, dividend initiation or buybacks possible.",
+        "capex_history": [
+          {
+            "year": "FY23",
+            "capex": "Rs 450 Cr",
+            "as_pct_revenue": "6.2%"
+          },
+          {
+            "year": "FY24",
+            "capex": "Rs 600 Cr",
+            "as_pct_revenue": "9.2%"
+          },
+          {
+            "year": "FY25",
+            "capex": "Rs 800 Cr",
+            "as_pct_revenue": "7.4%"
+          },
+          {
+            "year": "FY26E",
+            "capex": "Rs 1,200 Cr",
+            "as_pct_revenue": "7.1%"
+          }
+        ],
+        "dividend_history": [
+          {
+            "year": "FY08",
+            "dividend": "Rs 0.92/share",
+            "yield": "~0.5%"
+          },
+          {
+            "year": "FY09-FY26",
+            "dividend": "Rs 0",
+            "yield": "0%"
+          }
+        ],
+        "buybacks": "No share buybacks conducted. Company focused on organic growth investment and balance sheet strengthening. Post-FY26 potential for capital return as cash accumulation accelerates.",
+        "capital_allocation_strategy": "Priority 1: Manufacturing capacity expansion (4,500 MW toward 6,000+ MW) to support 3-4 GW delivery targets. Priority 2: Working capital management for growing order book execution. Priority 3: R&D investment in next-generation turbines (3.5-4 MW platform). Priority 4: Debt repayment (completed). Priority 5 (future): Dividend initiation and/or buybacks as cash generation exceeds investment needs."
+      }
+    },
+    "versions": []
+  },
+  "forensic": {
+    "current": {
+      "section": "forensic",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://simplywall.st/stocks/in/capital-goods/nse-suzlon/suzlon-energy-shares/news/suzlon-energys-nsesuzlon-earnings-might-be-weaker-than-you-t",
+        "https://www.tijorifinance.com/company/suzlon-energy-limited/financials/",
+        "https://dcfmodeling.com/blogs/health/suzlonns-financial-health"
+      ],
+      "data": {
+        "summary": "Forensic analysis raises moderate concerns about Suzlon's FY26 earnings quality. Key flags: accrual ratio of 0.38 (earnings significantly exceed cash flows), one-off tax benefit of Rs 7.4 billion boosting reported profits, and high receivables indicating working capital intensity. However, green flags include debt-free status, improving EBITDA margins, and legitimate revenue growth driven by physical turbine deliveries (verifiable). The accrual issues are partly structural (rapid growth requires working capital build) rather than purely accounting-driven.",
+        "accrual_ratio": 0.38,
+        "beneish_m_score": -2.1,
+        "red_flags": [
+          "Accrual ratio 0.38 in FY26: Free cash flow Rs 6.3B vs reported profit Rs 31.6B - significant gap",
+          "One-off tax benefit of Rs 7.4 billion in FY26 boosted reported profit; non-recurring",
+          "High and growing receivables as revenue scales rapidly - working capital intensive",
+          "Resources allocated to majorly unproductive assets (accounts receivable) - working capital management concern",
+          "Historical pattern: company had accounting irregularities during peak debt period (2012-2018)"
+        ],
+        "green_flags": [
+          "Revenue growth is verifiable through physical turbine deliveries (2,456 MW in FY26 vs 1,550 MW in FY25)",
+          "Debt-free status; net cash position confirms no financial engineering",
+          "CRISIL A+/Stable credit rating - independent third-party validation of financial health",
+          "EBITDA margins improving: WTG contribution margin expanded to 23% (+360 bps in FY25)",
+          "OMS business provides recurring cash flows with ~40% EBITDA margins - high quality earnings",
+          "Auditor (reputable firm) has not flagged material concerns",
+          "Revenue recognized on percentage-of-completion basis aligned with actual deliveries"
+        ],
+        "revenue_quality": "Medium-High. Revenue growth backed by verifiable physical turbine deliveries. Order book independently verifiable. OMS revenue is recurring and contractually backed. Some risk from long-duration EPC contracts and revenue recognition timing.",
+        "earnings_quality": "Medium. EBITDA quality is solid, but PAT inflated by one-off tax benefit. Underlying earnings power (ex-tax benefit) closer to Rs 24 billion. Accrual ratio is a concern but partly explained by working capital build during rapid growth phase.",
+        "cash_conversion": "Low in FY26 (free cash flow Rs 6.3B vs profit Rs 31.6B = 20% conversion rate). Expected to improve to 40-50% as working capital stabilizes post growth ramp. Monitor closely."
+      }
+    },
+    "versions": []
+  },
+  "iprd": {
+    "current": {
+      "section": "iprd",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/in-en/end-to-end-solutions/renewable-energy-research-and-development",
+        "https://themachinemaker.com/news/suzlons-s144-wind-turbine-achieves-industry-leading-low-carbon-footprint/",
+        "https://www.suzlon.com/press-release-detail/497/suzlons-s144-becomes-indias-first-lowest-wind-turbine-solution"
+      ],
+      "data": {
+        "summary": "Suzlon has global R&D capabilities with centers in India, Germany, Netherlands, and Denmark. R&D focuses on next-generation turbines, carbon fiber blade technology, SCADA/digital monitoring, and low-wind site optimization. The S144 3MW platform is the current commercial flagship. Next-gen 3.5-4 MW platform in development for higher wind class sites and export markets. Suzlon holds significant IP in turbine design, blade technology, and control systems.",
+        "rd_spend": "Estimated Rs 200-300 crore annually (not separately disclosed)",
+        "rd_as_pct_revenue": 1.5,
+        "key_patents": [
+          "S144 Doubly Fed Induction Generator (DFIG) technology",
+          "SB 70.5 carbon fiber blade design and manufacturing process",
+          "SCADA remote monitoring system architecture for 10,000+ turbines",
+          "Hybrid steel-concrete tower designs for 140-160m hub heights",
+          "Low-wind site optimization algorithms",
+          "Blade recycling and end-of-life management processes"
+        ],
+        "technology_partnerships": [
+          "Internal R&D centers in Germany, Netherlands, Denmark leveraging European wind technology heritage",
+          "Carbon fiber blade technology partners (material suppliers)",
+          "IIT and Indian academic institutions for materials research",
+          "SCADA and digital monitoring technology partners"
+        ],
+        "innovation_areas": [
+          "Next-generation 3.5-4 MW turbine platform for higher wind classes and export",
+          "Carbon fiber blade technology (SB 70.5) - 70.5m blades for S144",
+          "Smart SCADA: AI-enabled predictive maintenance for 10,000+ turbine fleet",
+          "Precast concrete towers for higher hub heights (140-160m) economically",
+          "Blade recycling programs to address end-of-life sustainability concerns",
+          "Hybrid wind-solar integrated systems",
+          "Low-carbon manufacturing: S144 certified India's first lowest carbon wind turbine"
+        ],
+        "ev_roadmap": "Suzlon is a pure-play wind energy company with no EV roadmap. However, the company's renewable energy infrastructure supports India's broader EV ecosystem by providing clean grid power. No plans to enter EV manufacturing or charging infrastructure directly."
+      }
+    },
+    "versions": []
+  },
+  "supply_chain": {
+    "current": {
+      "section": "supply_chain",
+      "symbol": "SUZLON.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.suzlon.com/in-en/end-to-end-solutions/supply-chain-management-and-manufacturing",
+        "https://en.wikipedia.org/wiki/Suzlon",
+        "https://www.indiamart.com/suzlonenergyltd-pune/infrastructure-and-facilities.html"
+      ],
+      "data": {
+        "summary": "Suzlon is one of the most vertically integrated wind turbine manufacturers globally, producing almost all key components in-house. With 14 manufacturing facilities across India, USA, and China JV, and 4,500 MW annual capacity, the company has built a resilient supply chain with local content of 85-90% in the S144 turbine. This vertical integration provides significant cost control, quality assurance, and supply security advantages over pure-assembly competitors.",
+        "key_suppliers": [
+          {
+            "name": "Internal - Suzlon Blade Manufacturing",
+            "component": "Rotor Blades (SB 70.5 carbon fiber)",
+            "dependency": "Self-supplied - critical capability"
+          },
+          {
+            "name": "Internal - Suzlon Towers",
+            "component": "Tubular Steel Towers & Precast Concrete Towers",
+            "dependency": "Self-supplied"
+          },
+          {
+            "name": "Internal - Suzlon Generators",
+            "component": "Annular Generators & DFIG systems",
+            "dependency": "Self-supplied"
+          },
+          {
+            "name": "Internal - Suzlon Foundry",
+            "component": "Hub Castings, Nacelle Components",
+            "dependency": "Self-supplied via foundry & forging segment"
+          },
+          {
+            "name": "External - Steel Suppliers (JSW, Tata Steel etc.)",
+            "component": "Steel for towers and nacelles",
+            "dependency": "High - steel is ~40-45% of turbine cost; sourced from domestic producers"
+          },
+          {
+            "name": "External - Carbon Fiber Suppliers (Toray, SGL etc.)",
+            "component": "Carbon fiber for SB 70.5 blades",
+            "dependency": "Medium-High - imported; concentration risk from Japanese/European suppliers"
+          },
+          {
+            "name": "External - Bearing Suppliers (SKF, Schaeffler)",
+            "component": "Main bearings, gearbox bearings",
+            "dependency": "Medium - global OEMs"
+          },
+          {
+            "name": "External - Electronics/Control Components",
+            "component": "Inverters, control electronics, sensors",
+            "dependency": "Medium - sourced globally including from Europe and Asia"
+          }
+        ],
+        "concentration_risk": "Low-to-Medium. Vertical integration significantly reduces external supplier dependency. Key concentration risks: (1) carbon fiber sourcing from limited global suppliers; (2) steel price exposure to domestic steel industry; (3) specialized electronics from European suppliers. RLMM policy protects against Chinese component imports.",
+        "localisation_pct": 87.5,
+        "risks": [
+          "Steel price inflation: steel is ~40-45% of turbine cost; domestic steel price spikes impact margins",
+          "Carbon fiber supply: primarily imported from Japan/Europe; supply disruptions or price spikes impact blade costs",
+          "Electronics components: some specialized inverters and sensors sourced from Europe/Asia; potential lead time issues",
+          "Logistics: wind turbine blades (70.5m) and towers require specialized transport; logistical bottlenecks in remote sites",
+          "Skilled labor: shortage of specialized installation and commissioning engineers as industry scales",
+          "Land acquisition: not Suzlon's direct risk but customer's; delays in customer land acquisition slow deliveries"
+        ],
+        "resilience": "High. Suzlon's vertical integration is its primary supply chain resilience mechanism. 14 manufacturing facilities with 4,500 MW annual capacity provide geographic and operational redundancy. Domestic sourcing at 85-90% reduces international supply chain exposure. Established vendor base with long-term relationships provides stability. Inventory management and production planning systems have matured over 30 years of operations."
+      }
+    },
+    "versions": []
+  }
+}

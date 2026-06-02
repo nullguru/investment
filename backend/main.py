@@ -540,6 +540,18 @@ def api_symbol_research_version_restore(symbol: str, section: str, version_idx: 
     return {"status": "restored", "envelope": envelope}
 
 
+@app.get("/api/symbol/{symbol}/field-gaps")
+def api_field_gaps(symbol: str):
+    """Return field gaps for a symbol — fields that the data provider cannot supply."""
+    from modules.market.field_gaps import get_symbol_gaps, get_unfilled_gaps, ENRICHABLE_FIELDS
+    return {
+        "symbol": symbol,
+        "gaps": get_symbol_gaps(symbol),
+        "unfilled": get_unfilled_gaps(symbol),
+        "enrichable": ENRICHABLE_FIELDS,  # so the frontend knows what *could* be missing
+    }
+
+
 @app.get("/api/resolve")
 def api_resolve(q: str = Query(""), market: str = Query("india")):
     """Resolve search query to ticker (e.g. TCS -> TCS.NS for India, AAPL -> AAPL for US)."""
@@ -897,24 +909,45 @@ def api_compare(symbols: str = Query(""), market: str = Query("india")):
             val = yf_get_section(sym, "valuation", force=False, market=market)
             fin = yf_get_section(sym, "financials", force=False, market=market)
             ov  = yf_get_section(sym, "overview", force=False, market=market)
-            base["current_price"] = _safe_val(mkt.get("currentPrice") or val.get("currentPrice"))
-            base["52w_high"] = _safe_val(mkt.get("fiftyTwoWeekHigh"))
-            base["52w_low"] = _safe_val(mkt.get("fiftyTwoWeekLow"))
-            base["52w_change_pct"] = _safe_val(mkt.get("fiftyTwoWeekChangePercent") or mkt.get("52WeekChange"))
+            price = _safe_val(mkt.get("currentPrice") or val.get("currentPrice"))
+            high52 = _safe_val(mkt.get("fiftyTwoWeekHigh"))
+            low52  = _safe_val(mkt.get("fiftyTwoWeekLow"))
+            base["current_price"] = price
+            base["52w_high"] = high52
+            base["52w_low"]  = low52
+            # Compute 52w return from 52w low/high midpoint vs current (fallback)
+            raw_52w = mkt.get("fiftyTwoWeekChangePercent") or mkt.get("52WeekChange")
+            if raw_52w is None and price and low52 and low52 > 0:
+                raw_52w = (price - low52) / low52  # rough proxy from 52w low
+            base["52w_change_pct"] = _safe_val(raw_52w)
             base["beta"] = _safe_val(mkt.get("beta"))
             base["dividend_yield"] = _safe_val(mkt.get("dividendYield") or val.get("dividendYield"))
             base["trailing_pe"] = _safe_val(val.get("trailingPE") or mkt.get("trailingPE"))
             base["forward_pe"] = _safe_val(val.get("forwardPE") or mkt.get("forwardPE"))
             base["price_to_book"] = _safe_val(val.get("priceToBook") or mkt.get("priceToBook"))
+            base["price_to_sales"] = _safe_val(val.get("priceToSalesTrailing12Months") or val.get("priceToSales"))
             base["ev_to_ebitda"] = _safe_val(val.get("enterpriseToEbitda") or val.get("evToEbitda"))
             base["roe"] = _safe_val(fin.get("returnOnEquity") or ov.get("returnOnEquity"))
             base["roa"] = _safe_val(fin.get("returnOnAssets") or ov.get("returnOnAssets"))
-            base["profit_margin"] = _safe_val(fin.get("profitMargins") or ov.get("profitMargins"))
+            base["gross_margin"] = _safe_val(fin.get("grossMargins") or ov.get("grossMargins"))
+            base["operating_margin"] = _safe_val(fin.get("operatingMargins") or ov.get("operatingMargins"))
+            base["net_margin"] = _safe_val(fin.get("profitMargins") or ov.get("profitMargins"))
+            base["profit_margin"] = base["net_margin"]
+            base["ebitda_margin"] = _safe_val(fin.get("ebitdaMargins") or ov.get("ebitdaMargins"))
             base["revenue_growth"] = _safe_val(fin.get("revenueGrowth") or ov.get("revenueGrowth"))
             base["earnings_growth"] = _safe_val(fin.get("earningsGrowth") or ov.get("earningsGrowth"))
             base["debt_to_equity_live"] = _safe_val(fin.get("debtToEquity") or ov.get("debtToEquity"))
             base["current_ratio"] = _safe_val(fin.get("currentRatio") or ov.get("currentRatio"))
+            base["quick_ratio"] = _safe_val(fin.get("quickRatio") or ov.get("quickRatio"))
+            base["interest_coverage"] = _safe_val(fin.get("interestCoverage") or ov.get("interestCoverage"))
             base["employees"] = _safe_val(ov.get("fullTimeEmployees"))
+            # Merge quality cache scores
+            qcache = load_quality_cache()
+            if sym in qcache:
+                q = qcache[sym]
+                base["total_score"] = q.get("total_score")
+                for qf in ["profitability_score","cash_generation_score","financial_strength_score","valuation_score"]:
+                    base[qf] = q.get(qf)
             if not base.get("name") or base["name"] == sym:
                 base["name"] = ov.get("shortName") or ov.get("longName") or mkt.get("shortName") or sym
             if not base.get("market_cap"):

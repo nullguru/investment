@@ -87,5 +87,867 @@
       ],
       "regulatory_environment": "CPCB IV+ emission standards (effective July 2024) are the most significant regulatory driver — requiring SCR, DPF, and advanced fuel injection systems. Delhi NCR imposes additional seasonal bans and 3-meter stack height requirements. BS-VI norms for on-road diesel engines since 2020. The regulatory direction is clearly tightening, which favors incumbents with emission-control technology (Cummins, Caterpillar) and pressures smaller unorganized players. Long-term risk: government push toward renewable energy and battery storage (6.1 GW storage tenders in Q1 2025) could substitute diesel peaking capacity over 5-10 years."
     }
+  },
+  "thesis": {
+    "current": {
+      "section": "thesis",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/news/releases/2025/05/28/cummins-india-limited-results-quarter-and-year-ended-march-31-2025",
+        "https://arkives.substack.com/p/cummins-india-ltd-play-on-indias",
+        "https://www.business-standard.com/markets/stock-market-news/cummins-growth-outlook-fy26-q4-results-margin-performance-125053001553_1.html"
+      ],
+      "data": {
+        "verdict": "Hold",
+        "summary": "Cummins India is a high-quality franchise benefiting from India's power infrastructure supercycle — data centres, railways, mining and industrial capex — with FY26 revenue crossing ₹11,950 Cr (+18% YoY). The stock commands a significant valuation premium (P/E ~67x) that prices in near-perfect execution and leaves limited margin of safety for new buyers. Existing holders should continue holding given structural tailwinds; fresh entry is best on corrections.",
+        "bull_case": [
+          "India data centre boom: hyperscalers have committed >$30B in India investments; data centres were 40% of Cummins India power generation revenue in H1 FY26",
+          "Infrastructure supercycle: government capex in roads, railways, metro, and defence drives sustained demand for diesel and gas engines",
+          "Export diversification: exports to 60+ countries; Middle East, Africa and SE Asia provide geographic diversification",
+          "Hydrogen & new energy transition: first H2-ICE development happening in India; HELM platform and GAIL partnership position company for future-fuel transition",
+          "Margin expansion: operating leverage on higher revenue base; aftermarket/distribution segment (~30-32% of revenue) provides recurring high-margin income",
+          "Parent backing: Cummins Inc (~51% stake) provides technology access, global R&D, and brand credibility"
+        ],
+        "bear_case": [
+          "Expensive valuation at ~67x P/E trades well above 5-year median; multiple compression risk if growth disappoints",
+          "Royalty outflow to Cummins Inc (~4-5% of sales) is a structural drag on margins and a Sharia concern",
+          "Grid improvement risk: as India electricity grid becomes more reliable, backup genset demand could moderate over the long run",
+          "Export revenue volatility: export share fell from ~27% (FY23) to ~17% (FY25); geopolitical disruptions in Middle East/West Asia routes",
+          "Commodity and currency headwinds: steel, copper, semiconductor costs; USD/INR moves impact both exports and import components",
+          "Cyclical exposure: industrial capex linked to economic cycles; slowdown in infrastructure spending could dampen demand"
+        ],
+        "key_risks": [
+          "Valuation risk — stock trading at significant premium to intrinsic value estimates",
+          "Energy transition risk — accelerated EV adoption or grid improvement reducing genset TAM",
+          "Geopolitical risk — Middle East/West Asia conflicts disrupting export routes",
+          "Royalty and related-party risk — ongoing royalty payments to parent compress margins",
+          "Concentration risk — increasing dependence on data centre segment (~40% of power gen revenue)",
+          "Regulatory risk — emission norms tightening (BS-VI / Stage-V) increasing R&D burden"
+        ],
+        "time_horizon": "3-5 years"
+      }
+    },
+    "versions": []
+  },
+  "business": {
+    "current": {
+      "section": "business",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/news/releases/2025/05/28/cummins-india-limited-results-quarter-and-year-ended-march-31-2025",
+        "https://themachinemaker.com/news/cummins-india-reports-strong-fy26-performance-with-18-growth-in-revenue/",
+        "https://matrixbcg.com/blogs/growth-strategy/cummins"
+      ],
+      "data": {
+        "overview": "Cummins India Limited (NSE: CUMMINSIND) is India's leading manufacturer of diesel and natural gas engines, power generation systems, and related components. Established in 1962 and headquartered in Pune, it is a ~51% subsidiary of Cummins Inc. (NYSE: CMI), the US-based global power technology company. In FY26 (year ended March 2026), Cummins India crossed ₹11,950 Cr in revenue — a milestone reflecting sustained double-digit growth. The company operates across 20 manufacturing facilities in India, exports to 60+ countries, and employs ~14,000 people across 200+ locations through eight legal entities.",
+        "revenue_streams": [
+          {
+            "name": "Power Systems (Gensets)",
+            "pct_of_revenue": 50,
+            "growth": "High teens",
+            "description": "Largest segment providing power generation solutions, gensets (50 kVA to multi-MW), alternators, switchgear, and associated controls. Key demand from data centres, hospitals, commercial buildings, and industrial users."
+          },
+          {
+            "name": "Distribution (Parts, Service & Aftermarket)",
+            "pct_of_revenue": 32,
+            "growth": "Stable mid-teens",
+            "description": "High-margin recurring revenue from spare parts, service contracts, and maintenance. Provides earnings stability through economic cycles. Includes Fleetguard filtration products."
+          },
+          {
+            "name": "Engines",
+            "pct_of_revenue": 18,
+            "growth": "Mid-teens",
+            "description": "Diesel and natural gas engines for mining, railways, construction, agriculture, marine, and industrial applications. Includes new HELM (Higher Efficiency, Lower Emissions, Multiple Fuels) platform."
+          }
+        ],
+        "competitive_advantages": [
+          "Technology access from parent Cummins Inc — early adoption of global platforms including hydrogen ICE and Tier 4/Stage V emission-compliant engines",
+          "Brand equity and 60+ year track record in India across demanding industrial applications",
+          "Extensive 200+ location distribution and service network across India providing customer lock-in",
+          "Vertically integrated supply chain via Cummins Technologies India subsidiaries covering turbochargers, filtration, fuel systems, and emission solutions",
+          "Scale manufacturing at Phaltan Mega Site enabling cost efficiencies",
+          "Long-standing OEM partnerships (Tata Motors JV for 30+ years, railways, defence PSUs)"
+        ],
+        "key_products": [
+          "Diesel and natural gas engines (19 kW – 3,500+ kW)",
+          "Power generators / gensets (50 kVA – multi-MW, for data centres, industrial, commercial)",
+          "HELM (Higher Efficiency Lower Emissions Multiple Fuels) engine platform",
+          "Hydrogen internal combustion engines (H2-ICE, 6.7L H2S engine first developed in India)",
+          "Turbochargers (Cummins Turbo Technologies India)",
+          "Filtration systems — Fleetguard air, fuel, oil, water filters",
+          "Emission solutions — SCR, DPF, after-treatment systems",
+          "Alternators and switchgear (Cummins Generator Technologies)"
+        ],
+        "business_model": "Asset-light manufacturing with strong IP licensing from parent. Revenue model combines one-time product sales with high-margin recurring aftermarket, parts and service revenue. Pays royalty of ~4-5% of net sales to Cummins Inc for technology access. Exports ~17% of revenue to Middle East, Africa, and Southeast Asia. Benefits from parent's global R&D, reducing standalone R&D burden while accelerating new product adoption."
+      }
+    },
+    "versions": []
+  },
+  "management": {
+    "current": {
+      "section": "management",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/en-na/en/in/investors/cummins-india-limited-board-of-directors",
+        "https://www.cummins.com/en-na/en/in/company/india-leadership",
+        "https://blinkx.in/insights/bod/cummins-india-ltd-board-of-directors"
+      ],
+      "data": {
+        "ceo": {
+          "name": "Shveta Arya",
+          "since": "2024-09-01",
+          "background": "Appointed Managing Director from September 1, 2024 (Additional Director from August 8, 2024). Career executive within the Cummins group with deep operational expertise in India market."
+        },
+        "board_size": 7,
+        "board_independence_pct": 40.0,
+        "insider_ownership_pct": 51.0,
+        "other_key_executives": [
+          {
+            "name": "Jennifer Mary Bush",
+            "title": "Chairperson (Non-Executive)",
+            "since": "2021",
+            "background": "Previously President and Chief Operating Officer; represents parent Cummins Inc on the board as Chairperson."
+          },
+          {
+            "name": "Rajiv Batra",
+            "title": "Chief Financial Officer, Head of Internal Audit, Government Relations & Facilities",
+            "since": "N/A",
+            "background": "Long-serving finance leader at Cummins India with broad portfolio covering financial reporting, audit, and government relations."
+          },
+          {
+            "name": "Ashwath Ram",
+            "title": "Vice President — India Area Business Organization (ABO)",
+            "since": "N/A",
+            "background": "Senior Cummins India leader responsible for overall India business strategy and operations."
+          },
+          {
+            "name": "Donald G. Jackson",
+            "title": "Non-Executive & Non-Independent Director",
+            "since": "N/A",
+            "background": "Represents Cummins Inc interests on the board."
+          },
+          {
+            "name": "Lira Goswami",
+            "title": "Independent Director",
+            "since": "2025",
+            "background": "Newly appointed independent director in 2025."
+          },
+          {
+            "name": "Rekha",
+            "title": "Independent Director",
+            "since": "N/A",
+            "background": "Serves as independent director providing governance oversight."
+          },
+          {
+            "name": "Vinaya Joshi",
+            "title": "Company Secretary & Compliance Officer",
+            "since": "N/A",
+            "background": "Responsible for secretarial compliance, regulatory filings, and board governance."
+          }
+        ],
+        "governance_score": "Moderate",
+        "red_flags": [
+          "Majority-parent dominated board — Cummins Inc (~51% stake) effectively controls board composition and strategic decisions",
+          "Related-party transactions — royalty payments of ~4-5% of net sales to parent Cummins Inc represent a consistent earnings drain",
+          "Limited independent board representation (~40%) given the parents significant ownership stake",
+          "Sharia non-compliance concern due to royalty payments to parent (interest-like obligation)"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "esg": {
+    "current": {
+      "section": "esg",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/company/esg/sustainability-progress-reports",
+        "https://www.csrhub.com/CSR_and_sustainability_information/Cummins-India-Ltd",
+        "https://www.sustainalytics.com/esg-rating/cummins-inc/1008143499"
+      ],
+      "data": {
+        "overall_rating": "Low Risk / Good",
+        "rating_provider": "Sustainalytics / MSCI (Parent: Cummins Inc rated AA by MSCI, Low Risk 19.4 by Sustainalytics)",
+        "environmental": {
+          "score": "B+",
+          "highlights": [
+            "Destination Zero strategy targeting net-zero carbon emissions across value chain by 2050",
+            "First hydrogen internal combustion engine (H2-ICE) developed in India for Tata Motors",
+            "Partnership with GAIL to advance green hydrogen production, transportation and storage in India",
+            "Manufacturing facilities certified to ISO 14001 environmental management standards",
+            "Stage V / BS-VI emission-compliant engine platforms reducing NOx and particulate emissions",
+            "Commitment to circularity — remanufactured parts program reducing industrial waste"
+          ]
+        },
+        "social": {
+          "score": "B",
+          "highlights": [
+            "~14,000 employees across 200+ locations in India",
+            "Cummins India Foundation active in STEM education, water access and community development in Pune and other operational regions",
+            "Women in STEM and leadership development programs aligned with parent company D&I goals",
+            "Tata Cummins JV creating manufacturing employment in Jamshedpur",
+            "Vocational training and skilling programs for local communities near manufacturing sites"
+          ]
+        },
+        "governance": {
+          "score": "B-",
+          "highlights": [
+            "Listed on both NSE and BSE with mandatory SEBI compliance including LODR regulations",
+            "Annual sustainability reporting aligned with GRI and TCFD frameworks (via parent Cummins Inc)",
+            "Whistle-blower policy and code of business conduct in place",
+            "Audit committee with independent directors overseeing financial controls"
+          ]
+        },
+        "controversies": [
+          "Royalty payments to parent Cummins Inc (~4-5% of net sales) raise related-party transaction concerns among minority shareholders",
+          "Diesel engine focus faces ESG headwinds from investors pushing decarbonization — partially offset by new energy roadmap",
+          "No material ESG controversies, fines, or regulatory sanctions reported for Cummins India specifically"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "estimates": {
+    "current": {
+      "section": "estimates",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://trendlyne.com/equity/consensus-estimates/297/CUMMINSIND/cummins-india-ltd/",
+        "https://simplywall.st/stocks/in/capital-goods/nse-cumminsind/cummins-india-shares/future",
+        "https://univest.in/blogs/cummins-india-share-price-target-2026"
+      ],
+      "data": {
+        "consensus": "Buy",
+        "price_target": {
+          "mean": "₹5,221",
+          "low": "₹4,500",
+          "high": "₹6,200"
+        },
+        "num_analysts": 22,
+        "eps_estimates": [
+          {
+            "period": "FY26E",
+            "consensus": "₹82",
+            "low": "₹76",
+            "high": "₹88"
+          },
+          {
+            "period": "FY27E",
+            "consensus": "₹97.67",
+            "low": "₹88",
+            "high": "₹108"
+          },
+          {
+            "period": "FY28E",
+            "consensus": "₹112",
+            "low": "₹100",
+            "high": "₹124"
+          }
+        ],
+        "revenue_estimates": [
+          {
+            "period": "FY26E",
+            "consensus": "₹11,950 Cr",
+            "low": "₹11,400 Cr",
+            "high": "₹12,400 Cr"
+          },
+          {
+            "period": "FY27E",
+            "consensus": "₹13,700 Cr",
+            "low": "₹12,900 Cr",
+            "high": "₹14,500 Cr"
+          },
+          {
+            "period": "FY28E",
+            "consensus": "₹15,800 Cr",
+            "low": "₹14,800 Cr",
+            "high": "₹17,000 Cr"
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "revenue": {
+    "current": {
+      "section": "revenue",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/news/releases/2025/05/28/cummins-india-limited-results-quarter-and-year-ended-march-31-2025",
+        "https://themachinemaker.com/news/cummins-india-reports-strong-fy26-performance-with-18-growth-in-revenue/",
+        "https://hdfcsky.com/news/cummins-indias-profit-in-fy25-up-by-15-percent"
+      ],
+      "data": {
+        "total_revenue": "₹11,950 Cr (FY26); ₹10,166 Cr (FY25)",
+        "growth_yoy": "18% (FY26); 15% (FY25)",
+        "recurring_pct": 32.0,
+        "by_segment": [
+          {
+            "name": "Power Systems (Gensets)",
+            "revenue": "₹5,975 Cr",
+            "pct": 50,
+            "yoy_growth": "~20%"
+          },
+          {
+            "name": "Distribution (Aftermarket & Services)",
+            "revenue": "₹3,824 Cr",
+            "pct": 32,
+            "yoy_growth": "~15%"
+          },
+          {
+            "name": "Engines",
+            "revenue": "₹2,151 Cr",
+            "pct": 18,
+            "yoy_growth": "~14%"
+          }
+        ],
+        "by_geography": [
+          {
+            "region": "India (Domestic)",
+            "revenue": "₹9,913 Cr",
+            "pct": 83,
+            "yoy_growth": "~20% (FY26 est.)"
+          },
+          {
+            "region": "Middle East & Africa",
+            "revenue": "₹1,075 Cr",
+            "pct": 9,
+            "yoy_growth": "~6%"
+          },
+          {
+            "region": "Southeast Asia",
+            "revenue": "₹597 Cr",
+            "pct": 5,
+            "yoy_growth": "~8%"
+          },
+          {
+            "region": "Rest of World (Europe, Americas)",
+            "revenue": "₹358 Cr",
+            "pct": 3,
+            "yoy_growth": "~4%"
+          }
+        ],
+        "key_drivers": [
+          "Data centre boom in India — hyperscalers driving high-kVA genset demand; data centres ~40% of power gen revenue",
+          "India infrastructure capex — roads, metro, railways, defence fuelling engine and genset demand",
+          "Domestic industrial capex revival in manufacturing, mining, and real estate",
+          "Export growth to Middle East and Southeast Asia — new geographies offset domestic cyclicality",
+          "Aftermarket revenue expansion as installed base grows — high-margin recurring income",
+          "New product launches — HELM platform, hydrogen ICE, gas gensets penetrating new segments"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "catalysts": {
+    "current": {
+      "section": "catalysts",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.businesstoday.in/bt-tv/market-today/video/cummins-india-q4fy26-earnings-bets-big-on-railways-mining-data-centre-boom-fy27-outlook-533934-2026-05-29",
+        "https://www.whalesbook.com/news/English/Industrial-GoodsServices/Indias-dollar30B-Data-Center-Boom-Fuels-Power-Giants-Amid-Tech-Surge/69604f36ef4ed95f980a3cc4",
+        "https://tradebrains.in/cummins-india-shares-jump-9-as-company-sees-strong-growth-in-data-centre-business/"
+      ],
+      "data": {
+        "near_term": [
+          {
+            "event": "Q1 FY27 Results",
+            "date": "August 2026",
+            "impact": "High",
+            "description": "First quarter results for FY27 will validate management guidance of double-digit domestic growth across all segments. Strong data centre order book execution will be closely watched."
+          },
+          {
+            "event": "Data Centre Hyperscaler Order Announcements",
+            "date": "Ongoing H1 FY27",
+            "impact": "High",
+            "description": "India data centre capacity doubling from 1 GW to 2 GW by end-2026 generates sustained high-kVA genset orders. Each major hyperscaler deal represents significant revenue visibility."
+          },
+          {
+            "event": "Budget / PLI Scheme for Data Centres",
+            "date": "H1 FY27",
+            "impact": "Medium",
+            "description": "Government tax incentives for data centres (announced in FY26 budget) are expected to accelerate investment, creating additional demand tailwind for Cummins India gensets."
+          }
+        ],
+        "medium_term": [
+          {
+            "event": "Railway Electrification & Alternative Fuel Engine Orders",
+            "date": "FY27-FY28",
+            "impact": "High",
+            "description": "Indian Railways expanding diesel and CNG locomotive fleet for non-electrified routes. Cummins India is a key engine supplier. New HELM platform qualifications expected."
+          },
+          {
+            "event": "Hydrogen ICE Commercialisation",
+            "date": "FY27-FY29",
+            "impact": "Medium",
+            "description": "6.7L H2S hydrogen engine developed in India for Tata Motors. Commercial scale orders contingent on hydrogen fuel infrastructure rollout under India's National Hydrogen Mission."
+          },
+          {
+            "event": "Export Market Expansion — Africa & SE Asia",
+            "date": "FY27-FY28",
+            "impact": "Medium",
+            "description": "Cummins India targeting expansion in Africa and Southeast Asia to diversify from Middle East concentration. New distributor appointments and product homologations underway."
+          },
+          {
+            "event": "Phaltan Mega Site Capacity Expansion",
+            "date": "FY27-FY28",
+            "impact": "Medium",
+            "description": "Ongoing capacity additions at Phaltan facility to meet high-kVA genset demand from data centres. Completion would enable revenue scaling without supply constraints."
+          }
+        ],
+        "risks": [
+          {
+            "risk": "Data centre investment slowdown",
+            "probability": "Low",
+            "impact": "High"
+          },
+          {
+            "risk": "India grid reliability improvement reducing backup genset demand",
+            "probability": "Medium",
+            "impact": "Medium"
+          },
+          {
+            "risk": "Middle East geopolitical escalation disrupting export routes",
+            "probability": "Medium",
+            "impact": "Medium"
+          },
+          {
+            "risk": "Valuation de-rating if earnings growth disappoints",
+            "probability": "Medium",
+            "impact": "High"
+          },
+          {
+            "risk": "Competition from domestic genset manufacturers gaining share in mid-kVA segment",
+            "probability": "Medium",
+            "impact": "Low"
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "cyclical": {
+    "current": {
+      "section": "cyclical",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://arkives.substack.com/p/cummins-india-ltd-play-on-indias",
+        "https://futurecaps.com/portfolio/cummins-india-multibagger-analysis-2026/",
+        "https://www.wrightresearch.in/blog/infrastructure-stocks-india-supercycle/"
+      ],
+      "data": {
+        "cyclicality": "Moderate — Cyclical with secular growth overlay",
+        "current_cycle_position": "Mid-Upcycle — India in a multi-year infrastructure and digital capex supercycle with data centre demand providing structural (less cyclical) support",
+        "cycle_drivers": [
+          "India government infrastructure capex (roads, railways, metro, ports, defence) — direct engine and genset demand",
+          "Private sector capex recovery in manufacturing, mining, and real estate",
+          "Data centre investment surge driven by AI, 5G, and cloud adoption — less cyclical, multi-year visibility",
+          "Industrial power backup demand correlated with grid reliability gaps and manufacturing output",
+          "Export demand linked to commodity cycles in Middle East and African economies"
+        ],
+        "historical_pattern": "Cummins India revenues stagnated during FY17-FY20 period of weak industrial capex, then surged +40%+ through FY23-FY26 driven by both domestic infrastructure capex and data centre demand. Historical cycle length approximately 5-7 years. The data centre secular driver is new and may extend the current upcycle beyond historical norms.",
+        "recommendation": "Maintain position through cycle. The data centre secular driver reduces pure cyclicality risk. Watch for early indicators of infrastructure capex slowdown (government budget cuts, private capex surveys) as early warning. Near-term cycle appears intact through FY27."
+      }
+    },
+    "versions": []
+  },
+  "ma": {
+    "current": {
+      "section": "ma",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://mergr.com/cummins-india-acquisitions",
+        "https://www.cummins.com/en-na/news/releases/2023/04/26/cummins-inc-and-tata-motors-strengthen-their-30-year-alliance-power",
+        "https://investor.cummins.com/news/detail/672/accelera-and-gail-partner-to-advance-green-hydrogen"
+      ],
+      "data": {
+        "summary": "Cummins India has historically grown through joint ventures rather than outright acquisitions. The company has 0 standalone acquisitions on record and divested 1 asset (Cummins Power Rental sold to Aggreko for $4M in 2008). Its M&A and partnership strategy is executed primarily through parent Cummins Inc, which has been active in acquiring new energy and decarbonization technology assets globally.",
+        "recent_deals": [
+          {
+            "year": 2024,
+            "type": "Joint Venture Expansion",
+            "target": "TCPL Green Energy Solutions Pvt Ltd (subsidiary of Tata Cummins JV)",
+            "value": "Undisclosed",
+            "rationale": "New entity under existing 30-year Tata-Cummins JV to focus on development and manufacturing of sustainable technology products including hydrogen engines and low-emission solutions."
+          },
+          {
+            "year": 2024,
+            "type": "MOU / Partnership",
+            "target": "GAIL (India) Limited",
+            "value": "N/A",
+            "rationale": "MOU signed via Accelera (Cummins subsidiary) to collaborate on green hydrogen production, transportation, and storage in India. Leverages GAIL's natural gas infrastructure."
+          },
+          {
+            "year": 2008,
+            "type": "Divestiture",
+            "target": "Cummins Power Rental",
+            "value": "$4M",
+            "rationale": "Sale of non-core power rental business to Aggreko to focus on core manufacturing and distribution."
+          }
+        ],
+        "strategy": "Joint venture-led expansion model with parent Cummins Inc driving technology partnerships. India strategy focuses on building manufacturing and distribution scale through JVs (Tata Cummins, Fleetguard Filters, Valvoline Cummins, Cummins Generator Technologies) rather than debt-funded acquisitions. This preserves balance sheet strength and leverages partner capabilities.",
+        "pipeline": "No announced acquisitions in pipeline. Strategic focus on organic capex expansion at Phaltan Mega Site, deepening the GAIL hydrogen partnership, and expanding TCPL Green Energy Solutions for alternative fuel products. Parent Cummins Inc acquired First Mode mining decarbonization assets in February 2025 — technology could eventually be deployed through Cummins India for mining sector."
+      }
+    },
+    "versions": []
+  },
+  "value": {
+    "current": {
+      "section": "value",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.alphaspread.com/security/nse/cumminsind/summary",
+        "https://www.gurufocus.com/term/intrinsic-value-projected-fcf/NSE:CUMMINSIND",
+        "https://www.smart-investing.in/pe-ratio.php?Company=CUMMINS+INDIA+LTD"
+      ],
+      "data": {
+        "summary": "Cummins India trades at a significant premium to most intrinsic value estimates. At ~₹5,390 CMP (June 2026), the stock is at ~67x trailing P/E and ~18.6x P/B — well above historical averages. Multiple valuation methodologies suggest the stock is pricing in near-perfect execution of FY27-FY29 growth. Not a deep value play; suitable for quality-growth investors willing to pay premium for franchise quality.",
+        "intrinsic_value": "₹2,582–₹4,002 (range from conservative DCF to GF Value)",
+        "methodology": "Multiple approaches: (1) Historical median-based intrinsic value ₹2,582 (smart-investing.in, Mar 2026); (2) GuruFocus GF Value ₹4,002 (FCF-based, Significantly Overvalued at CMP); (3) Projected FCF valuation by GuruFocus implies Price-to-IV of 9.0x — extreme overvaluation on FCF basis",
+        "pe_band": {
+          "current": 66.66,
+          "5yr_avg": 40.5,
+          "premium_discount": "Premium of ~65% to 5-year average P/E"
+        },
+        "pb_band": {
+          "current": 18.57,
+          "5yr_avg": 11.0
+        },
+        "dcf_value": "₹3,200–₹4,000 (assuming 15-18% revenue CAGR for 5 years, terminal growth 6%, WACC 12%)",
+        "margin_of_safety": "Negative — stock trades at 35-110% premium to most intrinsic value estimates. No margin of safety at current levels.",
+        "valuation_verdict": "Overvalued for new entry. The business is exceptional but the price reflects optimism. Investors should wait for a 20-30% correction to approach fair value entry points around ₹3,800–₹4,200."
+      }
+    },
+    "versions": []
+  },
+  "faq": {
+    "current": {
+      "section": "faq",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/news/releases/2025/05/28/cummins-india-limited-results-quarter-and-year-ended-march-31-2025",
+        "https://arkives.substack.com/p/cummins-india-ltd-play-on-indias",
+        "https://univest.in/blogs/cummins-india-share-price-target-2026"
+      ],
+      "data": {
+        "questions": [
+          {
+            "question": "What does Cummins India actually do and how does it make money?",
+            "answer": "Cummins India manufactures diesel and natural gas engines, power generators/gensets, and filtration systems. Revenue comes from three streams: Power Systems (gensets, ~50% of revenue) primarily sold to data centres, hospitals, and commercial buildings; Distribution/Aftermarket (spare parts, service contracts, ~32%) providing recurring high-margin income; and Engines (~18%) for railways, mining, construction, and agriculture. The company also earns royalty-enabled technology revenue by paying ~4-5% of sales to parent Cummins Inc for access to global engine technology platforms."
+          },
+          {
+            "question": "Why is Cummins India stock so expensive at 60-70x P/E?",
+            "answer": "The premium valuation reflects: (1) quality franchise with 60+ year brand moat in India; (2) secular growth driver from India data centre boom — data centres now 40% of power gen revenue; (3) strong balance sheet with net cash position of ~₹5,020 Cr; (4) consistent dividend payer with high payout (~70%); (5) parent Cummins Inc technology access reducing execution risk. However, the premium is stretched — the stock trades 65% above its 5-year average P/E and most DCF models suggest 20-50% downside to intrinsic value."
+          },
+          {
+            "question": "What is the impact of the data centre boom on Cummins India?",
+            "answer": "Very significant. Data centres contributed ~40% of Cummins India's Power Systems segment revenue in H1 FY26. India's hyperscaler investments (Microsoft, Google, Amazon, Meta collectively committing $30B+) require reliable high-kVA backup power — exactly what Cummins India provides. India's installed data centre capacity is expected to double from 1 GW to 2 GW by end-2026. This is a less cyclical, more structural demand driver compared to traditional infrastructure capex."
+          },
+          {
+            "question": "What is the royalty payment concern and does it affect Sharia compliance?",
+            "answer": "Cummins India pays ~4-5% of net sales as royalty to its parent Cummins Inc (US) for technology licensing. In FY25 (revenue ₹10,166 Cr) this amounted to ~₹400-500 Cr annually. This is a direct drag on margins. For Sharia-compliant investors, this royalty — which functions like a guaranteed income stream to the parent — is typically classified as a non-compliant related-party obligation, making the stock generally excluded from Islamic finance screens."
+          },
+          {
+            "question": "How exposed is Cummins India to the energy transition risk from EVs and grid improvement?",
+            "answer": "Moderate risk over 10+ year horizon. Near-term (3-5 years) risk is low as data centre backup power demand is growing faster than grid improvement. Medium-term risk exists in the automotive/CV engine segment (Tata Cummins JV) as EV adoption accelerates. Long-term risk to industrial genset demand if India achieves 24x7 reliable grid power. The company is proactively hedging by developing hydrogen ICE, CNG engines, and battery energy storage integration, but diesel still dominates its revenue today."
+          },
+          {
+            "question": "What is Cummins India's dividend policy and track record?",
+            "answer": "Cummins India is a generous dividend payer with a payout ratio of ~71%. In FY25, the company declared dividends totalling ₹36/share across multiple tranches (final + interim). In FY24 it paid ₹38/share. With FY26 EPS estimated at ~₹82, investors can expect dividends of ~₹55-58/share in FY26. The dividend yield at ₹5,390 CMP is modest (~1%), but the consistent and growing payout reflects strong free cash flow generation."
+          },
+          {
+            "question": "Who are Cummins India's main competitors in India?",
+            "answer": "In power generation/gensets: Kirloskar Electric, Greaves Cotton, KOEL (Kirloskar Oil Engines), Mahindra Powerol, and Jakson Group in mid-kVA; in high-kVA, competition is limited as Cummins India has near-dominant market share. In engines: KOEL, Ashok Leyland (via Hinduja group), and international brands (Caterpillar, Perkins, Volvo Penta). In filtration: Mann+Hummel, Parker Hannifin, Donaldson. Cummins India's technology lead from parent, scale, and distribution network creates significant barriers to entry at the premium end."
+          },
+          {
+            "question": "What is the key risk to the FY27 growth outlook?",
+            "answer": "The primary risk is a slowdown in data centre investment commitments — if hyperscalers delay or reduce India infrastructure spend, the single largest demand driver weakens. Secondary risks include: Middle East geopolitical escalation disrupting ~9% export revenue; commodity cost inflation (steel, copper) compressing margins; and any de-rating if the stock fails to grow into its expensive 67x P/E multiple. Management has guided for double-digit domestic revenue growth across all segments in FY27, but execution risk remains at premium valuations."
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "credit": {
+    "current": {
+      "section": "credit",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.alphaspread.com/security/nse/cumminsind/financials/balance-sheet",
+        "https://companiesmarketcap.com/aud/cummins-india/dividends/",
+        "https://www.tijorifinance.com/company/cummins-india-limited/financials/"
+      ],
+      "data": {
+        "summary": "Cummins India maintains an exceptionally strong balance sheet — the company is debt-free and holds a substantial net cash position of ~₹5,020 Cr (as of March 2025). This reflects consistent free cash flow generation supported by asset-light operations and high profitability margins (~19% PAT margin in FY25). No formal external credit rating exists for the India entity as it does not carry rated debt.",
+        "credit_rating": "Not Rated (No external debt; implied AAA-equivalent given net cash position and parent backing)",
+        "debt_to_equity": 0.0,
+        "interest_coverage": 999.0,
+        "net_cash_position": "₹5,020 Cr net cash (March 2025); approximately ₹1,760 Cr (September 2025, post dividends)",
+        "debt_maturity_profile": "No external debt. Company is fully equity-funded with no borrowings on balance sheet.",
+        "liquidity": "Excellent. Current ratio estimated >2x. Large cash reserves provide ample buffer for capital expenditure, dividends, and any opportunistic acquisitions. Working capital funded entirely through internal accruals.",
+        "key_covenants": [
+          "No external debt covenants applicable — the company carries zero debt",
+          "Royalty payment obligation to parent Cummins Inc (~4-5% of net sales) is a quasi-fixed cost obligation",
+          "Dividend policy effectively acts as a cash distribution commitment (~70% payout ratio)"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "geofx": {
+    "current": {
+      "section": "geofx",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.ainvest.com/news/cummins-india-limited-powerhouse-growth-india-evolving-mobility-clean-energy-landscape-2508/",
+        "https://www.business-standard.com/companies/news/extended-iran-conflict-may-disrupt-l-t-s-order-inflows-regional-projects-126030201191_1.html",
+        "https://www.cummins.com/news/releases/2025/05/28/cummins-india-limited-results-quarter-and-year-ended-march-31-2025"
+      ],
+      "data": {
+        "summary": "Cummins India derives ~17% of revenue from exports (FY25: ₹1,771 Cr export vs ₹8,395 Cr domestic). Export share has declined from ~27% in FY23 reflecting stronger domestic demand growth. Key export markets are Middle East, Africa, and Southeast Asia. USD/INR is the primary FX exposure. The company has limited hedging disclosure; a weaker rupee benefits export realisations but increases imported component costs.",
+        "revenue_by_geography": [
+          {
+            "region": "India (Domestic)",
+            "pct": 83
+          },
+          {
+            "region": "Middle East & Africa",
+            "pct": 9
+          },
+          {
+            "region": "Southeast Asia",
+            "pct": 5
+          },
+          {
+            "region": "Rest of World",
+            "pct": 3
+          }
+        ],
+        "fx_exposure": "Moderate. Export revenue (~17% of total) is primarily USD-denominated, providing a natural hedge for USD-priced imported components (turbochargers, specialty steel, electronics from parent/affiliates). Net FX exposure is limited but a strengthening INR reduces export competitiveness. The company does not disclose a formal hedging programme.",
+        "key_currencies": [
+          "USD (primary export and import currency)",
+          "AED (Middle East/UAE exports)",
+          "SGD/MYR (Southeast Asia)",
+          "EUR (limited European exports)"
+        ],
+        "geopolitical_risks": [
+          "Middle East conflict escalation — West Asia is a key export market; Red Sea/Strait of Hormuz disruptions could delay export deliveries and increase freight costs",
+          "Iran-Israel or broader Gulf conflict impacting shipping lanes used for Middle East exports",
+          "Southeast Asia trade policy changes affecting import duties on Indian-origin engines",
+          "India-China relations — Cummins India sources some components from global supply chain with China exposure; any trade restrictions could impact parts availability",
+          "Export control regulations — advanced engine technology may face export restrictions to certain jurisdictions"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "capital": {
+    "current": {
+      "section": "capital",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://stockanalysis.com/quote/nse/CUMMINSIND/dividend/",
+        "https://trendlyne.com/equity/Dividend/CUMMINSIND/297/cummins-india-ltd-dividend/",
+        "https://companiesmarketcap.com/aud/cummins-india/dividends/"
+      ],
+      "data": {
+        "summary": "Cummins India pursues a highly shareholder-friendly capital allocation strategy: debt-free balance sheet, high dividend payout (~70%), and selective capex for capacity expansion. The company does not conduct share buybacks. Net cash of ~₹5,020 Cr (Mar 2025) underpins dividend sustainability and provides optionality for inorganic investments. Capex is primarily directed at Phaltan Mega Site expansion for high-kVA genset capacity.",
+        "capex_history": [
+          {
+            "year": "FY2023",
+            "capex": "~₹250 Cr",
+            "as_pct_revenue": 3.2
+          },
+          {
+            "year": "FY2024",
+            "capex": "~₹310 Cr",
+            "as_pct_revenue": 3.5
+          },
+          {
+            "year": "FY2025",
+            "capex": "~₹380 Cr",
+            "as_pct_revenue": 3.7
+          },
+          {
+            "year": "FY2026E",
+            "capex": "~₹450 Cr",
+            "as_pct_revenue": 3.8
+          }
+        ],
+        "dividend_history": [
+          {
+            "year": "FY2026",
+            "dividend": "~₹58 (est.)",
+            "yield": "~1.1%"
+          },
+          {
+            "year": "FY2025",
+            "dividend": "₹36",
+            "yield": "~0.7%"
+          },
+          {
+            "year": "FY2024",
+            "dividend": "₹38",
+            "yield": "~0.8%"
+          },
+          {
+            "year": "FY2023",
+            "dividend": "₹32",
+            "yield": "~1.0%"
+          },
+          {
+            "year": "Q3 FY26 (interim)",
+            "dividend": "₹20",
+            "yield": "N/A"
+          }
+        ],
+        "buybacks": "No share buybacks have been conducted. Management prefers dividends as the primary shareholder return mechanism. Minority shareholders would benefit from buybacks given the company's net cash position but none have been announced.",
+        "capital_allocation_strategy": "1. Maintain debt-free balance sheet with strong cash reserves; 2. Return ~70% of PAT as dividends; 3. Invest ~3.5-4% of revenues in capex for manufacturing capacity and technology upgrades; 4. Retain residual cash for strategic opportunities including JV expansions and new energy investments. Royalty payments to parent (~4-5% of sales) are a prior claim before shareholder distributions."
+      }
+    },
+    "versions": []
+  },
+  "forensic": {
+    "current": {
+      "section": "forensic",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.tijorifinance.com/company/cummins-india-limited/financials/",
+        "https://www.screener.in/company/CUMMINSIND/consolidated/",
+        "https://www.alphaspread.com/security/nse/cumminsind/financials/balance-sheet"
+      ],
+      "data": {
+        "summary": "Cummins India presents high-quality earnings with strong cash conversion. The company is debt-free, consistently converts operating profit to free cash flow, and has no history of accounting irregularities. Forensic analysis reveals no major red flags. Accrual ratios are healthy, working capital management is disciplined, and audit quality (B S R & Co. LLP / KPMG affiliate) is strong. The main governance concern is related-party royalty transactions with parent Cummins Inc.",
+        "accrual_ratio": 0.05,
+        "beneish_m_score": -2.8,
+        "red_flags": [
+          "Royalty payments to parent Cummins Inc (~4-5% of net sales) classified as operating expense — reduces reported margins vs economic earnings; transfer pricing risk exists",
+          "Export share decline from ~27% (FY23) to ~17% (FY25) warrants monitoring — could indicate competitive pressure in export markets",
+          "Dividend payout ratio of ~70% is high relative to capex needs — limits retained earnings for growth; signals management may not see better internal deployment alternatives"
+        ],
+        "green_flags": [
+          "Consistent free cash flow generation — PAT of ₹1,906 Cr in FY25 accompanied by strong operating cash flows",
+          "Debt-free balance sheet with ₹5,020 Cr net cash — eliminates risk of financial distress",
+          "Strong receivables management — distribution and aftermarket business limits credit concentration",
+          "Audited by B S R & Co. LLP (KPMG India affiliate) — high audit quality",
+          "No history of restatements, qualified audit reports, or regulatory actions by SEBI",
+          "Revenue quality high — ~32% from recurring aftermarket/service revenues with high cash collection",
+          "Beneish M-Score of approximately -2.8 suggests very low probability of earnings manipulation (below -2.22 threshold)"
+        ],
+        "revenue_quality": "High — mix of product sales with ~32% recurring aftermarket revenue. No significant deferred revenue or aggressive recognition concerns identified.",
+        "earnings_quality": "High — PAT margins (~18-19%) are stable and improving; cash profits closely track reported profits; no significant non-cash income items inflating earnings.",
+        "cash_conversion": "Strong — Operating cash flow to PAT ratio approximately 90-100%. Capital-light model with modest capex (~3.5-4% of revenue) generates significant free cash flow available for dividends."
+      }
+    },
+    "versions": []
+  },
+  "iprd": {
+    "current": {
+      "section": "iprd",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/en-na/news/releases/2024/05/01/cummins-produces-hydrogen-internal-combustion-engines-tata-motors-new",
+        "https://www.cummins.com/en-na/news/releases/2025/12/09/cummins-india-showcases-its-next-generation-power-portfolio-infrastructure",
+        "https://investor.cummins.com/news/detail/672/accelera-and-gail-partner-to-advance-green-hydrogen"
+      ],
+      "data": {
+        "summary": "Cummins India leverages parent Cummins Inc's global R&D capability ($1B+ annual global R&D) through royalty licensing, significantly reducing standalone R&D burden. India-specific R&D is conducted at the Cummins Technical Center India (CTCI) in Pune, one of the largest R&D centres globally for Cummins Inc. India is the lead development site for hydrogen ICE engines, making it a strategic technology hub within the global Cummins network.",
+        "rd_spend": "~₹120-150 Cr (estimated standalone India R&D; incremental to royalty-funded technology access)",
+        "rd_as_pct_revenue": 1.3,
+        "key_patents": [
+          "Hydrogen Internal Combustion Engine (H2-ICE) technology for the 6.7L H2S engine — first developed in India",
+          "HELM (Higher Efficiency, Lower Emissions, Multiple Fuels) multi-fuel engine platform patents",
+          "BS-VI / Stage-V after-treatment systems (SCR, DPF, DOC)",
+          "Advanced fuel injection and combustion optimization for natural gas engines",
+          "Turbocharger efficiency improvements (via Cummins Turbo Technologies India)"
+        ],
+        "technology_partnerships": [
+          "Parent Cummins Inc — master technology license covering all engine platforms, emission solutions, and powertrain technology",
+          "GAIL (India) Limited — MOU via Accelera for green hydrogen production, blending, transportation and storage",
+          "Tata Motors (TCPL JV) — 30-year partnership on engine development; new TCPL Green Energy Solutions for low/zero emission products",
+          "Indian Railways — long-term engine supply and development agreements",
+          "IIT research institutions — collaborative R&D on hydrogen combustion and emission optimization"
+        ],
+        "innovation_areas": [
+          "Hydrogen Internal Combustion Engines (H2-ICE) for heavy-duty commercial vehicles",
+          "CNG/LNG engine platforms for bus, truck, and industrial applications",
+          "Battery Energy Storage System (BESS) integration with gensets for hybrid power solutions",
+          "AI/IoT-enabled predictive maintenance and remote monitoring (PowerCommand telematics)",
+          "High-efficiency turbocharging for Stage-V emission compliance",
+          "Data centre optimized power generation with fuel agnostic capability"
+        ],
+        "ev_roadmap": "Cummins India is developing a portfolio spanning the full fuel spectrum: diesel (current core), CNG/LNG (near-term growth), hydrogen ICE (medium-term, in development), and fuel cell electric via parent's Accelera brand (long-term). The 6.7L H2S hydrogen engine produced in India for Tata Motors marks the first commercial H2-ICE deployment. The company's Destination Zero strategy targets carbon neutrality by 2050. Battery electric solutions for stationary power applications are being explored through BESS integration partnerships."
+      }
+    },
+    "versions": []
+  },
+  "supply_chain": {
+    "current": {
+      "section": "supply_chain",
+      "symbol": "CUMMINSIND.NS",
+      "updated_at": "2026-06-03T00:00:00.000Z",
+      "sources": [
+        "https://www.cummins.com/en-na/en/in/company/india-companies/cummins-technologies-india-pvt-limited",
+        "https://supplier.cummins.com/supply-chain-management",
+        "https://www.marklines.com/en/news/320722"
+      ],
+      "data": {
+        "summary": "Cummins India operates an integrated supply chain leveraging its eight India legal entities as both internal suppliers and manufacturing units. The company maintains high localisation (~70-75% by value) for most product categories, reducing FX risk. Key supply chain operations are managed through Cummins Technologies India Pvt Ltd's dedicated Supply Chain Operations (SCO) division covering purchasing, logistics, planning, parts distribution, and remanufactured parts.",
+        "key_suppliers": [
+          {
+            "name": "Cummins Technologies India (internal)",
+            "component": "Turbochargers, fuel systems, emission solutions",
+            "dependency": "High — captive supplier via Cummins Turbo Technologies India and Cummins Emission Solutions India"
+          },
+          {
+            "name": "Fleetguard Filters (JV)",
+            "component": "Air, fuel, oil, water filtration systems",
+            "dependency": "High — JV between Cummins Filtration Inc and Perfect Sealing Systems; three Indian manufacturing sites"
+          },
+          {
+            "name": "Indian steel and castings suppliers (Pune cluster)",
+            "component": "Engine castings, forgings, structural components",
+            "dependency": "Medium — multiple domestic suppliers around Pune industrial cluster"
+          },
+          {
+            "name": "Global electronics/semiconductor suppliers",
+            "component": "Engine control modules, sensors, electronics for PowerCommand systems",
+            "dependency": "Medium-High — sourced globally; semiconductor shortage risk"
+          },
+          {
+            "name": "Tata Cummins Private Limited (JV)",
+            "component": "BS-VI diesel engines for Tata Motors commercial vehicles",
+            "dependency": "Medium — reciprocal supply relationship"
+          }
+        ],
+        "concentration_risk": "Moderate. Significant internal sourcing through Cummins group entities reduces third-party supplier risk but creates group-level concentration. Key external exposure is semiconductor/electronics supply and specialty steel/alloys.",
+        "localisation_pct": 72.0,
+        "risks": [
+          "Semiconductor shortages — engine control units and emission systems electronics remain vulnerable to global chip supply disruptions",
+          "Commodity price volatility — steel, copper, and aluminium represent significant input costs; price spikes compress margins",
+          "Single-site concentration — Phaltan Mega Site is primary manufacturing hub; any natural disaster or labour disruption would be high-impact",
+          "Rare earth elements for emission catalysts — import dependency on Chinese supply chain for palladium and platinum in SCR catalysts",
+          "Logistics disruption — Red Sea/Suez Canal route disruptions affect imports of specialty components from Europe and Americas"
+        ],
+        "resilience": "High. The Cummins India supply chain is resilient due to: high localisation (~72%) reducing import dependency; captive supplier network within Cummins India group entities; established relationships with 1000+ domestic suppliers; strategic buffer inventory policy for critical components; and parent Cummins Inc global supply chain leverage for crisis management."
+      }
+    },
+    "versions": []
   }
 }

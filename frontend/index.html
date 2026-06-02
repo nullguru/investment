@@ -171,16 +171,16 @@
                      class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
               <div x-show="symbolPickerState.home.open && (symbolPickerState.home.query.length >= 1 || symbolPickerMatches('home').length)"
                    x-transition
-                   class="absolute z-20 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                   class="absolute z-20 mt-1 w-full rounded-xl border border-slate-600 bg-slate-800 shadow-xl max-h-60 overflow-y-auto">
                 <template x-for="sym in symbolPickerMatches('home').slice(0, 12)" :key="sym">
                   <button type="button"
                           @click="symbolPickerCommit('home', sym)"
-                          class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
-                    <span class="font-medium text-slate-800" x-text="sym"></span>
-                    <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                          class="w-full text-left px-4 py-3 text-sm hover:bg-slate-700 flex justify-between items-center gap-2 transition">
+                    <span class="font-medium text-slate-100" x-text="sym"></span>
+                    <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
                   </button>
                 </template>
-                <p x-show="symbolPickerState.home.query.length >= 1 && symbolPickerMatches('home').length === 0" class="px-4 py-3 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+                <p x-show="symbolPickerState.home.query.length >= 1 && symbolPickerMatches('home').length === 0" class="px-4 py-3 text-sm text-slate-400">No matches. Press Enter to try the typed symbol.</p>
               </div>
             </div>
           </div>
@@ -756,16 +756,16 @@
                 <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
                 <div x-show="symbolPickerState.per_stock.open && (symbolPickerState.per_stock.query.length >= 1 || symbolPickerMatches('per_stock').length)"
                      x-transition
-                     class="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                     class="absolute z-20 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-xl max-h-60 overflow-y-auto">
                   <template x-for="sym in symbolPickerMatches('per_stock').slice(0, 12)" :key="sym">
                     <button type="button"
                             @click="symbolPickerCommit('per_stock', sym)"
-                            class="w-full text-left px-3 py-2.5 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
-                      <span class="font-medium text-slate-800" x-text="sym"></span>
-                      <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                            class="w-full text-left px-3 py-2.5 text-sm hover:bg-slate-700 flex justify-between items-center gap-2 transition">
+                      <span class="font-medium text-slate-100" x-text="sym"></span>
+                      <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
                     </button>
                   </template>
-                  <p x-show="symbolPickerState.per_stock.query.length >= 1 && symbolPickerMatches('per_stock').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+                  <p x-show="symbolPickerState.per_stock.query.length >= 1 && symbolPickerMatches('per_stock').length === 0" class="px-3 py-2 text-sm text-slate-400">No matches. Press Enter to try the typed symbol.</p>
                 </div>
               </div>
             </div>
@@ -880,7 +880,7 @@
           <div class="flex flex-wrap items-center gap-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Data</span>
             <template x-for="t in ['overview','market','financials','valuation']" :key="t">
-              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
                       x-text="perStockTabLabels[t]"></button>
             </template>
@@ -893,7 +893,7 @@
           <div class="flex flex-wrap items-center gap-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Research <span class="text-teal-400">(AI)</span></span>
             <template x-for="t in ['thesis','industry','business','management','esg','estimates','revenue','catalysts','cyclical']" :key="t">
-              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-teal-50 text-teal-700 border border-teal-300 hover:bg-teal-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
                 <span x-text="perStockTabLabels[t]"></span>
               </button>
@@ -903,7 +903,7 @@
           <div class="flex flex-wrap items-center gap-1">
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">More <span class="text-teal-400">(AI)</span></span>
             <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
-              <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-violet-50 text-violet-700 border border-violet-300 hover:bg-violet-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
                 <span x-text="perStockTabLabels[t]"></span>
               </button>
@@ -940,10 +940,10 @@
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Promoter & Ownership</h3>
                 <dl class="space-y-2 text-sm">
                   <div class="flex justify-between"><dt class="text-slate-500">Insiders / Promoter</dt><dd x-text="getSectionData('overview')?.heldPercentInsiders != null ? formatPct(getSectionData('overview').heldPercentInsiders) : (perStockRow?.promoter_holding ?? '—')"></dd></div>
-                  <div class="flex justify-between"><dt class="text-slate-500">Pledged Shares</dt><dd x-text="perStockRow?.pledged_shares ?? '—'"></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Pledged Shares</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.pledged_shares ?? '—'"></span><span x-show="isFieldGap('overview','pledgedSharesPct') && !perStockRow?.pledged_shares" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
                   <div class="flex justify-between"><dt class="text-slate-500">Institutional</dt><dd x-text="getSectionData('overview')?.heldPercentInstitutions != null ? formatPct(getSectionData('overview').heldPercentInstitutions) : (perStockRow?.institutional ?? '—')"></dd></div>
-                  <div class="flex justify-between"><dt class="text-slate-500">Board Size</dt><dd x-text="perStockRow?.board_size ?? '—'"></dd></div>
-                  <div class="flex justify-between"><dt class="text-slate-500">Board Independence</dt><dd x-text="perStockRow?.board_independence ?? '—'"></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Board Size</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.board_size ?? '—'"></span><span x-show="isFieldGap('overview','boardSize') && !perStockRow?.board_size" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Board Independence</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.board_independence ?? '—'"></span><span x-show="isFieldGap('overview','boardIndependencePct') && !perStockRow?.board_independence" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
                   <div class="flex flex-col gap-1"><dt class="text-slate-500 mb-1">Top holders</dt><dd class="text-slate-600 text-xs space-y-0.5" x-show="(getSectionData('overview')?.majorHolders || []).length"><template x-for="h in (getSectionData('overview')?.majorHolders || [])" :key="h.label"><div class="flex justify-between" x-text="formatMajorHolder(h)"></div></template></dd><dd x-show="!(getSectionData('overview')?.majorHolders || []).length" x-text="perStockRow?.top_holders ?? '—'"></dd></div>
                 </dl>
               </section>
@@ -979,7 +979,12 @@
               <p class="text-sm font-medium" x-text="'Sharia: ' + (perStockRow?.Sharia ?? '—')"></p>
               <div x-show="perStockRow?.debt_to_equity_ratio != null" class="mt-4 pt-4 border-t border-slate-100">
                 <p class="text-xs font-medium text-slate-500 mb-2">Key ratios (latest period)</p>
-                <ul class="text-sm space-y-1"><li>Debt/Equity <button x-show="learningMode" @mouseenter="showExplainer('debt_to_equity', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="perStockRow?.debt_to_equity_ratio"></span></li><li>Cash/Assets % <button x-show="learningMode" @mouseenter="showExplainer('cash_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="perStockRow?.cash_to_assets_pct"></span></li><li>Other Rev/Revenue % <button x-show="learningMode" @mouseenter="showExplainer('other_rev_pct', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="perStockRow?.other_revenue_to_revenue_pct"></span></li><li>Receivables/Assets % <button x-show="learningMode" @mouseenter="showExplainer('receivables_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="perStockRow?.receivables_to_assets_pct"></span></li></ul>
+                <ul class="text-sm space-y-1">
+                  <li>Debt/Equity <button x-show="learningMode" @mouseenter="showExplainer('debt_to_equity', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtNum(perStockRow?.debt_to_equity_ratio, 4)"></span></li>
+                  <li>Cash/Assets % <button x-show="learningMode" @mouseenter="showExplainer('cash_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.cash_to_assets_pct, 2)"></span></li>
+                  <li>Other Rev/Revenue % <button x-show="learningMode" @mouseenter="showExplainer('other_rev_pct', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.other_revenue_to_revenue_pct, 2)"></span></li>
+                  <li>Receivables/Assets % <button x-show="learningMode" @mouseenter="showExplainer('receivables_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.receivables_to_assets_pct, 2)"></span></li>
+                </ul>
               </div>
             </div>
             <div x-show="perStockPeriodRows.length" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
@@ -1006,8 +1011,8 @@
                 <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekHigh != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekHigh).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W High <button x-show="learningMode" @mouseenter="showExplainer('52w_high', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
                 <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekLow != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekLow).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W Low <button x-show="learningMode" @mouseenter="showExplainer('52w_low', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
                 <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.beta != null ? Number(getSectionData('market').beta).toFixed(2) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Beta (5Y Monthly) <button x-show="learningMode" @mouseenter="showExplainer('beta', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
-                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.dividendYield != null ? (getSectionData('market').dividendYield + '%') : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Dividend Yield <button x-show="learningMode" @mouseenter="showExplainer('dividend_yield', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
-                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.vs200DMA != null ? (getSectionData('market').vs200DMA > 0 ? '+' : '') + getSectionData('market').vs200DMA + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">VS 200 DMA <button x-show="learningMode" @mouseenter="showExplainer('vs_200dma', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.dividendYield != null ? (Number(getSectionData('market').dividendYield).toFixed(2) + '%') : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Dividend Yield <button x-show="learningMode" @mouseenter="showExplainer('dividend_yield', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.vs200DMA != null ? (getSectionData('market').vs200DMA > 0 ? '+' : '') + Number(getSectionData('market').vs200DMA).toFixed(2) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">VS 200 DMA <button x-show="learningMode" @mouseenter="showExplainer('vs_200dma', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
               </div>
               <p x-show="getSectionData('market')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('market')?.error"></p>
             </section>
@@ -1023,10 +1028,10 @@
             <section>
               <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Dividend Quality & Total Shareholder Return</h3>
               <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Yield</h4><p class="text-sm text-slate-600" x-text="getSectionData('market')?.dividendYield != null ? getSectionData('market').dividendYield + '%' : '—'"></p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Payout Ratio</h4><p class="text-sm text-slate-600" x-text="(getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) != null ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) <= 1 ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) * 100).toFixed(1) : (getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio).toFixed(1)) + '%' : '—'"></p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Yield</h4><p class="text-sm text-slate-600" x-text="getSectionData('market')?.dividendYield != null ? Number(getSectionData('market').dividendYield).toFixed(2) + '%' : '—'"></p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Payout Ratio</h4><p class="text-sm text-slate-600" x-text="(getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) != null ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) <= 1 ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) * 100).toFixed(1) : (getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio).toFixed(1)) + '%' : '—'"></p></div>
                 <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Sustainability</h4><p class="text-sm text-slate-600">—</p></div>
               </div>
-              <p class="text-sm text-slate-600 mt-4">Total Capital Return Yield: <span x-text="getSectionData('market')?.dividendYield != null ? getSectionData('market').dividendYield + '%' : '—'"></span></p>
+              <p class="text-sm text-slate-600 mt-4">Total Capital Return Yield: <span x-text="getSectionData('market')?.dividendYield != null ? Number(getSectionData('market').dividendYield).toFixed(2) + '%' : '—'"></span></p>
             </section>
           </div>
 
@@ -1270,7 +1275,8 @@
           </div>
 
           <!-- Valuation -->
-          <div x-show="perStockTab === 'valuation'" x-cloak class="space-y-6">
+          <div x-show="perStockTab === 'valuation'" x-cloak class="space-y-6"
+               x-init="$watch('perStockTab', v => { if (v === 'valuation') $nextTick(() => initDcf()); })">
             <div class="grid md:grid-cols-2 gap-6">
               <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
@@ -1287,24 +1293,172 @@
                   <tr class="border-b border-slate-100"><td class="py-2">P/S (TTM)</td><td class="text-right" x-text="getSectionData('valuation')?.priceToSalesTrailing12Months != null ? getSectionData('valuation').priceToSalesTrailing12Months.toFixed(1) + 'x' : '—'"></td></tr>
                   <tr class="border-b border-slate-100"><td class="py-2">Price/Book</td><td class="text-right" x-text="getSectionData('valuation')?.priceToBook != null ? getSectionData('valuation').priceToBook.toFixed(1) + 'x' : '—'"></td></tr>
                   <tr class="border-b border-slate-100"><td class="py-2">PEG Ratio</td><td class="text-right" x-text="getSectionData('valuation')?.pegRatio != null ? getSectionData('valuation').pegRatio.toFixed(1) : '—'"></td></tr>
-                  <tr><td class="py-2">Earnings Yield</td><td class="text-right text-emerald-600" x-text="getSectionData('valuation')?.earningsYield != null ? (getSectionData('valuation').earningsYield + '%') : '—'"></td></tr>
+                  <tr><td class="py-2">Earnings Yield</td><td class="text-right text-emerald-400" x-text="getSectionData('valuation')?.earningsYield != null ? Number(getSectionData('valuation').earningsYield).toFixed(2) + '%' : '—'"></td></tr>
                 </tbody></table>
-                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-slate-700">Qualitative commentary: —</div>
+                <div class="mt-4 p-3 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-slate-300">Qualitative commentary: —</div>
                 <p class="text-xs text-slate-500 mt-2">Peers: —</p>
                 <p x-show="getSectionData('valuation')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('valuation')?.error"></p>
               </section>
-              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-4">DCF - Intrinsic Value</h3>
-                <dl class="space-y-2 text-sm">
-                  <div class="flex justify-between"><dt>Current Market Price</dt><dd class="font-bold" x-text="getSectionData('valuation')?.currentPrice != null ? '₹' + Number(getSectionData('valuation').currentPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></dd></div>
-                  <div class="flex justify-between"><dt>Target Mean Price</dt><dd x-text="getSectionData('valuation')?.targetMeanPrice != null ? '₹' + Number(getSectionData('valuation').targetMeanPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></dd></div>
-                  <div class="flex justify-between"><dt>Market Cap</dt><dd x-text="getSectionData('valuation')?.marketCap != null ? (getSectionData('valuation').marketCap / 1e12).toFixed(2) + ' T' : '—'"></dd></div>
-                  <div class="flex justify-between"><dt>Enterprise Value</dt><dd x-text="getSectionData('valuation')?.enterpriseValue != null ? (getSectionData('valuation').enterpriseValue / 1e12).toFixed(2) + ' T' : '—'"></dd></div>
-                  <div class="flex justify-between"><dt>Dividend Yield</dt><dd x-text="getSectionData('valuation')?.dividendYield != null ? ((getSectionData('valuation').dividendYield <= 1 ? getSectionData('valuation').dividendYield * 100 : getSectionData('valuation').dividendYield) + '%') : '—'"></dd></div>
-                  <div class="flex justify-between"><dt>Payout Ratio</dt><dd x-text="getSectionData('valuation')?.payoutRatio != null ? (getSectionData('valuation').payoutRatio * 100).toFixed(1) + '%' : '—'"></dd></div>
-                </dl>
-                <h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">Methodology</h4>
-                <p class="text-sm text-slate-600">—</p>
+              <!-- DCF Interactive Calculator -->
+              <section class="bg-slate-900 rounded-xl border border-slate-700 p-5 shadow-sm col-span-full">
+
+                <div class="flex items-center justify-between mb-5">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider">DCF Calculator</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Two-stage discounted cash flow · adjust inputs to explore fair value</p>
+                  </div>
+                  <button @click="initDcf()" class="text-xs text-teal-400 hover:text-teal-300 border border-slate-600 rounded-lg px-3 py-1.5 transition">↻ Refresh from data</button>
+                </div>
+
+                <!-- Input grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                  <!-- FCF -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Base FCF (₹ Cr)</label>
+                    <input type="number" x-model="dcfFcfInput" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 7713" />
+                    <p class="text-[9px] text-slate-500 mt-1">Last 12 months free cash flow</p>
+                  </div>
+                  <!-- Shares -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Shares (Lakh)</label>
+                    <input type="number" x-model="dcfSharesInput" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 3023" />
+                    <p class="text-[9px] text-slate-500 mt-1">Outstanding shares in lakhs</p>
+                  </div>
+                  <!-- Cash -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Net Cash (₹ Cr)</label>
+                    <div class="flex gap-1">
+                      <input type="number" x-model="dcfCashInput" class="w-1/2 bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="Cash" />
+                      <input type="number" x-model="dcfDebtInput" class="w-1/2 bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="Debt" />
+                    </div>
+                    <p class="text-[9px] text-slate-500 mt-1">Cash / Debt in ₹ Cr</p>
+                  </div>
+                  <!-- Current price -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Current Price (₹)</label>
+                    <input type="number" x-model="dcf.price" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 13022" />
+                    <p class="text-[9px] text-slate-500 mt-1">For margin of safety calc</p>
+                  </div>
+                </div>
+
+                <!-- Sliders -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                      <span class="font-medium">Phase 1 Growth</span>
+                      <span class="font-bold text-teal-400" x-text="dcf.g1 + '%'"></span>
+                    </div>
+                    <input type="range" x-model.number="dcf.g1" min="0" max="40" step="0.5" class="w-full accent-teal-500" />
+                    <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>0%</span><span x-text="'First ' + dcf.years1 + ' yrs'"></span><span>40%</span></div>
+                    <div class="flex items-center gap-2 mt-1.5">
+                      <label class="text-[10px] text-slate-500">Years:</label>
+                      <select x-model.number="dcf.years1" class="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600">
+                        <option>5</option><option>7</option><option>10</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                      <span class="font-medium">Phase 2 Growth</span>
+                      <span class="font-bold text-violet-400" x-text="dcf.g2 + '%'"></span>
+                    </div>
+                    <input type="range" x-model.number="dcf.g2" min="0" max="25" step="0.5" class="w-full accent-violet-500" />
+                    <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>0%</span><span x-text="'Next ' + dcf.years2 + ' yrs'"></span><span>25%</span></div>
+                    <div class="flex items-center gap-2 mt-1.5">
+                      <label class="text-[10px] text-slate-500">Years:</label>
+                      <select x-model.number="dcf.years2" class="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600">
+                        <option>3</option><option>5</option><option>7</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="space-y-3">
+                    <div>
+                      <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span class="font-medium">Terminal Growth</span>
+                        <span class="font-bold text-amber-400" x-text="dcf.gT + '%'"></span>
+                      </div>
+                      <input type="range" x-model.number="dcf.gT" min="1" max="7" step="0.5" class="w-full accent-amber-500" />
+                      <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>1%</span><span>Perpetuity rate</span><span>7%</span></div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span class="font-medium">Discount Rate (WACC)</span>
+                        <span class="font-bold text-rose-400" x-text="dcf.wacc + '%'"></span>
+                      </div>
+                      <input type="range" x-model.number="dcf.wacc" min="8" max="20" step="0.5" class="w-full accent-rose-500" />
+                      <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>8%</span><span>Required return</span><span>20%</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Results: 3 scenarios -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                  <!-- Bear -->
+                  <div class="rounded-xl border border-rose-800/60 bg-rose-950/30 p-4 text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-rose-400 mb-2">Bear Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + Math.max(0,dcf.g1-7).toFixed(1) + '% · g₂=' + Math.max(0,dcf.g2-5).toFixed(1) + '% · r=' + (dcf.wacc+2).toFixed(1) + '%'"></p>
+                    <p class="text-2xl font-bold text-rose-300" x-text="dcfFmt(dcfBear)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBear)" x-text="dcfMosFmt(dcfBear)"></p>
+                  </div>
+                  <!-- Base -->
+                  <div class="rounded-xl border border-teal-700/60 bg-teal-950/40 p-4 text-center ring-1 ring-teal-600/30">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-teal-400 mb-2">Base Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + dcf.g1 + '% · g₂=' + dcf.g2 + '% · r=' + dcf.wacc + '%'"></p>
+                    <p class="text-2xl font-bold text-teal-300" x-text="dcfFmt(dcfBase)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBase)" x-text="dcfMosFmt(dcfBase)"></p>
+                  </div>
+                  <!-- Bull -->
+                  <div class="rounded-xl border border-emerald-800/60 bg-emerald-950/30 p-4 text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-2">Bull Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + (dcf.g1+5) + '% · g₂=' + (dcf.g2+3) + '% · r=' + Math.max(8,dcf.wacc-2) + '%'"></p>
+                    <p class="text-2xl font-bold text-emerald-300" x-text="dcfFmt(dcfBull)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBull)" x-text="dcfMosFmt(dcfBull)"></p>
+                  </div>
+                </div>
+
+                <!-- Sensitivity matrix -->
+                <div>
+                  <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Sensitivity — Intrinsic Value per Share</h4>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse">
+                      <thead>
+                        <tr>
+                          <th class="text-slate-500 text-left pb-2 pr-3 whitespace-nowrap">WACC ↓ / Growth →</th>
+                          <template x-for="g in sensGrowths()" :key="g">
+                            <th class="pb-2 px-2 text-center whitespace-nowrap font-medium"
+                                :class="Math.abs(g - dcf.g1) < 0.1 ? 'text-teal-400' : 'text-slate-400'"
+                                x-text="g.toFixed(1) + '%'"></th>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template x-for="w in sensWaccs()" :key="w">
+                          <tr>
+                            <td class="py-1.5 pr-3 whitespace-nowrap font-medium"
+                                :class="Math.abs(w - dcf.wacc) < 0.1 ? 'text-rose-400' : 'text-slate-400'"
+                                x-text="w.toFixed(1) + '%'"></td>
+                            <template x-for="g in sensGrowths()" :key="g">
+                              <td class="py-1.5 px-2 text-center rounded font-medium"
+                                  :class="[sensColor(sensVal(w, g)), (Math.abs(w - dcf.wacc) < 0.1 && Math.abs(g - dcf.g1) < 0.1) ? 'ring-1 ring-teal-400' : '']"
+                                  x-text="dcfFmt(sensVal(w, g))"></td>
+                            </template>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p class="text-[10px] text-slate-500 mt-2">Green = undervalued · Amber = near fair value · Red = overvalued vs current price</p>
+                </div>
+
+                <!-- Assumptions note -->
+                <div class="mt-4 bg-slate-800/50 rounded-lg p-3">
+                  <p class="text-[10px] text-slate-500 leading-relaxed">
+                    <span class="font-semibold text-slate-400">Model:</span> Two-stage FCF-to-equity DCF.
+                    Phase 1 (<span x-text="dcf.years1"></span> yrs at <span x-text="dcf.g1"></span>%) → Phase 2 (<span x-text="dcf.years2"></span> yrs at <span x-text="dcf.g2"></span>%) → Terminal at <span x-text="dcf.gT"></span>% growth.
+                    Enterprise value + cash − debt ÷ shares. Bear/bull vary g₁±5–7pp, WACC±2pp.
+                    <span class="text-amber-400">FCF inputs in ₹ Cr · Shares in lakh.</span>
+                  </p>
+                </div>
               </section>
             </div>
             <section>
@@ -2129,12 +2283,60 @@
             </section>
           </div>
 
-          <!-- Remaining placeholder tabs (M&A, Value, FAQ, Credit, Geo/FX, Capital, Forensic, IP & R&D, Supply Chain) -->
-          <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
-            <div x-show="perStockTab === t" x-cloak>
+          <!-- More (AI) tabs — generic renderer for all extended research sections -->
+          <template x-for="t in moreAISections" :key="t">
+            <div x-show="perStockTab === t" x-cloak x-init="$watch('perStockTab', v => { if (v === t) fetchSectionDataIfNeeded(t); })">
               <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 class="text-lg font-semibold text-slate-800 mb-4" x-text="perStockTabLabels[t]"></h3>
-                <p class="text-slate-500 text-sm">Placeholder for <span x-text="perStockTabLabels[t]"></span>. API data coming soon.</p>
+                <!-- Header row -->
+                <div class="flex items-start justify-between mb-5">
+                  <div>
+                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2" x-text="perStockTabLabels[t]"></h3>
+                    <span x-show="hasResearchData(t)" class="text-xs text-slate-400 mt-0.5 block" x-text="'Last researched ' + formatResearchDate(getSectionData(t)?.updated_at)"></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <!-- Version pill -->
+                    <button x-show="hasResearchData(t)"
+                      @click="toggleResearchVersions(t)"
+                      class="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border transition"
+                      :class="researchVersionOpen === researchVersionKey(t) ? 'bg-teal-50 border-teal-300 text-teal-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300'">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      History
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Version history drawer -->
+                <div x-show="researchVersionOpen === researchVersionKey(t)" x-collapse class="mb-4 bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  <p class="text-xs text-slate-500 mb-2">Previous versions</p>
+                  <template x-if="(researchVersions[researchVersionKey(t)] || []).length === 0">
+                    <p class="text-xs text-slate-400">No previous versions.</p>
+                  </template>
+                  <template x-for="(v, idx) in (researchVersions[researchVersionKey(t)] || [])" :key="idx">
+                    <div class="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0 text-xs">
+                      <span class="text-slate-600" x-text="formatResearchDate(v.updated_at)"></span>
+                      <div class="flex gap-2">
+                        <button @click="restoreResearchVersion(t, idx)" class="text-teal-600 hover:text-teal-800">Restore</button>
+                        <button @click="deleteResearchVersion(t, idx)" class="text-rose-500 hover:text-rose-700">Delete</button>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Loading -->
+                <div x-show="isSectionLoading(t)" class="text-slate-500 text-sm flex items-center gap-2">
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                  Loading…
+                </div>
+
+                <!-- No data state -->
+                <div x-show="!hasResearchData(t) && !isSectionLoading(t)" class="text-center py-8">
+                  <p class="text-slate-400 text-sm mb-3">No AI research yet for <span class="font-medium" x-text="perStockTabLabels[t]"></span>.</p>
+                  <p class="text-xs text-slate-400 mb-4">Run AI Research and select this section to populate it.</p>
+                  <code class="text-xs bg-slate-100 px-2 py-1 rounded" x-text="'research ' + (perStockSymbol||'') + ' --section ' + t"></code>
+                </div>
+
+                <!-- Rendered data -->
+                <div x-show="hasResearchData(t) && !isSectionLoading(t)" x-html="renderMoreAISection(t)"></div>
               </section>
             </div>
           </template>
@@ -2218,9 +2420,14 @@
 
         <!-- Head-to-head comparison -->
         <template x-if="!loading && compareRows.length === 2">
-          <div class="space-y-4" x-data="{ cmpData() { return { a: compareRows[0], b: compareRows[1] }; } }">
+          <div class="space-y-4" x-data="{ cmpView: 'charts' }">
 
-            <!-- Helper: win = which side wins for this metric. direction: 'lower'|'higher'|'sharia'|'none' -->
+            <!-- View toggle -->
+            <div class="flex gap-2">
+              <button @click="cmpView = 'charts'" :class="cmpView === 'charts' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition">📊 Charts</button>
+              <button @click="cmpView = 'table'" :class="cmpView === 'table' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition">⇄ Head-to-Head</button>
+            </div>
+
             <!-- Identity header -->
             <div class="grid grid-cols-[1fr_80px_1fr] gap-0 rounded-2xl border border-slate-700 overflow-hidden">
               <!-- A header -->
@@ -2240,6 +2447,40 @@
                 <p class="text-xs text-slate-500 mt-1 truncate" x-text="compareRows[1].sector || compareRows[1].industry || '—'"></p>
               </div>
             </div>
+
+            <!-- ── CHARTS VIEW ─────────────────────────────────────── -->
+            <div x-show="cmpView === 'charts'" class="space-y-4">
+              <!-- Row 1: Radar + Valuation bars -->
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Overall Profile</p>
+                  <div class="relative" style="height:260px"><canvas id="cmp-radar"></canvas></div>
+                </div>
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Valuation Multiples</p>
+                  <div class="relative" style="height:260px"><canvas id="cmp-valuation"></canvas></div>
+                </div>
+              </div>
+              <!-- Row 2: Profitability + Growth -->
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Profitability (%)</p>
+                  <div class="relative" style="height:220px"><canvas id="cmp-profit"></canvas></div>
+                </div>
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Growth (%)</p>
+                  <div class="relative" style="height:220px"><canvas id="cmp-growth"></canvas></div>
+                </div>
+              </div>
+              <!-- Row 3: Financial Health horizontal bars -->
+              <div class="bg-slate-800 rounded-2xl border border-slate-700 p-4">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Financial Health &amp; Market</p>
+                <div class="relative" style="height:200px"><canvas id="cmp-health"></canvas></div>
+              </div>
+            </div>
+
+            <!-- ── TABLE / HEAD-TO-HEAD VIEW ───────────────────────── -->
+            <div x-show="cmpView === 'table'" class="space-y-4">
 
             <!-- Metric groups -->
             <template x-for="group in compareMetricGroups()" :key="group.label">
@@ -2312,6 +2553,8 @@
                 </div>
               </template>
             </div>
+
+            </div><!-- /cmpView table -->
 
           </div>
         </template>
@@ -2400,17 +2643,17 @@
               <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
               <div x-show="symbolPickerState.portfolio.open && (symbolPickerState.portfolio.query.length >= 1 || symbolPickerMatches('portfolio').length)"
                    x-transition
-                   class="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                   class="absolute z-50 mt-1 w-full rounded-xl border border-slate-600 bg-slate-800 shadow-xl max-h-60 overflow-y-auto">
                 <template x-for="sym in symbolPickerMatches('portfolio').slice(0, 12)" :key="sym">
                   <button type="button"
                           @click="symbolPickerCommit('portfolio', sym)"
-                          class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 flex justify-between items-center gap-2">
-                    <span class="font-medium text-slate-800" x-text="sym"></span>
-                    <span class="text-slate-500 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                          class="w-full text-left px-4 py-3 text-sm hover:bg-slate-700 flex justify-between items-center gap-2 transition">
+                    <span class="font-medium text-slate-100" x-text="sym"></span>
+                    <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
                   </button>
                 </template>
                 <p x-show="symbolPickerState.portfolio.query.length >= 1 && symbolPickerMatches('portfolio').length === 0"
-                   class="px-4 py-3 text-sm text-slate-500">No matches. Press Enter to try the typed symbol.</p>
+                   class="px-4 py-3 text-sm text-slate-400">No matches. Press Enter to try the typed symbol.</p>
               </div>
             </div>
             <!-- Market toggle switch -->
@@ -3639,15 +3882,16 @@
             this.$nextTick(() => { if (!this.qualityLoaded && !this.qualityLoading) this.fetchQualityScores(); });
           }
           else if (this.page === 'per_stock') {
-            if (!this.perStockSymbol) this.perStockSymbol = this.symbolSearchUniverse()[0] || this.tickers[0] || '';
-            // Only set tab to overview if switching to a new symbol; keep current tab when returning
-            if (!this._perStockLoadedSym) this.perStockTab = 'overview';
+            // Restore last symbol from session (never auto-pick the first ticker)
+            if (!this.perStockSymbol) this.perStockSymbol = this.sessionGet('perStockSymbol') || '';
             // Re-fetch only if symbol changed or not yet loaded
             if (this.perStockSymbol !== this._perStockLoadedSym) {
               this.perStockTab = 'overview';
               this.fetchPerStock();
             } else {
-              // Same symbol — just re-init periods table from cached data
+              // Same symbol — restore last tab, re-init periods table from cached data
+              const savedTab = this.sessionGet('perStockTab');
+              if (savedTab && this.perStockTabs.includes(savedTab)) this.perStockTab = savedTab;
               this.$nextTick(() => {
                 if (this.perStockPeriodRows.length) this.initTableWithColumns('per_stock_periods');
                 this.fetchSectionDataIfNeeded(this.perStockTab);
@@ -3655,8 +3899,15 @@
             }
           }
           else if (this.page === 'comparison') {
-            // Only fetch if no results yet
-            if (!this.compareRows || !this.compareRows.length) this.fetchCompare();
+            // Restore from session if not already set
+            if (!this.compareSymA) { this.compareSymA = this.sessionGet('compareSymA') || ''; if (this.compareSymA) this.symbolPickerState.compareA.query = this.compareSymA.replace('.NS','').replace('.BO',''); }
+            if (!this.compareSymB) { this.compareSymB = this.sessionGet('compareSymB') || ''; if (this.compareSymB) this.symbolPickerState.compareB.query = this.compareSymB.replace('.NS','').replace('.BO',''); }
+            // Only fetch if no results yet; otherwise re-render charts from cache
+            if (!this.compareRows || !this.compareRows.length) {
+              this.fetchCompare();
+            } else {
+              setTimeout(() => this.renderCmpCharts(), 200);
+            }
           }
           else if (this.page === 'portfolio') {
             if (this.portfolioRows.length) {
@@ -3684,6 +3935,34 @@
         },
         fmtPct(v, digits = 1) { return v == null || isNaN(v) ? '—' : (Number(v) * 100).toFixed(digits) + '%'; },
         fmtMoney(v) { return v == null || isNaN(v) ? '—' : '₹' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }); },
+        // ── Session storage helpers (tab-switching state, not settings) ───
+        sessionSet(key, val) { try { sessionStorage.setItem('inv_' + key, val == null ? '' : String(val)); } catch(_) {} },
+        sessionGet(key) { try { return sessionStorage.getItem('inv_' + key) || ''; } catch(_) { return ''; } },
+        // Generic number formatter — trims trailing zeros, handles null/NaN/Inf
+        fmtNum(v, decimals = 2) {
+          if (v == null) return '—';
+          const n = Number(v);
+          if (!isFinite(n) || isNaN(n)) return '—';
+          // For very small numbers that round to 0.00, show more precision
+          if (n !== 0 && Math.abs(n) < Math.pow(10, -decimals)) {
+            return n.toPrecision(2);
+          }
+          return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals });
+        },
+        // Format a ratio as-is (like D/E = 0.05x)
+        fmtRatio(v, decimals = 2) {
+          if (v == null) return '—';
+          const n = Number(v);
+          if (!isFinite(n) || isNaN(n)) return '—';
+          return n.toFixed(decimals) + 'x';
+        },
+        // Format percentage already in % form (not 0-1 scale)
+        fmtPctRaw(v, decimals = 2) {
+          if (v == null) return '—';
+          const n = Number(v);
+          if (!isFinite(n) || isNaN(n)) return '—';
+          return n.toFixed(decimals) + '%';
+        },
         parseSymbolsText(raw) {
           const seen = new Set();
           return (raw || '')
@@ -3743,6 +4022,7 @@
           const resolved = await this.resolveSymbolInput(raw);
           if (!resolved) return;
           this.perStockSymbol = resolved;
+          this.sessionSet('perStockSymbol', resolved);
           this.perStockTab = 'overview';
           this.metricsHistory = null;
           this.priceHistory = null;
@@ -3781,6 +4061,7 @@
         },
         clearPerStockSymbol() {
           this.perStockSymbol = '';
+          this.sessionSet('perStockSymbol', '');
           this.perStockRow = null;
           this.perStockPeriodRows = [];
           this.perStockQuality = null;
@@ -4684,6 +4965,8 @@
           try {
             const sym = this.perStockSymbol;
             this._perStockLoadedSym = sym;
+            this.fieldGaps = {};  // reset for new symbol
+            this.fetchFieldGaps(sym);  // non-blocking
             this.perStockRow = await fetch(API + '/symbol/' + encodeURIComponent(sym)).then(r => r.ok ? r.json() : null);
             // Fetch all period rows for the periods table
             const pr = await fetch(API + '/symbol/' + encodeURIComponent(sym) + '/periods').then(r => r.ok ? r.json() : { rows: [] });
@@ -4701,9 +4984,9 @@
             });
             this.$nextTick(() => {
               this.fetchSectionDataIfNeeded(this.perStockTab);
-              if (this.perStockPeriodRows.length) {
-                this.initTableWithColumns('per_stock_periods');
-              }
+              if (this.perStockPeriodRows.length) this.initTableWithColumns('per_stock_periods');
+              // Pre-populate DCF inputs once valuation data is available
+              this.fetchSectionData('valuation').then(() => this.initDcf());
             });
           } catch { this.perStockRow = null; this.perStockPeriodRows = []; }
           finally { this.loading = false; }
@@ -4756,6 +5039,182 @@
             this.researchVersionOpen = null;
             this.fetchResearchVersions(section);
           }
+        },
+        // ── DCF Calculator methods ────────────────────────────────────────
+        get dcfCurrSym() { return this.market === 'us' ? '$' : '₹'; },
+        dcfCalc(g1, g2, gT, wacc) {
+          const fcfCr = parseFloat(this.dcfFcfInput) || 0;
+          const shares = parseFloat(this.dcfSharesInput) || 1;
+          const cash = parseFloat(this.dcfCashInput) || 0;
+          const debt = parseFloat(this.dcfDebtInput) || 0;
+          if (!fcfCr || !shares) return null;
+          const r = wacc / 100, gRate1 = g1 / 100, gRate2 = g2 / 100, gTerm = gT / 100;
+          if (r <= gTerm) return null;
+          let pv = 0, fcfNow = fcfCr;
+          for (let t = 1; t <= this.dcf.years1; t++) { fcfNow *= (1 + gRate1); pv += fcfNow / Math.pow(1 + r, t); }
+          for (let t = 1; t <= this.dcf.years2; t++) { fcfNow *= (1 + gRate2); pv += fcfNow / Math.pow(1 + r, this.dcf.years1 + t); }
+          const tv = (fcfNow * (1 + gTerm)) / (r - gTerm);
+          const pvTv = tv / Math.pow(1 + r, this.dcf.years1 + this.dcf.years2);
+          return (pv + pvTv + cash - debt) / shares;
+        },
+        get dcfBase() { return this.dcfCalc(this.dcf.g1, this.dcf.g2, this.dcf.gT, this.dcf.wacc); },
+        get dcfBear() { return this.dcfCalc(Math.max(0, this.dcf.g1-7), Math.max(0, this.dcf.g2-5), Math.max(1, this.dcf.gT-1), this.dcf.wacc+2); },
+        get dcfBull() { return this.dcfCalc(this.dcf.g1+5, this.dcf.g2+3, Math.min(6, this.dcf.gT+1), Math.max(8, this.dcf.wacc-2)); },
+        dcfMos(iv) { const p = parseFloat(this.dcf.price); if (!iv || !p) return null; return (iv - p) / p * 100; },
+        dcfFmt(v) { if (v == null || !isFinite(v)) return '—'; return this.dcfCurrSym + Math.round(v).toLocaleString(); },
+        dcfMosFmt(iv) { const m = this.dcfMos(iv); if (m == null) return ''; return (m > 0 ? '+' : '') + m.toFixed(1) + '%'; },
+        dcfMosColor(iv) { const m = this.dcfMos(iv); if (m == null) return 'text-slate-400'; return m > 20 ? 'text-emerald-400' : m > 0 ? 'text-amber-400' : 'text-rose-400'; },
+        sensWaccs() { const w = this.dcf.wacc; return [w-3, w-1.5, w, w+1.5, w+3]; },
+        sensGrowths() { const g = this.dcf.g1; return [g-6, g-3, g, g+3, g+6]; },
+        sensVal(w, g) { return this.dcfCalc(g, this.dcf.g2, this.dcf.gT, w); },
+        sensColor(iv) {
+          const m = this.dcfMos(iv);
+          if (m == null) return 'bg-slate-800 text-slate-400';
+          if (m > 30) return 'bg-emerald-900/60 text-emerald-300';
+          if (m > 15) return 'bg-emerald-900/30 text-emerald-400';
+          if (m > 0)  return 'bg-amber-900/30 text-amber-300';
+          if (m > -15) return 'bg-rose-900/20 text-rose-400';
+          return 'bg-rose-900/50 text-rose-300';
+        },
+        initDcf() {
+          try {
+            const vSec = this.getSectionData('valuation') || {};
+            const fSec = this.getSectionData('financials') || {};
+            const rawFcf = vSec.freeCashflow || fSec.freeCashFlow;
+            const rawShares = vSec.sharesOutstanding;
+            const rawCash = vSec.totalCash;
+            const rawDebt = vSec.totalDebt;
+            const rawPrice = vSec.currentPrice;
+            const rawGrowth = vSec.revenueGrowth || vSec.earningsGrowth;
+            if (rawFcf) this.dcfFcfInput = String(+(rawFcf / 1e7).toFixed(1));
+            if (rawShares) this.dcfSharesInput = String(+(rawShares / 1e5).toFixed(2));
+            if (rawCash) this.dcfCashInput = String(+(rawCash / 1e7).toFixed(1));
+            if (rawDebt) this.dcfDebtInput = String(+(rawDebt / 1e7).toFixed(1));
+            if (rawPrice) this.dcf.price = rawPrice;
+            if (rawGrowth && rawGrowth > 0) this.dcf.g1 = Math.min(40, +(rawGrowth * 100).toFixed(1));
+          } catch(_) {}
+        },
+        // ── Field gap system ──────────────────────────────────────────────
+        fieldGaps: {},  // {section: {field: gap_info}} for current symbol
+        // ── DCF Calculator state ─────────────────────────────────────────
+        dcf: { g1: 15, g2: 8, gT: 4, wacc: 12, years1: 7, years2: 5, price: null },
+        dcfFcfInput: '', dcfSharesInput: '', dcfCashInput: '', dcfDebtInput: '',
+        async fetchFieldGaps(sym) {
+          if (!sym) return;
+          try {
+            const r = await fetch(API + '/symbol/' + encodeURIComponent(sym) + '/field-gaps').then(r => r.ok ? r.json() : null);
+            if (r && r.gaps) this.fieldGaps = r.gaps;
+          } catch (_) {}
+        },
+        isFieldGap(section, field) {
+          return this.fieldGaps?.[section]?.[field]?.status === 'not_found_in_api' && !this.fieldGaps?.[section]?.[field]?.filled_by;
+        },
+        // ── More (AI) generic renderer ────────────────────────────────────
+        _escHtml(s) {
+          return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        },
+        _fmtKey(k) {
+          return String(k).replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
+        },
+        renderMoreAISection(section) {
+          const d = this.getSectionData(section)?.data;
+          if (!d) return '<p class="text-slate-400 text-sm">No data.</p>';
+          let html = '';
+
+          // 1. Summary banner
+          if (d.summary) {
+            html += `<div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 mb-5">
+              <p class="text-sm text-slate-700 leading-relaxed">${this._escHtml(d.summary)}</p></div>`;
+          }
+
+          // 2. Special: FAQ questions
+          if (d.questions && Array.isArray(d.questions)) {
+            html += '<div class="space-y-3 mb-4">';
+            for (const q of d.questions) {
+              html += `<div class="rounded-lg border border-slate-200 p-4">
+                <p class="text-sm font-semibold text-slate-800 mb-1.5">${this._escHtml(q.question || q.q || '')}</p>
+                <p class="text-sm text-slate-600 leading-relaxed">${this._escHtml(q.answer || q.a || '')}</p>
+              </div>`;
+            }
+            html += '</div>';
+          }
+
+          // 3. Special: red_flags / green_flags lists
+          if (d.red_flags || d.green_flags) {
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">';
+            if (d.red_flags && d.red_flags.length) {
+              html += '<div><h4 class="text-xs font-semibold text-rose-600 uppercase tracking-wider mb-2">⚠ Red Flags</h4><ul class="space-y-1">';
+              for (const f of d.red_flags) html += `<li class="text-sm text-slate-700 flex gap-2"><span class="text-rose-400 mt-0.5">●</span>${this._escHtml(f)}</li>`;
+              html += '</ul></div>';
+            }
+            if (d.green_flags && d.green_flags.length) {
+              html += '<div><h4 class="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-2">✓ Green Flags</h4><ul class="space-y-1">';
+              for (const f of d.green_flags) html += `<li class="text-sm text-slate-700 flex gap-2"><span class="text-emerald-400 mt-0.5">●</span>${this._escHtml(f)}</li>`;
+              html += '</ul></div>';
+            }
+            html += '</div>';
+          }
+
+          // 4. Scalar fields as metric cards (exclude already-shown or internal fields)
+          const skipKeys = new Set(['summary','questions','red_flags','green_flags','recent_deals','capex_history','dividend_history','revenue_by_geography','key_suppliers','key_patents','technology_partnerships','innovation_areas','key_currencies','key_covenants','management_changes']);
+          const scalars = Object.entries(d).filter(([k,v]) => !skipKeys.has(k) && !Array.isArray(v) && (typeof v !== 'object' || v === null));
+          if (scalars.length) {
+            html += '<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">';
+            for (const [k,v] of scalars) {
+              const badge = k === 'valuation_verdict' ? `bg-emerald-50 border-emerald-200 text-emerald-700`
+                          : k.includes('rating') || k.includes('score') ? 'bg-blue-50 border-blue-200 text-blue-700'
+                          : 'bg-slate-50 border-slate-200 text-slate-800';
+              html += `<div class="rounded-lg border ${badge} p-3">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">${this._fmtKey(k)}</p>
+                <p class="text-sm font-bold">${this._escHtml(String(v ?? '—'))}</p>
+              </div>`;
+            }
+            html += '</div>';
+          }
+
+          // 5. Object fields as KV grids
+          for (const [k,v] of Object.entries(d)) {
+            if (skipKeys.has(k) || Array.isArray(v) || typeof v !== 'object' || v === null) continue;
+            const entries = Object.entries(v);
+            if (!entries.length) continue;
+            html += `<div class="mb-4"><h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${this._fmtKey(k)}</h4>
+              <div class="bg-slate-50 rounded-lg p-3 grid grid-cols-2 gap-x-6 gap-y-1">`;
+            for (const [ek,ev] of entries) {
+              html += `<div class="flex justify-between border-b border-slate-100 py-1 col-span-1">
+                <span class="text-xs text-slate-500">${this._fmtKey(ek)}</span>
+                <span class="text-xs font-medium text-slate-800">${this._escHtml(String(ev ?? '—'))}</span>
+              </div>`;
+            }
+            html += '</div></div>';
+          }
+
+          // 6. Array fields as tables (non-questions/flags)
+          for (const [k,v] of Object.entries(d)) {
+            if (skipKeys.has(k) || !Array.isArray(v) || !v.length) continue;
+            if (typeof v[0] !== 'object') {
+              // Array of strings → bullet list
+              html += `<div class="mb-4"><h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${this._fmtKey(k)}</h4>
+                <ul class="list-disc list-inside space-y-1">`;
+              for (const item of v) html += `<li class="text-sm text-slate-700">${this._escHtml(String(item))}</li>`;
+              html += '</ul></div>';
+            } else {
+              // Array of objects → table
+              const cols = Object.keys(v[0]);
+              html += `<div class="mb-4 overflow-x-auto">
+                <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${this._fmtKey(k)}</h4>
+                <table class="w-full text-sm border-collapse">
+                  <thead><tr class="text-left">`;
+              for (const c of cols) html += `<th class="text-xs font-semibold text-slate-500 pb-2 pr-4 whitespace-nowrap border-b border-slate-200">${this._fmtKey(c)}</th>`;
+              html += '</tr></thead><tbody>';
+              for (const row of v) {
+                html += '<tr class="border-b border-slate-100 hover:bg-slate-50 transition">';
+                for (const c of cols) html += `<td class="py-2 pr-4 text-slate-700 align-top">${this._escHtml(String(row[c] ?? '—'))}</td>`;
+                html += '</tr>';
+              }
+              html += '</tbody></table></div>';
+            }
+          }
+          return html || '<p class="text-slate-400 text-sm">No structured data available.</p>';
         },
         formatResearchDate(iso) {
           if (!iso) return '—';
@@ -5025,17 +5484,162 @@
           try {
             const r = await fetch(API + '/compare?symbols=' + encodeURIComponent(syms.join(',')) + '&market=' + encodeURIComponent(this.market)).then(r => r.json());
             this.compareRows = r.rows || [];
+            if (this.compareRows.length === 2) {
+              const tryRender = (attempts) => {
+                const el = document.getElementById('cmp-radar');
+                if (el && el.offsetParent !== null) {
+                  this.renderCmpCharts();
+                } else if (attempts > 0) {
+                  setTimeout(() => tryRender(attempts - 1), 200);
+                }
+              };
+              setTimeout(() => tryRender(10), 100);
+            }
           } finally { this.loading = false; }
         },
         comparePickerCommit(side, explicitSym) {
           const key = side === 'A' ? 'compareA' : 'compareB';
           const query = (explicitSym || this.symbolPickerMatches(key)[0] || this.symbolPickerState[key].query || '').trim();
           if (!query) return;
-          if (side === 'A') this.compareSymA = query;
-          else this.compareSymB = query;
+          if (side === 'A') { this.compareSymA = query; this.sessionSet('compareSymA', query); }
+          else { this.compareSymB = query; this.sessionSet('compareSymB', query); }
           this.symbolPickerState[key].query = query.replace('.NS','').replace('.BO','');
           this.symbolPickerState[key].open = false;
           if (this.compareSymA && this.compareSymB) this.fetchCompare();
+        },
+        _cmpCharts: {},
+        renderCmpCharts() {
+          if (this.compareRows.length < 2) return;
+          const a = this.compareRows[0], b = this.compareRows[1];
+          const symA = (a.symbol||'').replace('.NS','').replace('.BO','');
+          const symB = (b.symbol||'').replace('.NS','').replace('.BO','');
+          const colA = 'rgba(45,212,191,0.85)';   // teal
+          const colB = 'rgba(167,139,250,0.85)';   // violet
+          const colAB = [colA, colB];
+          const grid = { color: 'rgba(148,163,184,0.12)' };
+          const tick = { color: '#94a3b8', font: { size: 11 } };
+          const legend = { labels: { color: '#cbd5e1', font: { size: 12 }, boxWidth: 12 } };
+          // yfinance returns ratios as 0-1 (e.g. 0.19 = 19%); dividend_yield already in %
+          const pctVal = v => v == null ? 0 : Math.abs(v) <= 1.5 ? +(v*100).toFixed(1) : +Number(v).toFixed(1);
+
+          const destroyAll = () => {
+            Object.values(this._cmpCharts).forEach(c => { try { c.destroy(); } catch(_) {} });
+            this._cmpCharts = {};
+            // Force-release canvas contexts so getContext('2d') doesn't return null on re-render
+            ['cmp-radar','cmp-valuation','cmp-profit','cmp-growth','cmp-health'].forEach(id => {
+              const c = document.getElementById(id);
+              if (c && c.tagName === 'CANVAS') { c.width = c.width; }
+            });
+          };
+          destroyAll();
+
+          const mkBar = (id, labels, dataA, dataB, opts = {}) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const ctx = el.getContext('2d');
+            if (!ctx) return;
+            return new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [
+                  { label: symA, data: dataA, backgroundColor: colA, borderRadius: 4 },
+                  { label: symB, data: dataB, backgroundColor: colB, borderRadius: 4 },
+                ]
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { ...legend, position: 'top' }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + (opts.suffix||'') } } },
+                scales: {
+                  x: { ticks: tick, grid },
+                  y: { ticks: { ...tick, callback: v => v + (opts.suffix||'') }, grid, beginAtZero: opts.beginAtZero !== false },
+                }
+              }
+            });
+          };
+
+          // 1. Radar — normalised 0-10 scoring on 6 dimensions
+          const radarEl = document.getElementById('cmp-radar');
+          if (radarEl && radarEl.getContext('2d')) {
+            const norm = (v, lo, hi) => v == null ? 0 : Math.min(10, Math.max(0, (v - lo) / (hi - lo) * 10));
+            const dims = ['Profitability', 'Valuation', 'Growth', 'Health', 'Momentum', 'Quality'];
+            const scoreA = [
+              norm(pctVal(a.roe), 0, 30),
+              norm(30 - (a.trailing_pe||30), 0, 30),
+              norm(pctVal(a.revenue_growth), -10, 30),
+              norm(a.current_ratio, 0, 3),
+              norm(a['52w_change_pct']||0, -30, 50),
+              norm(a.total_score||0, 0, 100),
+            ];
+            const scoreB = [
+              norm(pctVal(b.roe), 0, 30),
+              norm(30 - (b.trailing_pe||30), 0, 30),
+              norm(pctVal(b.revenue_growth), -10, 30),
+              norm(b.current_ratio, 0, 3),
+              norm(b['52w_change_pct']||0, -30, 50),
+              norm(b.total_score||0, 0, 100),
+            ];
+            this._cmpCharts['radar'] = new Chart(radarEl.getContext('2d'), {
+              type: 'radar',
+              data: {
+                labels: dims,
+                datasets: [
+                  { label: symA, data: scoreA, backgroundColor: 'rgba(45,212,191,0.15)', borderColor: colA, borderWidth: 2, pointBackgroundColor: colA },
+                  { label: symB, data: scoreB, backgroundColor: 'rgba(167,139,250,0.15)', borderColor: colB, borderWidth: 2, pointBackgroundColor: colB },
+                ]
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend },
+                scales: { r: { min: 0, max: 10, ticks: { stepSize: 2, color: '#64748b', font: { size: 9 }, backdropColor: 'transparent' }, grid: { color: 'rgba(148,163,184,0.15)' }, angleLines: { color: 'rgba(148,163,184,0.15)' }, pointLabels: { color: '#94a3b8', font: { size: 11 } } } }
+              }
+            });
+          }
+
+          // 2. Valuation multiples
+          this._cmpCharts['val'] = mkBar('cmp-valuation',
+            ['P/E TTM', 'P/E Fwd', 'EV/EBITDA', 'P/B', 'P/S'],
+            [a.trailing_pe, a.forward_pe, a.ev_to_ebitda, a.price_to_book, a.price_to_sales].map(v => v != null ? +v.toFixed(1) : 0),
+            [b.trailing_pe, b.forward_pe, b.ev_to_ebitda, b.price_to_book, b.price_to_sales].map(v => v != null ? +v.toFixed(1) : 0),
+            { suffix: 'x' }
+          );
+
+          // 3. Profitability
+          this._cmpCharts['prof'] = mkBar('cmp-profit',
+            ['Gross Margin', 'EBIT Margin', 'Net Margin', 'ROE', 'ROA'],
+            [a.gross_margin, a.operating_margin, a.profit_margin||a.net_margin, a.roe, a.roa].map(pctVal),
+            [b.gross_margin, b.operating_margin, b.profit_margin||b.net_margin, b.roe, b.roa].map(pctVal),
+            { suffix: '%' }
+          );
+
+          // 4. Growth — dividend_yield already in %, others are 0-1 ratios
+          const growthVal = (v, alreadyPct) => v == null ? 0 : alreadyPct ? +Number(v).toFixed(1) : +(v*100).toFixed(1);
+          this._cmpCharts['growth'] = mkBar('cmp-growth',
+            ['Revenue Growth', 'Earnings Growth', 'Dividend Yield', '52W Return'],
+            [growthVal(a.revenue_growth,false), growthVal(a.earnings_growth,false), growthVal(a.dividend_yield,true), growthVal(a['52w_change_pct'],false)],
+            [growthVal(b.revenue_growth,false), growthVal(b.earnings_growth,false), growthVal(b.dividend_yield,true), growthVal(b['52w_change_pct'],false)],
+            { suffix: '%', beginAtZero: false }
+          );
+
+          // 5. Health & Market — horizontal grouped bar
+          const healthEl = document.getElementById('cmp-health');
+          if (healthEl && healthEl.getContext('2d')) {
+            const labels = ['Current Ratio', 'Quick Ratio', 'Interest Coverage', 'Beta', 'D/E Ratio'];
+            const va = [a.current_ratio, a.quick_ratio, a.interest_coverage, a.beta, a.debt_to_equity||a.debt_to_equity_live].map(v => v != null ? +Number(v).toFixed(2) : 0);
+            const vb = [b.current_ratio, b.quick_ratio, b.interest_coverage, b.beta, b.debt_to_equity||b.debt_to_equity_live].map(v => v != null ? +Number(v).toFixed(2) : 0);
+            this._cmpCharts['health'] = new Chart(healthEl.getContext('2d'), {
+              type: 'bar',
+              data: { labels, datasets: [
+                { label: symA, data: va, backgroundColor: colA, borderRadius: 4 },
+                { label: symB, data: vb, backgroundColor: colB, borderRadius: 4 },
+              ]},
+              options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { ...legend, position: 'top' } },
+                scales: { x: { ticks: tick, grid, beginAtZero: true }, y: { ticks: tick, grid } }
+              }
+            });
+          }
         },
         compareMetricGroups() {
           return [

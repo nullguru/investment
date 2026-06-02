@@ -373,6 +373,14 @@ def _fetch_valuation(ticker: yf.Ticker) -> Dict[str, Any]:
         "priceToSalesTrailing12Months": _safe_val(price_to_sales),
         "priceToSales": _safe_val(price_to_sales),
         "priceToFreeCashFlow": _safe_val(pfcf),
+        # DCF inputs
+        "freeCashflow": _safe_val(fcf),
+        "sharesOutstanding": _safe_val(info.get("sharesOutstanding") or info.get("impliedSharesOutstanding")),
+        "totalCash": _safe_val(info.get("totalCash")),
+        "totalDebt": _safe_val(info.get("totalDebt")),
+        "revenueGrowth": _safe_val(info.get("revenueGrowth")),
+        "earningsGrowth": _safe_val(info.get("earningsGrowth")),
+        "ebitda": _safe_val(info.get("ebitda")),
     }
 
 
@@ -409,6 +417,12 @@ def get_section_data(symbol: str, section: str, force: bool = False, market: str
         data["symbol"] = symbol
         data["_ticker"] = ticker_str
         _YF_CACHE[cache_key] = data.copy()
+        # Track which enrichable fields are missing from this provider
+        try:
+            from modules.market.field_gaps import record_field_gaps
+            record_field_gaps(symbol, section, data)
+        except Exception:
+            pass  # never block main data fetch for gap tracking
         return data
     except Exception as e:
         return {"error": str(e), "symbol": symbol}
