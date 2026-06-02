@@ -677,7 +677,7 @@
         <div class="space-y-2 pb-2 border-b border-slate-200">
           <!-- Category: Core Data (yfinance-backed) -->
           <div class="flex flex-wrap items-center gap-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">Data</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Data</span>
             <template x-for="t in ['overview','market','financials','valuation']" :key="t">
               <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
@@ -686,7 +686,7 @@
           </div>
           <!-- Category: Research (web-research-backed) -->
           <div class="flex flex-wrap items-center gap-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">Research <span class="text-teal-400">(AI)</span></span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Research <span class="text-teal-400">(AI)</span></span>
             <template x-for="t in ['thesis','industry','business','management','esg','estimates','revenue','catalysts','cyclical']" :key="t">
               <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-teal-50 text-teal-700 border border-teal-300 hover:bg-teal-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
@@ -696,7 +696,7 @@
           </div>
           <!-- Category: Advanced (future) -->
           <div class="flex flex-wrap items-center gap-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 w-16 shrink-0">More <span class="text-teal-400">(AI)</span></span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">More <span class="text-teal-400">(AI)</span></span>
             <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
               <button @click="perStockTab = t; fetchSectionDataIfNeeded(t)"
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-violet-50 text-violet-700 border border-violet-300 hover:bg-violet-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
@@ -734,12 +734,38 @@
               <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Promoter & Ownership</h3>
                 <dl class="space-y-2 text-sm">
-                  <div class="flex justify-between"><dt class="text-slate-500">Insiders / Promoter</dt><dd x-text="getSectionData('overview')?.heldPercentInsiders != null ? (getSectionData('overview').heldPercentInsiders + '%') : (perStockRow?.promoter_holding ?? '—')"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Insiders / Promoter</dt><dd x-text="getSectionData('overview')?.heldPercentInsiders != null ? formatPct(getSectionData('overview').heldPercentInsiders) : (perStockRow?.promoter_holding ?? '—')"></dd></div>
                   <div class="flex justify-between"><dt class="text-slate-500">Pledged Shares</dt><dd x-text="perStockRow?.pledged_shares ?? '—'"></dd></div>
-                  <div class="flex justify-between"><dt class="text-slate-500">Institutional</dt><dd x-text="getSectionData('overview')?.heldPercentInstitutions != null ? (getSectionData('overview').heldPercentInstitutions + '%') : (perStockRow?.institutional ?? '—')"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Institutional</dt><dd x-text="getSectionData('overview')?.heldPercentInstitutions != null ? formatPct(getSectionData('overview').heldPercentInstitutions) : (perStockRow?.institutional ?? '—')"></dd></div>
                   <div class="flex justify-between"><dt class="text-slate-500">Board Size</dt><dd x-text="perStockRow?.board_size ?? '—'"></dd></div>
                   <div class="flex justify-between"><dt class="text-slate-500">Board Independence</dt><dd x-text="perStockRow?.board_independence ?? '—'"></dd></div>
-                  <div class="flex flex-col gap-1"><dt class="text-slate-500">Top holders</dt><dd class="text-slate-600 text-xs" x-show="(getSectionData('overview')?.majorHolders || []).length"><template x-for="h in (getSectionData('overview')?.majorHolders || [])" :key="h.label"><div class="flex justify-between" x-text="h.label + ': ' + (typeof h.value === 'number' && h.value < 10 && h.value > 0 ? (h.value * 100).toFixed(2) + '%' : (typeof h.value === 'number' ? h.value.toLocaleString() : (h.value ?? '—')))"></div></template></dd><dd x-show="!(getSectionData('overview')?.majorHolders || []).length" x-text="perStockRow?.top_holders ?? '—'"></dd></div>
+                  <div class="flex flex-col gap-1"><dt class="text-slate-500 mb-1">Top holders</dt><dd class="text-slate-600 text-xs space-y-0.5" x-show="(getSectionData('overview')?.majorHolders || []).length"><template x-for="h in (getSectionData('overview')?.majorHolders || [])" :key="h.label"><div class="flex justify-between" x-text="formatMajorHolder(h)"></div></template></dd><dd x-show="!(getSectionData('overview')?.majorHolders || []).length" x-text="perStockRow?.top_holders ?? '—'"></dd></div>
+                </dl>
+              </section>
+              <!-- Company Links -->
+              <section x-show="getSectionData('overview')?.website || perStockRow?.symbol" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Company Links</h3>
+                <dl class="space-y-2 text-sm">
+                  <div x-show="getSectionData('overview')?.website" class="flex justify-between items-center">
+                    <dt class="text-slate-500">Website</dt>
+                    <dd><a :href="getSectionData('overview')?.website" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline truncate max-w-[180px] inline-block" x-text="(getSectionData('overview')?.website || '').replace(/^https?:\/\//, '')"></a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Investor Relations</dt>
+                    <dd><a :href="'https://www.bseindia.com/stock-share-price/' + (perStockSymbol || '').replace('.NS','').replace('.BO','').toLowerCase() + '/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">BSE Filing Page ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">NSE Filings</dt>
+                    <dd><a :href="'https://www.nseindia.com/get-quotes/equity?symbol=' + (perStockSymbol || '').replace('.NS','').replace('.BO','')" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">NSE Quote ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Annual Reports</dt>
+                    <dd><a :href="'https://www.screener.in/company/' + (perStockSymbol || '').replace('.NS','').replace('.BO','') + '/annual-report/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">Screener.in ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Quarterly Results</dt>
+                    <dd><a :href="'https://www.screener.in/company/' + (perStockSymbol || '').replace('.NS','').replace('.BO','') + '/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">Screener.in ↗</a></dd>
+                  </div>
                 </dl>
               </section>
             </div>
@@ -4029,6 +4055,22 @@
         },
         getSectionData(section) { const sym = this.perStockSymbol; if (!sym) return null; return (this.perStockSectionData[sym] || {})[section] || null; },
         hasResearchData(section) { const d = this.getSectionData(section); return d && d.data && !d.error; },
+        formatMajorHolder(h) {
+          const labelMap = { insidersPercentHeld: 'Insiders held', institutionsPercentHeld: 'Institutions held', institutionsFloatPercentHeld: 'Float held by inst.', institutionsCount: 'Institution count' };
+          const label = labelMap[h.label] || h.label;
+          const isCount = h.label === 'institutionsCount';
+          let val;
+          if (isCount) {
+            val = typeof h.value === 'number' ? Math.round(h.value).toLocaleString() : (h.value ?? '—');
+          } else if (typeof h.value === 'number') {
+            const pct = h.value > 0 && h.value <= 1 ? h.value * 100 : h.value;
+            val = pct.toFixed(2) + '%';
+          } else {
+            val = h.value ?? '—';
+          }
+          return label + ': ' + val;
+        },
+        formatPct(val) { if (val == null) return '—'; const n = parseFloat(val); return isNaN(n) ? val : n.toFixed(2) + '%'; },
         researchVersionKey(section) { return (this.perStockSymbol || '') + '_' + section; },
         async fetchResearchVersions(section) {
           const sym = this.perStockSymbol; if (!sym) return;
