@@ -1126,15 +1126,36 @@ def api_screener(
             "cash_generation_score": qscore.get("cash_generation_score"),
             "financial_strength_score": qscore.get("financial_strength_score"),
             "valuation_score": qscore.get("valuation_score"),
+            # Profitability
             "roe": qscore.get("roe"),
+            "roa": qscore.get("roa"),
             "operating_margin": qscore.get("operating_margin"),
             "gross_margin": qscore.get("gross_margin"),
+            "net_margin": qscore.get("net_margin"),
+            "ebitda_margin": qscore.get("ebitda_margin"),
+            "roce": qscore.get("roce"),
+            # Growth
+            "revenue_growth": qscore.get("revenue_growth"),
+            "earnings_growth": qscore.get("earnings_growth"),
+            # Financial health
             "fcf_conversion": qscore.get("fcf_conversion"),
             "debt_to_equity": qscore.get("debt_to_equity"),
             "current_ratio": qscore.get("current_ratio"),
+            "quick_ratio": qscore.get("quick_ratio"),
+            "interest_coverage": qscore.get("interest_coverage"),
+            # Valuation
             "peg_ratio": qscore.get("peg_ratio"),
             "trailing_pe": qscore.get("trailing_pe"),
             "forward_pe": qscore.get("forward_pe"),
+            "price_to_book": qscore.get("price_to_book"),
+            "ev_to_ebitda": qscore.get("ev_to_ebitda"),
+            "price_to_sales": qscore.get("price_to_sales"),
+            "ev_to_revenue": qscore.get("ev_to_revenue"),
+            # Market
+            "beta": qscore.get("beta"),
+            "dividend_yield": qscore.get("dividend_yield"),
+            "payout_ratio": qscore.get("payout_ratio"),
+            "vs_200dma": qscore.get("vs_200dma"),
             "computed_at": qscore.get("computed_at"),
         }
         rows.append(row)

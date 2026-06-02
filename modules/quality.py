@@ -244,6 +244,7 @@ def compute_quality_score(
 
     fin = get_section_data(symbol, "financials", force=force, market=market)
     val = get_section_data(symbol, "valuation", force=force, market=market)
+    mkt = get_section_data(symbol, "market", force=force, market=market)
 
     if fin.get("error") or val.get("error"):
         result = {
@@ -273,6 +274,14 @@ def compute_quality_score(
     else:
         data_quality = "insufficient"
 
+    def _s(v):
+        if v is None: return None
+        try:
+            import math
+            if isinstance(v, float) and math.isnan(v): return None
+            return v.item() if hasattr(v, 'item') else v
+        except Exception: return None
+
     result = {
         "symbol": symbol,
         "computed_at": datetime.now(timezone.utc).isoformat(),
@@ -288,15 +297,38 @@ def compute_quality_score(
         "cash_generation_score": c["score"],
         "financial_strength_score": f["score"],
         "valuation_score": v["score"],
+        # Profitability
         "roe": p["roe"],
+        "roa": _s(fin.get("returnOnAssets")),
         "operating_margin": p["operating_margin"],
         "gross_margin": p["gross_margin"],
+        "net_margin": _s(fin.get("profitMargins")),
+        "ebitda_margin": _s(fin.get("ebitdaMargins")),
+        "roce": _s(fin.get("returnOnCapitalEmployed")),
+        # Growth
+        "revenue_growth": _s(fin.get("revenueGrowth")),
+        "earnings_growth": _s(fin.get("earningsGrowth")),
+        # Cash & strength
         "fcf_conversion": c["fcf_conversion"],
         "debt_to_equity": f["debt_to_equity"],
         "current_ratio": f["current_ratio"],
+        "quick_ratio": _s(fin.get("quickRatio")),
+        "interest_coverage": _s(fin.get("interestCoverage") or fin.get("ebit") and fin.get("interestExpense") and (fin["ebit"] / fin["interestExpense"]) if fin.get("interestExpense") else None),
+        # Valuation
         "peg_ratio": v["peg_ratio"],
         "trailing_pe": v["trailing_pe"],
         "forward_pe": v["forward_pe"],
+        "price_to_book": _s(val.get("priceToBook")),
+        "ev_to_ebitda": _s(val.get("enterpriseToEbitda")),
+        "price_to_sales": _s(val.get("priceToSalesTrailing12Months")),
+        "ev_to_revenue": _s(val.get("enterpriseToRevenue")),
+        # Market / price
+        "beta": _s(mkt.get("beta")),
+        "dividend_yield": _s(mkt.get("dividendYield")),
+        "payout_ratio": _s(mkt.get("payoutRatio")),
+        "vs_200dma": _s(mkt.get("vs200DMA")),
+        "52w_high": _s(mkt.get("fiftyTwoWeekHigh")),
+        "52w_low": _s(mkt.get("fiftyTwoWeekLow")),
     }
 
     save_quality_cache({symbol: result})

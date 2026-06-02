@@ -90,7 +90,7 @@
       "reason": true
     }
   },
-  "period": "31st December 2025",
+  "period": "All periods",
   "market": "india",
   "portfolioSymbolsText": "TCS\nINFY\nHCLTECH",
   "compareSymbolsText": "TCS.NS\nINFY.NS",
