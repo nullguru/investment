@@ -485,6 +485,45 @@ def api_symbol_research_put(symbol: str, section: str, body: dict):
     return {"status": "ok", "section": section, "symbol": symbol}
 
 
+@app.get("/api/symbol/{symbol}/research/{section}/versions")
+def api_symbol_research_versions(symbol: str, section: str):
+    """List historical versions for a research section (newest first)."""
+    from modules.research import load_research_versions, RESEARCH_SECTIONS
+    if section not in RESEARCH_SECTIONS:
+        raise HTTPException(400, f"Invalid section: {section}")
+    versions = load_research_versions(symbol, section)
+    # Return lightweight summary (no full data payload, just metadata)
+    summary = [
+        {"idx": i, "updated_at": v.get("updated_at"), "symbol": v.get("symbol", symbol)}
+        for i, v in enumerate(versions)
+    ]
+    return {"versions": summary}
+
+
+@app.delete("/api/symbol/{symbol}/research/{section}/versions/{version_idx}")
+def api_symbol_research_version_delete(symbol: str, section: str, version_idx: int):
+    """Delete a historical version by index (0 = newest historical)."""
+    from modules.research import delete_research_version, RESEARCH_SECTIONS
+    if section not in RESEARCH_SECTIONS:
+        raise HTTPException(400, f"Invalid section: {section}")
+    ok = delete_research_version(symbol, section, version_idx)
+    if not ok:
+        raise HTTPException(404, "Version not found")
+    return {"status": "deleted", "idx": version_idx}
+
+
+@app.post("/api/symbol/{symbol}/research/{section}/versions/{version_idx}/restore")
+def api_symbol_research_version_restore(symbol: str, section: str, version_idx: int):
+    """Restore a historical version to current."""
+    from modules.research import restore_research_version, RESEARCH_SECTIONS
+    if section not in RESEARCH_SECTIONS:
+        raise HTTPException(400, f"Invalid section: {section}")
+    envelope = restore_research_version(symbol, section, version_idx)
+    if not envelope:
+        raise HTTPException(404, "Version not found")
+    return {"status": "restored", "envelope": envelope}
+
+
 @app.get("/api/resolve")
 def api_resolve(q: str = Query(""), market: str = Query("india")):
     """Resolve search query to ticker (e.g. TCS -> TCS.NS for India, AAPL -> AAPL for US)."""
@@ -756,31 +795,133 @@ def api_portfolio_data(body: PortfolioDataBody):
     return {"pivot": pivot_list, "pivot_columns": list(pivot_df.columns) if not pivot_df.empty else [], "rows": rows, "missing": missing}
 
 
+class ReplacementBody(BaseModel):
+    symbol: str
+    sector: str | None = None
+    industry: str | None = None
+    exclude_symbols: list[str] = []
+    market: str = "india"
+    top_n: int = 5
+
+
+@app.post("/api/portfolio/replacements")
+def api_portfolio_replacements(body: ReplacementBody):
+    """Return top Sharia-compliant replacements for a non-compliant symbol, same sector."""
+    cached = get_cached_sharia(market=body.market)
+    if cached is None:
+        return {"replacements": []}
+    df = cached.copy()
+    # Enrich
+    if "industry_compliant" not in df.columns:
+        df["industry_compliant"] = df.apply(
+            lambda r: is_industry_compliant(r.get("industry"), r.get("sector")), axis=1
+        )
+    df["Sharia"] = df.apply(lambda r: effective_sharia(r["compliant"], r.get("industry_compliant")), axis=1)
+    # Latest period per symbol
+    df = df.sort_values("report_period").groupby("symbol", as_index=False).last()
+    # Filter: compliant, not the offending symbol, not in exclude list
+    exclude = set([body.symbol] + (body.exclude_symbols or []))
+    df = df[(df["Sharia"] == "Yes") & (~df["symbol"].isin(exclude))]
+    # Prefer same sector
+    sector_match = df[df["sector"] == body.sector] if body.sector else df
+    if len(sector_match) < 3:
+        sector_match = df  # widen if sector too narrow
+    # Sort by market cap desc, take top N
+    sector_match = sector_match.copy()
+    sector_match["market_cap"] = pd.to_numeric(sector_match["market_cap"], errors="coerce").fillna(0)
+    top = sector_match.sort_values("market_cap", ascending=False).head(body.top_n)
+    cols = ["symbol", "name", "sector", "industry", "market_cap", "debt_to_equity_ratio",
+            "cash_to_assets_pct", "receivables_to_assets_pct", "Sharia"]
+    cols = [c for c in cols if c in top.columns]
+    return {"replacements": _df_to_records(top[cols])}
+
+
 @app.get("/api/compare")
 def api_compare(symbols: str = Query(""), market: str = Query("india")):
-    """Compare multiple symbols (latest Sharia row each)."""
+    """Compare multiple symbols with Sharia + live market metrics."""
     sym_list = [s.strip() for s in symbols.split(",") if s.strip()]
     if not sym_list:
         return {"rows": []}
     cached = get_cached_sharia(market=market)
     _, exchange_map = get_universe(market=market)
-    if cached is None:
-        return {"rows": []}
-    df = cached[cached["symbol"].isin(sym_list)].copy()
-    if df.empty:
-        return {"rows": []}
-    df = df.sort_values(["symbol", "report_period"]).groupby("symbol").last().reset_index()
-    df["exchange"] = df["symbol"].map(exchange_map)
-    if "industry_compliant" not in df.columns:
-        df["industry_compliant"] = df.apply(
-            lambda r: is_industry_compliant(r.get("industry"), r.get("sector")), axis=1
-        )
-    df["Sharia"] = df.apply(
-        lambda r: effective_sharia(r["compliant"], r.get("industry_compliant")), axis=1
-    )
-    disp = ["symbol", "name", "Sharia", "industry", "sector", "market_cap", "debt_to_equity_ratio", "cash_to_assets_pct"]
-    disp = [c for c in disp if c in df.columns]
-    return {"rows": _df_to_records(df[disp])}
+
+    # Build base rows from Sharia cache
+    sharia_rows: dict = {}
+    if cached is not None and not cached.empty:
+        df = cached[cached["symbol"].isin(sym_list)].copy()
+        if not df.empty:
+            df = df.sort_values(["symbol", "report_period"]).groupby("symbol").last().reset_index()
+            if "industry_compliant" not in df.columns:
+                df["industry_compliant"] = df.apply(
+                    lambda r: is_industry_compliant(r.get("industry"), r.get("sector")), axis=1
+                )
+            df["Sharia"] = df.apply(
+                lambda r: effective_sharia(r["compliant"], r.get("industry_compliant")), axis=1
+            )
+            for _, row in df.iterrows():
+                sharia_rows[row["symbol"]] = {
+                    "symbol": row["symbol"],
+                    "name": row.get("name") or row["symbol"],
+                    "Sharia": row.get("Sharia"),
+                    "industry": row.get("industry"),
+                    "sector": row.get("sector"),
+                    "market_cap": _safe_val(row.get("market_cap")),
+                    "debt_to_equity_ratio": _safe_val(row.get("debt_to_equity_ratio")),
+                    "cash_to_assets_pct": _safe_val(row.get("cash_to_assets_pct")),
+                    "other_revenue_to_revenue_pct": _safe_val(row.get("other_revenue_to_revenue_pct")),
+                    "receivables_to_assets_pct": _safe_val(row.get("receivables_to_assets_pct")),
+                }
+
+    # Enrich with live yfinance market + valuation data
+    rows = []
+    for sym in sym_list:
+        base = sharia_rows.get(sym, {"symbol": sym, "name": sym, "Sharia": None})
+        try:
+            mkt = yf_get_section(sym, "market", force=False, market=market)
+            val = yf_get_section(sym, "valuation", force=False, market=market)
+            fin = yf_get_section(sym, "financials", force=False, market=market)
+            ov  = yf_get_section(sym, "overview", force=False, market=market)
+            base["current_price"] = _safe_val(mkt.get("currentPrice") or val.get("currentPrice"))
+            base["52w_high"] = _safe_val(mkt.get("fiftyTwoWeekHigh"))
+            base["52w_low"] = _safe_val(mkt.get("fiftyTwoWeekLow"))
+            base["52w_change_pct"] = _safe_val(mkt.get("fiftyTwoWeekChangePercent") or mkt.get("52WeekChange"))
+            base["beta"] = _safe_val(mkt.get("beta"))
+            base["dividend_yield"] = _safe_val(mkt.get("dividendYield") or val.get("dividendYield"))
+            base["trailing_pe"] = _safe_val(val.get("trailingPE") or mkt.get("trailingPE"))
+            base["forward_pe"] = _safe_val(val.get("forwardPE") or mkt.get("forwardPE"))
+            base["price_to_book"] = _safe_val(val.get("priceToBook") or mkt.get("priceToBook"))
+            base["ev_to_ebitda"] = _safe_val(val.get("enterpriseToEbitda") or val.get("evToEbitda"))
+            base["roe"] = _safe_val(fin.get("returnOnEquity") or ov.get("returnOnEquity"))
+            base["roa"] = _safe_val(fin.get("returnOnAssets") or ov.get("returnOnAssets"))
+            base["profit_margin"] = _safe_val(fin.get("profitMargins") or ov.get("profitMargins"))
+            base["revenue_growth"] = _safe_val(fin.get("revenueGrowth") or ov.get("revenueGrowth"))
+            base["earnings_growth"] = _safe_val(fin.get("earningsGrowth") or ov.get("earningsGrowth"))
+            base["debt_to_equity_live"] = _safe_val(fin.get("debtToEquity") or ov.get("debtToEquity"))
+            base["current_ratio"] = _safe_val(fin.get("currentRatio") or ov.get("currentRatio"))
+            base["employees"] = _safe_val(ov.get("fullTimeEmployees"))
+            if not base.get("name") or base["name"] == sym:
+                base["name"] = ov.get("shortName") or ov.get("longName") or mkt.get("shortName") or sym
+            if not base.get("market_cap"):
+                base["market_cap"] = _safe_val(val.get("marketCap") or mkt.get("marketCap"))
+        except Exception:
+            pass
+        rows.append(base)
+
+    return {"rows": rows}
+
+
+def _safe_val(v):
+    """Convert numpy/nan values to Python native or None."""
+    if v is None:
+        return None
+    try:
+        if hasattr(v, "item"):
+            v = v.item()
+        if isinstance(v, float) and (v != v):  # NaN check
+            return None
+        return v
+    except Exception:
+        return None
 
 
 # ----- Watchlist -----

@@ -1,0 +1,742 @@
+{
+  "thesis": {
+    "current": {
+      "section": "thesis",
+      "symbol": "MARUTI.NS",
+      "updated_at": "2026-06-01T00:00:00Z",
+      "sources": [
+        {
+          "title": "Maruti Suzuki FY2026 Financial Results Press Release",
+          "url": "https://www.marutisuzuki.com/corporate/media/press-releases/2026/april/maruti-suzuki-announces-financial-results-for-fy2025-26"
+        },
+        {
+          "title": "Maruti Suzuki FY26 Record Sales, Revenue, Profit",
+          "url": "https://www.newkerala.com/news/a/maruti-suzuki-reports-record-fy26-sales-revenue-profit-933.htm"
+        },
+        {
+          "title": "Maruti Suzuki India Share Price Target 2026",
+          "url": "https://univest.in/blogs/maruti-suzuki-india-share-price-target-2026"
+        },
+        {
+          "title": "Maruti Suzuki Hits Record Sales, Secures 42% Market Share",
+          "url": "https://www.whalesbook.com/news/English/auto/Maruti-Suzuki-Hits-Record-Sales-Secures-42percent-Market-Share/69f6e4319d1c9066481f77f9"
+        }
+      ],
+      "data": {
+        "summary": "Maruti Suzuki is India's undisputed passenger vehicle leader with ~39-42% market share, a net-cash balance sheet (₹50,000+ Cr), and record FY2026 performance (revenue ₹1.74L Cr, PAT ₹14,445 Cr, 24.2L units sold). The company is navigating a structural shift toward SUVs and CNG vehicles while managing long-term EV transition risk. Its dominant distribution network, Suzuki technology backing, and cost leadership create durable competitive advantages despite ongoing share erosion from Mahindra and Tata in the SUV segment.",
+        "verdict": "Buy",
+        "bull_case": {
+          "probability": 40,
+          "target": "₹17,500",
+          "narrative": "SUV portfolio ramp-up (Grand Vitara, Jimny, Brezza, Invicto) accelerates market share recovery above 42%. CNG penetration deepens as fuel cost sensitivity drives consumers. Kharkhoda plant + Hansalpur capacity expansion enables 3M+ unit sales. Export volumes grow 15%+ annually with e VITARA launch in 44 countries. Net cash deployed in buybacks or large dividends re-rates stock.",
+          "drivers": [
+            "SUV segment outperformance with 141.6% growth in April 2026",
+            "e VITARA EV launch in India and 44 export markets",
+            "Kharkhoda plant Phase 1 operational since Feb 2025",
+            "CNG portfolio expanded to 14 of 18 models",
+            "Record exports: 447,774 units in FY2026, 49% of India total"
+          ]
+        },
+        "base_case": {
+          "probability": 45,
+          "target": "₹13,500",
+          "narrative": "Maruti maintains 39-41% domestic market share, grows volumes 6-8% annually driven by SUV and CNG mix. Margin stays stable at ~8-9% EBITDA. EV transition proceeds gradually with e VITARA being a niche product. Stock trades at 25-28x earnings.",
+          "drivers": [
+            "Steady volume growth of 6-8% annually",
+            "CNG mix supporting margins amid commodity pressures",
+            "Suzuki technology pipeline ensuring product refresh cycle",
+            "Export diversification reducing India-cyclicality risk",
+            "Healthy dividend payout (₹140/share in FY2026)"
+          ]
+        },
+        "bear_case": {
+          "probability": 15,
+          "target": "₹9,500",
+          "narrative": "Market share erodes further below 35% as Mahindra and Tata continue SUV dominance. Maruti is late to BEV transition, losing early-mover advantage. Suzuki parent faces global challenges impacting India R&D investment. Rural demand slowdown hits entry-level hatchback volumes. Rising input costs compress margins.",
+          "drivers": [
+            "Market share erosion from 51% (FY2020) to potentially below 35%",
+            "Late entry into BEV market vs. Tata and MG",
+            "Mahindra SUV pipeline threatening compact SUV segment",
+            "Potential rupee depreciation increasing import costs",
+            "Slowdown in rural/semi-urban demand affecting entry-level segment"
+          ]
+        },
+        "key_drivers": [
+          "SUV portfolio mix shift (Brezza, Grand Vitara, Jimny, Invicto)",
+          "CNG vehicle penetration in a high-fuel-cost environment",
+          "Capacity expansion: Kharkhoda + Hansalpur fourth line",
+          "e VITARA BEV launch timing and acceptance",
+          "Export growth trajectory (target 500K+ units annually)",
+          "Net cash deployment strategy (₹50,000+ Cr sitting idle)",
+          "Market share trajectory vs. Mahindra and Tata Motors"
+        ]
+      }
+    },
+    "versions": [
+      {
+        "section": "thesis",
+        "symbol": "MARUTI.NS",
+        "updated_at": "2026-06-02T12:00:00Z",
+        "sources": [],
+        "data": {
+          "summary": "test v2"
+        }
+      }
+    ]
+  },
+  "industry": {
+    "section": "industry",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [
+      {
+        "title": "India Passenger Car Market Size Share & Report 2031 - Mordor Intelligence",
+        "url": "https://www.mordorintelligence.com/industry-reports/india-passenger-car-market-outlook"
+      },
+      {
+        "title": "Car Sales and Market Share FY26 - Rushlane",
+        "url": "https://www.rushlane.com/car-sales-and-market-share-fy-26-maruti-mahindra-tata-hyundai-toyota-12544857.html"
+      },
+      {
+        "title": "India Electric Vehicle Market Size 2026 - Precedence Research",
+        "url": "https://www.precedenceresearch.com/india-electric-vehicle-market"
+      },
+      {
+        "title": "Indian Passenger Car Market Analysis Report 2026 - Data Insights Market",
+        "url": "https://www.datainsightsmarket.com/reports/indian-passenger-car-market-15426"
+      }
+    ],
+    "data": {
+      "industry_name": "India Passenger Vehicle / Automobile Manufacturing",
+      "market_size": "~USD 41-44 billion (FY2026); total domestic PV volumes ~4.68 million units in FY2026, growing 8.4% YoY",
+      "growth_rate": "7.5% CAGR projected through 2031; EV sub-segment growing at 50%+ CAGR from a low base",
+      "trends": [
+        {
+          "title": "SUV Dominance",
+          "description": "SUVs now account for over 50% of passenger vehicle sales in India. Consumer preference has rapidly shifted from hatchbacks toward compact and mid-size SUVs, benefiting Mahindra, Tata, and increasingly Maruti (Grand Vitara, Brezza, Jimny)."
+        },
+        {
+          "title": "CNG and Alternative Fuel Penetration",
+          "description": "High petrol/diesel prices and CNG infrastructure expansion are driving CNG vehicle adoption. Maruti leads this segment with 14 of 18 models available in CNG variants, providing a fuel-cost-sensitive value proposition."
+        },
+        {
+          "title": "Electric Vehicle Transition",
+          "description": "India EV market valued at USD 18.79B in 2025, projected to grow at 52% CAGR. Passenger EVs dominate with 55% share. However, EV penetration in PV segment remains below 5% in FY2026, with charging infrastructure gaps constraining faster adoption."
+        },
+        {
+          "title": "Premiumization",
+          "description": "Average selling prices are rising as consumers upgrade from entry-level hatchbacks to feature-rich compact SUVs. This trend compresses unit volumes for entry-level segments but boosts revenue per unit."
+        },
+        {
+          "title": "Export Growth",
+          "description": "India is emerging as a global export hub for passenger vehicles. Total PV exports grew significantly with Maruti alone exporting 447,774 units in FY2026, accounting for ~49% of India total exports."
+        }
+      ],
+      "competitive_landscape": [
+        {
+          "company": "Maruti Suzuki",
+          "market_share": "38.93%",
+          "notes": "Dominant leader; 18.23L units in FY2026; share eroded from 51% in FY2020; strong in hatchbacks and CNG; accelerating in SUVs"
+        },
+        {
+          "company": "Mahindra & Mahindra",
+          "market_share": "14.10%",
+          "notes": "Fastest growing; 6.60L units; SUV-focused portfolio (Scorpio, XUV700, Thar, BE6); major share gainer"
+        },
+        {
+          "company": "Tata Motors",
+          "market_share": "13.48%",
+          "notes": "6.31L units; strong in EVs (Nexon EV, Tiago EV, Curvv); gained ~8.7pp share since FY2020"
+        },
+        {
+          "company": "Hyundai",
+          "market_share": "12.49%",
+          "notes": "5.85L units; slight volume decline YoY; strong in compact SUVs (Creta, Venue, Alcazar)"
+        },
+        {
+          "company": "Toyota",
+          "market_share": "7.84%",
+          "notes": "3.67L units; 18.6% YoY growth; gains from Innova Crysta, Urban Cruiser Hyryder, Fortuner"
+        },
+        {
+          "company": "Kia",
+          "market_share": "6.17%",
+          "notes": "2.89L units; upward trajectory with Seltos, Sonet, Carens"
+        },
+        {
+          "company": "Others (MG, Skoda, Honda, VW, Renault, etc.)",
+          "market_share": "6.99%",
+          "notes": "Fragmented; niche players in premium and EV segments"
+        }
+      ],
+      "barriers_to_entry": [
+        "Massive capital requirements for manufacturing plants (₹10,000+ Cr per greenfield facility)",
+        "Extensive dealer and service network (Maruti has 4,000+ touchpoints)",
+        "Brand trust and after-sales ecosystem built over decades",
+        "Supplier ecosystem development (takes 5-10 years to optimize)",
+        "Regulatory compliance (CAFE norms, BS6, safety ratings) requires R&D scale",
+        "Price competition in entry-level segment limits margin for new entrants"
+      ],
+      "regulatory_environment": "India is enforcing CAFE (Corporate Average Fuel Economy) Phase 2 norms, pushing OEMs toward fuel efficiency and electrification. GST on EVs is 5% vs 28%+cess on ICE vehicles, creating EV incentive differential. PLI scheme for Advanced Chemistry Cells supports local battery manufacturing. Safety ratings (Bharat NCAP) are becoming a consumer differentiator. Emission norms are BS6 Phase 2 (RDE-compliant) as of April 2023."
+    }
+  },
+  "estimates": {
+    "section": "estimates",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "consensus": "Buy",
+      "analyst_count": 40,
+      "avg_target": "₹16,198",
+      "high_target": "₹18,500",
+      "low_target": "₹12,000",
+      "current_price": "₹13,127",
+      "upside_pct": 23,
+      "fy_forecasts": [
+        {
+          "year": "FY26",
+          "revenue": "₹1,74,370 Cr",
+          "pat": "₹14,445 Cr",
+          "eps": "₹478",
+          "growth_pct": 20
+        },
+        {
+          "year": "FY27",
+          "revenue": "₹1,95,000 Cr",
+          "pat": "₹16,500 Cr",
+          "eps": "₹545",
+          "growth_pct": 14
+        }
+      ],
+      "key_assumptions": [
+        "e-Vitara ramp",
+        "CNG mix stable",
+        "Kharkhoda plant by FY28"
+      ]
+    }
+  },
+  "business": {
+    "section": "business",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "model_summary": "Maruti Suzuki India Limited (MSIL) is India's largest passenger vehicle manufacturer, a subsidiary of Suzuki Motor Corporation Japan (56.37% stake). Operates across value, mid, and premium segments with 19+ models. Revenue driven by vehicle sales (88%), spares (7%), and other income (5%). Manufactures at Gurugram, Manesar, and Kharkhoda (upcoming). Distributes via 4000+ dealer touchpoints.",
+      "moat_type": "Cost Leadership + Distribution",
+      "pricing_power": "Medium",
+      "moat_description": "Unmatched scale (2.4M units/yr capacity), lowest cost per unit in India PV space, dominant CNG platform, and deepest distribution network including Tier-2/3 cities create durable competitive moat.",
+      "revenue_streams": [
+        {
+          "name": "Vehicles",
+          "pct_of_revenue": 88
+        },
+        {
+          "name": "Spares & Accessories",
+          "pct_of_revenue": 7
+        },
+        {
+          "name": "Other",
+          "pct_of_revenue": 5
+        }
+      ],
+      "competitive_advantages": [
+        "41% PV market share",
+        "4000+ dealer touchpoints",
+        "CNG leadership 71% share",
+        "Zero debt balance sheet"
+      ],
+      "customer_concentration": "Retail/mass market, no single customer concentration"
+    }
+  },
+  "management": {
+    "section": "management",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Professional management team with Suzuki Japan nominees in key roles. R.C. Bhargava (non-exec Chairman) is a legendary figure who built MSIL over 4 decades. Hisashi Takeuchi took over as MD & CEO in 2022. Governance is moderate — parent influence is high.",
+      "key_people": [
+        {
+          "name": "Hisashi Takeuchi",
+          "title": "MD & CEO"
+        },
+        {
+          "name": "R.C. Bhargava",
+          "title": "Chairman"
+        },
+        {
+          "name": "Ajay Seth",
+          "title": "CFO"
+        },
+        {
+          "name": "Shashank Srivastava",
+          "title": "Senior ED, Marketing & Sales"
+        }
+      ],
+      "governance_score": "Medium",
+      "capital_allocation": "Conservative — ₹76,000 Cr cash, returning via dividends + capex",
+      "red_flags": [
+        "Suzuki Japan controls strategy",
+        "Royalty ~5% net sales = ₹8,700+ Cr/yr outflow"
+      ]
+    }
+  },
+  "revenue": {
+    "section": "revenue",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Record FY2026: ₹1,74,370 Cr (+20.2%), 24.2L units",
+      "segments": [
+        {
+          "name": "Vehicles",
+          "revenue": "₹1,53,000 Cr",
+          "pct_of_total": 88,
+          "yoy_growth": "21%"
+        },
+        {
+          "name": "Spares",
+          "revenue": "₹12,200 Cr",
+          "pct_of_total": 7,
+          "yoy_growth": "12%"
+        },
+        {
+          "name": "Other",
+          "revenue": "₹9,170 Cr",
+          "pct_of_total": 5
+        }
+      ],
+      "geographic_split": [
+        {
+          "region": "Domestic",
+          "pct": 74
+        },
+        {
+          "region": "Exports",
+          "pct": 26
+        }
+      ],
+      "trend_narrative": "Strong volume growth on SUV + CNG mix shift; exports hit record 4.47L units",
+      "margin_trend": "EBITDA margin 13.5%, PAT margin 8.3%"
+    }
+  },
+  "esg": {
+    "section": "esg",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Moderate ESG profile. Environmental progress via CNG dominance and BEV launch, but ICE-heavy fleet remains a long-term risk. Social scores are positive with large rural employment. Governance is medium due to parent royalty and control structure.",
+      "environmental_score": "Medium",
+      "social_score": "Medium",
+      "governance_score": "Medium",
+      "highlights": [
+        "World's first VCS Modal Shift carbon project",
+        "e-Vitara BEV launched Feb 2026",
+        "MSCI upgraded B→BB 2025"
+      ],
+      "risks": [
+        "ICE-heavy fleet transition risk",
+        "Royalty governance concern"
+      ]
+    }
+  },
+  "catalysts": {
+    "section": "catalysts",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "upcoming": [
+        {
+          "date": "Jul 2026",
+          "event": "e-Vitara full ramp",
+          "description": "BEV production scaling",
+          "impact": "High"
+        },
+        {
+          "date": "Q1 FY27",
+          "event": "Quarterly results",
+          "description": "First full quarter with SMG merged",
+          "impact": "Medium"
+        },
+        {
+          "date": "FY28",
+          "event": "Kharkhoda plant",
+          "description": "New 1M unit capacity",
+          "impact": "High"
+        }
+      ],
+      "recent": [
+        {
+          "date": "Dec 2025",
+          "event": "SMG merger",
+          "description": "Suzuki Motor Gujarat merged into MSIL",
+          "impact": "High"
+        },
+        {
+          "date": "Feb 2026",
+          "event": "e-Vitara launch",
+          "description": "India's first Maruti BEV at ₹10.99L",
+          "impact": "High"
+        }
+      ],
+      "long_term": [
+        {
+          "catalyst": "4 BEV models by FY2031",
+          "timeframe": "FY2028-31",
+          "description": "Full EV portfolio build-out"
+        }
+      ]
+    }
+  },
+  "cyclical": {
+    "section": "cyclical",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "verdict": "Semi-Cyclical",
+      "confidence": "High",
+      "reason": "Auto is a cyclical sector but Maruti's dominant market share, zero debt, and India's low vehicle penetration (25/1000 vs 800/1000 in US) provide structural secular growth that buffers pure cyclicality.",
+      "sector_basis": "Passenger vehicles are consumer cyclical — tied to GDP, interest rates, fuel prices, and consumer confidence.",
+      "quantitative_signals": [
+        {
+          "metric": "Revenue CV (5yr)",
+          "value": "14%",
+          "signal": "Semi-Cyclical",
+          "note": "Lower than peers due to market share stability"
+        },
+        {
+          "metric": "Beta (3yr)",
+          "value": "0.85",
+          "signal": "Defensive",
+          "note": "Below-market sensitivity — defensive within auto"
+        },
+        {
+          "metric": "Operating Leverage",
+          "value": "Medium",
+          "signal": "Neutral",
+          "note": "Fixed costs moderated by scale"
+        },
+        {
+          "metric": "Peak-to-Trough Revenue",
+          "value": "-8% (FY2020→FY2021)",
+          "signal": "Semi-Cyclical",
+          "note": "COVID trough; recovered fully in FY2022"
+        },
+        {
+          "metric": "Debt Amplification",
+          "value": "Zero",
+          "signal": "Defensive",
+          "note": "Net cash ₹76,000 Cr eliminates financial cycle risk"
+        }
+      ],
+      "cycle_drivers": [
+        "Auto demand falls sharply in recessions",
+        "Interest rate sensitivity (70%+ retail financed)",
+        "Fuel price shocks reduce discretionary spend",
+        "New model cycle risk"
+      ],
+      "defensive_factors": [
+        "41% market share — last to lose volume",
+        "₹76,000 Cr net cash = no distress risk",
+        "India penetration story = secular tailwind",
+        "Entry-level and CNG segments are more resilient"
+      ],
+      "historical_cycle": "FY2020→FY2021: volume -13% (COVID). FY2022→FY2026: strong recovery to record 24.2L units. FY2019→FY2020: -17% in a soft demand year.",
+      "investor_implication": "Buy on macro/rate stress dips; avoid at peak cycle valuations (PE >40x). Current PE ~28x is below 5yr avg of 38x — attractive entry."
+    }
+  },
+  "ma": {
+    "section": "ma",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Primarily organic growth; key recent deal: SMG merger (Dec 2025)",
+      "recent_deals": [
+        {
+          "year": "2025",
+          "type": "Merger",
+          "target": "Suzuki Motor Gujarat Pvt Ltd",
+          "value": "₹16,000 Cr swap",
+          "rationale": "Simplify structure, consolidate Gujarat capacity onto MSIL books"
+        },
+        {
+          "year": "Ongoing",
+          "type": "JV",
+          "target": "Toyota Motor Corp",
+          "value": "N/A",
+          "rationale": "Badge-engineering (Urban Cruiser, Hyryder); hybrid tech access"
+        }
+      ],
+      "strategy": "Asset-light where possible; use ₹76,000 Cr cash for capex (Kharkhoda) not acquisitions",
+      "pipeline": "No large M&A signalled; EV supply chain partnerships likely"
+    }
+  },
+  "value": {
+    "section": "value",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Trading at 26% discount to 5yr avg PE — attractive but not deep value",
+      "intrinsic_value": "₹10,883–₹13,500",
+      "methodology": "DCF + PE band",
+      "pe_band": {
+        "current": 28.3,
+        "5yr_avg": 38.4,
+        "premium_discount": "-26% discount"
+      },
+      "pb_band": {
+        "current": 4.2,
+        "5yr_avg": 5.1
+      },
+      "dcf_value": "₹10,883",
+      "margin_of_safety": "Current price near DCF — limited margin of safety on DCF alone; PE rerating to avg would yield ₹16,200",
+      "valuation_verdict": "Fairly Valued"
+    }
+  },
+  "faq": {
+    "section": "faq",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "questions": [
+        {
+          "question": "Why does Maruti pay royalty to Suzuki Japan?",
+          "answer": "Maruti pays ~5% of net sales (~₹8,700-9,900 Cr/yr) to Suzuki Motor Corporation for technology, brand, and platform access. This is a structural cost and governance concern for minority shareholders."
+        },
+        {
+          "question": "What is Maruti's EV strategy?",
+          "answer": "e-Vitara launched Feb 2026 at ₹10.99L (BaaS model). Plans for 4 BEV models by FY2031. Late to EVs vs Tata/Hyundai but leveraging Suzuki-Toyota platform."
+        },
+        {
+          "question": "Why has market share fallen from 51% to 39%?",
+          "answer": "Shift in demand toward SUVs where Hyundai, Tata and Kia are stronger. Maruti has responded with Brezza, Grand Vitara, Fronx, Jimny but SUV share still catching up."
+        },
+        {
+          "question": "What will Maruti do with ₹76,000 Cr cash?",
+          "answer": "₹14,000 Cr capex in FY26; Kharkhoda plant (₹18,000 Cr, 1M capacity by FY28); dividends ₹140/share; no large M&A signalled."
+        },
+        {
+          "question": "Is CNG growth sustainable?",
+          "answer": "Yes — CNG now 1-in-3 Marutis sold, 71% market share in CNG PVs. Supported by government infrastructure push and fuel cost advantage of ~50% vs petrol."
+        },
+        {
+          "question": "Is Maruti Sharia compliant?",
+          "answer": "Yes — net cash company, effectively zero debt. D/E well below 33% threshold across all periods."
+        }
+      ]
+    }
+  },
+  "credit": {
+    "section": "credit",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Exceptionally strong — net cash ₹76,736 Cr, essentially zero financial risk",
+      "credit_rating": "AAA (CRISIL/ICRA) equivalent",
+      "debt_to_equity": 0.001,
+      "interest_coverage": 604,
+      "net_cash_position": "₹76,736 Cr",
+      "debt_maturity_profile": "Negligible — ₹102 Cr total debt",
+      "liquidity": "Strong",
+      "key_covenants": []
+    }
+  },
+  "geofx": {
+    "section": "geofx",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "74% domestic India, 26% exports (record 4.47L units in FY26)",
+      "revenue_by_geography": [
+        {
+          "region": "India Domestic",
+          "pct": 74
+        },
+        {
+          "region": "Africa",
+          "pct": 8
+        },
+        {
+          "region": "Latin America",
+          "pct": 6
+        },
+        {
+          "region": "Middle East",
+          "pct": 5
+        },
+        {
+          "region": "Asia ex-India",
+          "pct": 4
+        },
+        {
+          "region": "Europe",
+          "pct": 3
+        }
+      ],
+      "fx_exposure": "Moderate — exports in USD/EUR, some JPY royalty exposure",
+      "key_currencies": [
+        "USD (exports)",
+        "JPY (royalty payments to Suzuki Japan)",
+        "EUR (Europe exports)"
+      ],
+      "hedging_policy": "Selective 3-6 month forward hedges on USD export receivables",
+      "export_markets": [
+        "South Africa",
+        "Chile",
+        "Mexico",
+        "Saudi Arabia",
+        "Indonesia"
+      ]
+    }
+  },
+  "capital": {
+    "section": "capital",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Conservative allocator — capex scaling up for EVs/Kharkhoda; strong dividend track record",
+      "capex_history": [
+        {
+          "year": "FY22",
+          "capex": "₹3,200 Cr",
+          "as_pct_revenue": 3.2
+        },
+        {
+          "year": "FY23",
+          "capex": "₹4,500 Cr",
+          "as_pct_revenue": 3.8
+        },
+        {
+          "year": "FY24",
+          "capex": "₹7,800 Cr",
+          "as_pct_revenue": 5.9
+        },
+        {
+          "year": "FY25",
+          "capex": "₹11,000 Cr",
+          "as_pct_revenue": 7.6
+        },
+        {
+          "year": "FY26",
+          "capex": "₹14,000 Cr",
+          "as_pct_revenue": 8.0
+        }
+      ],
+      "capex_guidance": "₹45,000 Cr over FY26-FY31 for EVs and Kharkhoda plant",
+      "dividend_policy": "~30% payout ratio; ₹140/share FY26",
+      "buyback_history": [],
+      "roce": 19,
+      "roe": 14.4,
+      "fcf_yield": "1.2%"
+    }
+  },
+  "forensic": {
+    "section": "forensic",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Very clean — high earnings quality, no red flags except royalty leakage to parent",
+      "accrual_ratio": -0.04,
+      "beneish_m_score": -2.9,
+      "red_flags": [
+        "Royalty to parent ~5% net sales — structural value leakage",
+        "Suzuki Japan controls technology and strategy"
+      ],
+      "green_flags": [
+        "OCF/PAT 1.32x — cash earnings exceed reported earnings",
+        "Zero debt — no interest expense manipulation risk",
+        "Conservative depreciation policy",
+        "Consistent dividend payments"
+      ],
+      "revenue_quality": "High",
+      "earnings_quality": "High",
+      "cash_conversion": "OCF ₹19,100 Cr vs PAT ₹14,445 Cr = 132% cash conversion"
+    }
+  },
+  "iprd": {
+    "section": "iprd",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "R&D primarily licensed from Suzuki Japan — Maruti does India-specific localisation R&D",
+      "rd_spend": "₹1,800-2,200 Cr",
+      "rd_as_pct_revenue": 1.2,
+      "key_patents": [
+        "CNG bi-fuel systems",
+        "Lightweight body structures",
+        "India-specific suspension tuning"
+      ],
+      "technology_partnerships": [
+        "Suzuki Motor Corporation (platform/powertrain)",
+        "Toyota Motor (hybrid — Hyryder/Urban Cruiser)"
+      ],
+      "innovation_areas": [
+        "BEV platform (e-Vitara)",
+        "CNG optimisation",
+        "Connected car tech (SmartPlay)"
+      ],
+      "ev_roadmap": "e-Vitara (2026) → 3 more BEV models by FY2031; battery sourcing from Toshiba-Denso JV"
+    }
+  },
+  "supply_chain": {
+    "section": "supply_chain",
+    "symbol": "MARUTI.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [],
+    "data": {
+      "summary": "Best-in-class localisation at 87%; JIT model with 326 Tier-1 suppliers",
+      "key_suppliers": [
+        {
+          "name": "Motherson Sumi",
+          "component": "Wiring harness, mirrors, bumpers",
+          "dependency": "High"
+        },
+        {
+          "name": "Uno Minda",
+          "component": "Switches, horns, lighting",
+          "dependency": "High"
+        },
+        {
+          "name": "Denso India",
+          "component": "AC, fuel systems",
+          "dependency": "High"
+        },
+        {
+          "name": "Subros",
+          "component": "AC compressors",
+          "dependency": "Medium"
+        },
+        {
+          "name": "Jay Bharat Maruti",
+          "component": "Exhaust systems",
+          "dependency": "Medium"
+        }
+      ],
+      "risks": [
+        "Semiconductor shortage (2021-23 showed vulnerability)",
+        "Battery cells for EVs — currently import dependent",
+        "Steel price volatility"
+      ],
+      "mitigants": [
+        "Dual sourcing for critical components",
+        "87% localisation reduces FX/import risk",
+        "Strong supplier development program"
+      ],
+      "localisation_pct": 87,
+      "inventory_days": 25
+    }
+  }
+}

@@ -1,0 +1,734 @@
+{
+  "thesis": {
+    "section": "thesis",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Intrinsic Valuation - Alpha Spread",
+        "url": "https://www.alphaspread.com/security/nse/srf/summary"
+      },
+      {
+        "title": "SRF Stock Forecast - Simply Wall St",
+        "url": "https://simplywall.st/stocks/in/materials/nse-srf/srf-shares/future"
+      },
+      {
+        "title": "SRF Q3 FY26 Results - SRF Official",
+        "url": "https://www.srf.com/srf-limited-posts-solid-q3fy26-results-driven-by-strong-chemicals-business-momentum/"
+      }
+    ],
+    "data": {
+      "summary": "SRF Limited is a multi-business specialty chemicals conglomerate with a leadership position in Indian fluorochemicals. The investment thesis centres on a structural shift from commodity HFCs to high-value HFOs and fluoropolymers, backed by the Chemours strategic partnership and rising specialty chemicals demand.",
+      "bull_case": {
+        "points": [
+          "HFO capacity of 10,000 tons commissioning in FY27 with revenue from FY28 — structural transition from low-margin HFCs to premium-priced next-gen refrigerants",
+          "Chemours strategic partnership positions SRF as a global fluoropolymer/fluoroelastomer supplier — no upfront capital from Chemours, revenue from CY26",
+          "Chemicals segment FY26 revenue grew 22% YoY in Q3FY26 to ₹1,825 crore with 36% EBIT growth; operating leverage improving",
+          "15–20% revenue CAGR guidance for FY27 underpinned by new capacity and product launches",
+          "Backward integration, indigenous technology, and sole Indian manufacturer of F134a and F32 — durable competitive moat",
+          "Net income CAGR of 27% projected over next 4 years per analyst consensus",
+          "Expanding pharma propellant and CDMO business diversifies revenue base"
+        ],
+        "key_upside": "HFO ramp-up and fluoropolymer volumes could drive 30-40% earnings re-rating from FY28"
+      },
+      "bear_case": {
+        "points": [
+          "Citi reiterated Sell with TP ₹2,725 (13% downside); Jefferies Underperform with TP ₹2,640 (16% downside)",
+          "Performance Films segment revenue declined 3% in Q3FY26; Technical Textiles down 11% — two of four segments under pressure",
+          "Sharia non-compliant: debt/equity ratio 0.362 exceeds 0.33 threshold",
+          "Capex cycle is heavy — ₹2,200–2,300 crore in FY26, additional ₹1,500–2,000 crore in Odisha — payback stretched",
+          "Specialty chemicals growth moderated below earlier 20% guidance",
+          "Revenue estimates revised down from ₹168.61 bn to ₹164.02 bn for FY26",
+          "Agrochemicals demand weakness reduces specialty chemicals offtake",
+          "P/E of 42.3x is demanding given near-term execution risks"
+        ],
+        "key_downside": "Execution delays in HFO/fluoropolymer projects or continued weakness in Films/Textiles could compress valuation multiples"
+      },
+      "verdict": "HOLD/SELECTIVE BUY — Quality compounder with visible long-term catalysts but near-term headwinds in non-chemicals segments and rich valuation. Best entry on dips below ₹2,500.",
+      "sharia_status": "NOT COMPLIANT — Debt/equity ratio 0.362 exceeds Islamic finance threshold of 0.33"
+    }
+  },
+  "industry": {
+    "section": "industry",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Fluorochemicals Business",
+        "url": "https://www.srf.com/our-businesses/fluorochemicals/"
+      },
+      {
+        "title": "SRF Limited - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/SRF_Limited"
+      },
+      {
+        "title": "Chemours-SRF Strategic Agreement",
+        "url": "https://www.prnewswire.com/in/news-releases/chemours-and-srf-limited-announce-strategic-agreements-in-india-to-support-market-needs-for-essential-applications-by-2026-302533230.html"
+      }
+    ],
+    "data": {
+      "fluorochemicals": {
+        "overview": "Global fluorochemicals market is transitioning from HFCs (hydrofluorocarbons) to HFOs (hydrofluoroolefins) under the Kigali Amendment to the Montreal Protocol. HFOs have near-zero global warming potential (GWP) versus HFCs with GWP of 1,000-4,000x CO2.",
+        "hfc_phasedown": "Developed nations phasing down HFCs by 80-85% by 2036; India and other developing nations have later timelines (~2024-2047). This drives structural demand for HFOs as substitute refrigerants.",
+        "hfo_opportunity": "HFOs command significant price premium over HFCs — 3-5x pricing. SRF is investing ₹1,100 crore for 10,000 ton HFO capacity commissioning FY27.",
+        "india_position": "India is the only country outside China with indigenous HFC manufacturing capability at scale. SRF is the sole Indian producer of F134a (HFC-134a) and F32 (HFC-32).",
+        "refrigerant_market": "Global refrigerant market size ~$15 billion growing at 6-7% CAGR driven by HVAC-R growth in Asia, automotive AC, and cold chain logistics."
+      },
+      "specialty_chemicals": {
+        "overview": "Indian specialty chemicals sector is gaining share from China post-2020 due to China+1 sourcing strategies by Western multinationals, stricter Chinese environmental regulations, and COVID supply chain disruptions.",
+        "agrochemicals": "India is world 4th largest agrochemical producer; global market ~$250 billion. SRF supplies agrochemical intermediates including fluorinated active ingredients.",
+        "pharma": "Pharmaceutical CDMO market growing at ~10% CAGR. SRF supplies pharma propellants (HFA 134a) and intermediate synthesis.",
+        "market_size": "Indian specialty chemicals market estimated at $32 billion, targeting $65 billion by 2035."
+      },
+      "packaging_films": {
+        "overview": "BOPET and BOPP flexible packaging films used in FMCG, pharma, food packaging. Oversupply globally from Chinese and Indian capacity additions has pressured margins in FY25-FY26.",
+        "outlook": "Recovery expected in H2FY27 as capacity additions slow and demand from e-commerce and food sectors grows."
+      },
+      "technical_textiles": {
+        "overview": "Nylon tyre cord fabric, polyester tyre cord fabric, belting fabric, coated fabrics. Demand linked to automotive tyre industry.",
+        "trends": "Radialisation of tyres in India ongoing; EV transition may shift tyre mix. Chinese competition pressuring margins."
+      },
+      "competitive_landscape": {
+        "fluorochemicals_peers": [
+          "Navin Fluorine International",
+          "Gujarat Fluorochemicals (GFL)",
+          "Chemours (US)",
+          "Daikin (Japan)",
+          "Honeywell (US)"
+        ],
+        "srf_moat": "Backward integration from HF acid, indigenous technology development, sole manufacturer of F134a in India, Chemours partnership for fluoropolymers"
+      }
+    }
+  },
+  "business": {
+    "section": "business",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Official Website - Fluorochemicals",
+        "url": "https://www.srf.com/our-businesses/fluorochemicals/"
+      },
+      {
+        "title": "SRF Specialty Chemicals",
+        "url": "https://www.srf.com/business-solutions/specialty-chemicals"
+      },
+      {
+        "title": "SRF Q3FY26 Results",
+        "url": "https://www.indianchemicalnews.com/chemical/srf-q3-fy26-pat-up-by-60-to-rs-433-crore-on-strong-chemicals-business-momentum-28996"
+      }
+    ],
+    "data": {
+      "overview": "SRF Limited is an Indian multi-business chemicals conglomerate incorporated in 1970. Operations span fluorochemicals, specialty chemicals, packaging films, and technical textiles across 11 manufacturing plants in India (Bhiwadi/Rajasthan, Dahej/Gujarat, Odisha upcoming), Thailand, South Africa, and Hungary. Exports to 90+ countries with 8,000+ employees.",
+      "segments": {
+        "chemicals_business": {
+          "description": "Largest and highest-margin segment comprising Fluorochemicals and Specialty Chemicals",
+          "fluorochemicals": {
+            "products": [
+              "Floron refrigerants: HFC-134a (F134a), HFC-32 (F32), HFC-125 (F125), HFC blends (410A, 407C)",
+              "HFO refrigerants (under development/expansion)",
+              "Pharma propellants: Dymel HFA 134a/P (acquired from DuPont)",
+              "Industrial chemicals: AHF (anhydrous hydrofluoric acid), HCFC-22",
+              "Fluoropolymers (PTFE, FKM) — partnership with Chemours"
+            ],
+            "market_position": "Only Indian manufacturer of F134a and F32 using indigenous technology; only Indian company with fully integrated HFC blending capability",
+            "manufacturing": "Bhiwadi (Rajasthan) and Dahej (Gujarat)"
+          },
+          "specialty_chemicals": {
+            "description": "Custom synthesis and CRAMS for agrochemicals and pharmaceuticals; established 2004",
+            "products": [
+              "Agrochemical intermediates (fluorinated AIs)",
+              "Pharmaceutical intermediates",
+              "Pharma CDMO services"
+            ],
+            "q3fy26_revenue": "Combined Chemicals segment ₹1,825 crore (+22% YoY)"
+          },
+          "q3fy26_ebit": "₹496 crore (+36% YoY)"
+        },
+        "performance_films_foil": {
+          "description": "BOPET (biaxially oriented polyethylene terephthalate), BOPP films, aluminum foils for flexible packaging",
+          "applications": [
+            "Food packaging",
+            "FMCG",
+            "Pharma",
+            "Industrial"
+          ],
+          "geographies": "India, Thailand, Hungary",
+          "q3fy26_revenue": "₹1,342 crore (-3% YoY)",
+          "challenge": "Global oversupply pressuring realizations"
+        },
+        "technical_textiles": {
+          "description": "Nylon tyre cord fabric (NTCF), polyester tyre cord fabric, belting fabrics, coated fabrics",
+          "applications": [
+            "Tyres (OTR, truck, passenger)",
+            "Industrial belting",
+            "Coated fabrics for defense/automotive"
+          ],
+          "q3fy26_revenue": "Down 11% YoY",
+          "challenge": "Chinese competition, radialisation pace slowing"
+        }
+      },
+      "chemours_partnership": {
+        "announced": "August 2025",
+        "scope": "SRF to manufacture fluoropolymers and fluoroelastomers for Chemours for global supply",
+        "capex": "₹745 crore (up from ₹595 crore) — ₹295 crore for Chemours-specific grades (2 products)",
+        "revenue_start": "CY2026",
+        "strategic_value": "No upfront capital from Chemours; gives SRF access to Chemours technology and global distribution"
+      },
+      "hfo_expansion": {
+        "capacity": "10,000 tons",
+        "capex": "₹1,100 crore",
+        "commissioning": "FY2027",
+        "revenue_from": "FY2028",
+        "location": "Odisha (new greenfield site)"
+      },
+      "r_and_d": "Deep R&D capability — indigenous development of F134a and F32 technologies; multiple patents in fluorochemicals",
+      "revenue_fy26": "₹15,787 crore (consolidated, FY26)",
+      "market_cap": "~₹80,503 crore"
+    }
+  },
+  "management": {
+    "section": "management",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Leadership Team",
+        "url": "https://www.srf.com/about-overview/about-leadership/"
+      },
+      {
+        "title": "SRF Board of Directors",
+        "url": "https://www.srf.com/investors/board-of-directors/"
+      },
+      {
+        "title": "Business Standard - Ashish Bharat Ram appointed CMD",
+        "url": "https://www.business-standard.com/markets/capital-market-news/srf-board-appoints-ashish-bharat-ram-as-chairman-md-for-5-year-term-125070400330_1.html"
+      }
+    ],
+    "data": {
+      "key_management": [
+        {
+          "name": "Ashish Bharat Ram",
+          "title": "Chairman & Managing Director",
+          "tenure": "MD since January 2007; appointed Chairman & MD from May 23, 2025 to March 31, 2030",
+          "background": "Third generation of the Bharat Ram family (founding family of SRF); has led SRF through major diversification into specialty chemicals and fluorochemicals expansion",
+          "recognition": [
+            "AIMA Emerging Business Leader of the Year 2024",
+            "Business Today Best CEO (Emerging Companies) 2023",
+            "Business Today Best CEO (Mid-Sized Companies) 2020"
+          ]
+        },
+        {
+          "name": "Kartik Bharat Ram",
+          "title": "Joint Managing Director",
+          "background": "Fourth generation of founding family; focuses on technical textiles and operational excellence"
+        },
+        {
+          "name": "Pramod Gopaldas Gujarathi",
+          "title": "Director (Safety & Environment)",
+          "focus": "EHS compliance and sustainability"
+        },
+        {
+          "name": "Geeta Jadhav",
+          "title": "President & Chief Human Resources Officer (CHRO)"
+        }
+      ],
+      "board_composition": {
+        "total_directors": "Mix of executive and independent directors",
+        "independent_directors": [
+          "Bharti Gupta Ramola (Non-Executive & Independent)",
+          "Puneet Yadu Dalmia (Non-Executive & Independent)"
+        ],
+        "promoter_holding": "Bharat Ram family (founding family) — promoter group"
+      },
+      "corporate_governance": {
+        "listing": "NSE and BSE listed",
+        "committees": [
+          "Audit Committee",
+          "Nomination & Remuneration Committee",
+          "Stakeholders Relationship Committee",
+          "ESG Committee (chaired by Joint MD)"
+        ],
+        "disclosures": "SEBI LODR compliant; BRSR disclosures with third-party validation",
+        "track_record": "Consistent dividend payment history; no major governance controversies on record"
+      },
+      "management_track_record": {
+        "value_creation": "Stock has delivered multi-bagger returns over 15 years under current leadership",
+        "strategic_pivots": [
+          "Exit from non-core businesses (carbon black)",
+          "Entry and scaling of specialty chemicals (2004)",
+          "Acquisition of Dymel HFA from DuPont",
+          "Chemours partnership (2025) for fluoropolymers"
+        ],
+        "capital_allocation": "Heavy capex cycle in FY26 (₹2,200–2,300 crore) focused on next-gen fluorochemicals — management has backed greenfield expansions with strong payback history"
+      },
+      "promoter_background": "Bharat Ram family has been associated with SRF since its founding in 1970. The company was originally part of the DCM group before becoming independent. Family has maintained significant stake and active operational involvement."
+    }
+  },
+  "esg": {
+    "section": "esg",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF ESG Report FY2024-25",
+        "url": "https://annualreport.srf.com/2024-25/about-the-esg-report.html"
+      },
+      {
+        "title": "SRF ESG Overview",
+        "url": "https://www.srf.com/esg/overview"
+      },
+      {
+        "title": "SRF Sustainability Reports",
+        "url": "https://www.srf.com/esg/sustainability-reports"
+      },
+      {
+        "title": "Sustainalytics ESG Rating - SRF",
+        "url": "https://www.sustainalytics.com/esg-rating/srf-ltd/1008759665"
+      }
+    ],
+    "data": {
+      "esg_framework": {
+        "name": "Aspirations 2030",
+        "description": "SRF's long-term ESG commitment framework aligning with UN SDGs",
+        "governance_structure": "Three-tier ESG governance framework led by ESG Committee chaired by Joint MD",
+        "reporting_standards": [
+          "ISO 14064 (carbon footprint)",
+          "BRSR (Business Responsibility and Sustainability Reporting)",
+          "Third-party validated disclosures",
+          "GRI aligned"
+        ]
+      },
+      "environmental": {
+        "climate_action": {
+          "strategy": "Transitioning product portfolio toward lower-GWP products (HFOs vs HFCs); emissions reduction initiatives across plants",
+          "hfo_significance": "HFOs have near-zero global warming potential vs HFCs (GWP 1,000-4,000x CO2) — SRF's HFO expansion is both a business and climate initiative",
+          "carbon_reporting": "ISO 14064 compliant carbon footprint measurement and reporting"
+        },
+        "water_management": {
+          "approach": "Closed-loop water management systems at key facilities; Zero Liquid Discharge (ZLD) implementation",
+          "goal": "Increased water recycling reducing freshwater intake"
+        },
+        "resource_efficiency": "Green chemistry principles integrated in specialty chemicals R&D; responsible consumption and production practices",
+        "chemical_safety": "Manufacturing of refrigerants that are ozone-friendly (F134a, F32 are non-ozone depleting vs legacy CFC refrigerants)"
+      },
+      "social": {
+        "workforce": "8,000+ employees across 11 manufacturing plants in 4 countries",
+        "safety": "Dedicated Director for Safety & Environment on board (Pramod Gopaldas Gujarathi)",
+        "community": "CSR initiatives in communities around manufacturing plants (Bhiwadi, Dahej)",
+        "employee_development": "Training programs; diversity initiatives under CHRO leadership"
+      },
+      "governance": {
+        "board_independence": "Meaningful independent director representation",
+        "transparency": "Annual reports, quarterly results, investor presentations publicly available",
+        "ethics": "Code of conduct; no major fraud/corruption incidents on record",
+        "auditor": "Big-4 audit firm",
+        "related_party": "Promoter family involvement monitored through independent oversight"
+      },
+      "esg_risks": {
+        "environmental_risks": [
+          "Chemical manufacturing inherently carries spill/contamination risk",
+          "HFC production itself contributes to greenhouse gases — transition to HFO is positive but requires execution",
+          "Regulatory risk from accelerated phase-down schedules"
+        ],
+        "social_risks": [
+          "Industrial safety incidents possible in chemical manufacturing"
+        ],
+        "governance_risks": [
+          "Family-controlled company — potential for concentrated decision-making"
+        ]
+      },
+      "positive_esg_factors": [
+        "Only Indian manufacturer of non-ODS (non-ozone depleting) refrigerants",
+        "Active transition to lower-GWP products (HFO expansion)",
+        "ZLD implementation at manufacturing sites",
+        "Strong ESG governance structure with board-level oversight"
+      ]
+    }
+  },
+  "estimates": {
+    "section": "estimates",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Analyst Estimates - Alpha Spread",
+        "url": "https://www.alphaspread.com/security/nse/srf/analyst-estimates"
+      },
+      {
+        "title": "SRF Analyst Ratings - Yahoo Finance",
+        "url": "https://finance.yahoo.com/quote/SRF.NS/analysis/"
+      },
+      {
+        "title": "SRF Q3 2026 Earnings Preview - Yahoo Finance",
+        "url": "https://finance.yahoo.com/news/srf-ltd-nse-srf-q3-121531482.html"
+      },
+      {
+        "title": "ICICI Direct SRF Target Price",
+        "url": "https://topnews.in/srf-limited-share-price-target-rs-3315-icici-direct-research-2418516"
+      }
+    ],
+    "data": {
+      "current_metrics": {
+        "stock_price_inr": 2736,
+        "market_cap_cr": 80503,
+        "pe_ratio": 42.3,
+        "book_value_inr": 474,
+        "price_to_book": 5.77,
+        "dividend_yield_pct": 0.33,
+        "roce_pct": 14.6,
+        "roe_pct": 14.3,
+        "operating_margin_pct": 22
+      },
+      "analyst_consensus": {
+        "rating": "HOLD (average brokerage recommendation 2.8 on 5-point scale)",
+        "number_of_analysts": 26,
+        "average_target_price_inr": 3073,
+        "high_target_inr": 3758,
+        "low_target_inr": 2231,
+        "upside_to_avg_target_pct": 12
+      },
+      "notable_ratings": [
+        {
+          "broker": "Citi",
+          "rating": "Sell",
+          "target_price_inr": 2725,
+          "implied_return_pct": -0.4
+        },
+        {
+          "broker": "Jefferies",
+          "rating": "Underperform",
+          "target_price_inr": 2640,
+          "implied_return_pct": -3.5
+        },
+        {
+          "broker": "ICICI Direct",
+          "rating": "Buy",
+          "target_price_inr": 3315,
+          "implied_return_pct": 21
+        },
+        {
+          "broker": "ICICI Securities",
+          "rating": "Buy",
+          "note": "Preparing for ambitious journey"
+        }
+      ],
+      "earnings_forecasts": {
+        "fy26_eps_inr": 65.44,
+        "fy27_eps_inr": 83.46,
+        "eps_growth_fy26_to_fy27_pct": 27,
+        "revenue_fy26_estimate_cr": 16402,
+        "revenue_fy27_estimate_cr": 18835,
+        "revenue_cagr_4yr_pct": 12,
+        "operating_income_cagr_4yr_pct": 21,
+        "net_income_cagr_4yr_pct": 27
+      },
+      "estimate_revisions": {
+        "fy26_revenue_revision": "Revised down from ₹16,861 crore to ₹16,402 crore over past 90 days",
+        "fy27_revenue_revision": "Revised down from ₹19,334 crore to ₹18,835 crore over past 90 days",
+        "beat_history": "SRF has historically beaten revenue estimates by ~2% on average"
+      },
+      "valuation_context": {
+        "historical_pe_range": "30x-60x (premium multiple reflecting specialty chemicals positioning)",
+        "current_pe_vs_history": "42.3x — mid-range; de-rated from peaks of 55-60x in FY22",
+        "peer_comparison": "Premium to generalist chemical companies; discount to pure-play specialty chemical peers like Navin Fluorine",
+        "fair_value_intrinsic_note": "Multiple brokerages flag stretched valuation at current levels given 3-year sales CAGR of only 2%"
+      }
+    }
+  },
+  "revenue": {
+    "section": "revenue",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "Screener.in - SRF Consolidated Financials",
+        "url": "https://www.screener.in/company/SRF/consolidated/"
+      },
+      {
+        "title": "SRF Q3FY26 Results Press Release",
+        "url": "https://www.srf.com/srf-limited-posts-solid-q3fy26-results-driven-by-strong-chemicals-business-momentum/"
+      },
+      {
+        "title": "SRF Q4FY25 Results",
+        "url": "https://www.srf.com/srf-limited-reports-21-revenue-growth-60-pbt-increase-in-q4fy25/"
+      },
+      {
+        "title": "Companies Market Cap - SRF Revenue",
+        "url": "https://companiesmarketcap.com/srf-ltd/revenue/"
+      }
+    ],
+    "data": {
+      "annual_revenue_cr": {
+        "fy2023": 14870,
+        "fy2024": 13139,
+        "fy2025": 14693,
+        "fy2026": 15787,
+        "note": "FY2026 based on Screener consolidated data; official figure per prior data point is ₹15,416 crore"
+      },
+      "revenue_cagr": {
+        "10yr_pct": 13,
+        "5yr_pct": 13,
+        "3yr_pct": 2,
+        "note": "3yr CAGR depressed by FY24 trough due to chemical cycle downturn"
+      },
+      "segment_revenue_q3fy26": {
+        "chemicals": {
+          "revenue_cr": 1825,
+          "yoy_growth_pct": 22,
+          "ebit_cr": 496,
+          "ebit_growth_pct": 36,
+          "ebit_margin_pct": 27.2
+        },
+        "performance_films_foil": {
+          "revenue_cr": 1342,
+          "yoy_growth_pct": -3,
+          "note": "Margin pressure from global oversupply"
+        },
+        "technical_textiles": {
+          "revenue_cr_change": "Down 11% YoY",
+          "ebit_change": "Down 24% YoY",
+          "note": "Chinese competition and slower radialisation"
+        }
+      },
+      "segment_revenue_q2fy26": {
+        "chemicals": {
+          "revenue_cr": 1667,
+          "yoy_growth_pct": 23,
+          "ebit_cr": 481,
+          "ebit_growth_pct": 96
+        },
+        "total_consolidated_revenue_cr": 3640,
+        "total_ebit_growth_pct": 56
+      },
+      "segment_mix_trend": {
+        "chemicals_share": "Increasing — was ~35% of revenue in FY22, approaching ~50% in FY26",
+        "films_share": "Declining relative share due to margin pressure",
+        "textiles_share": "Shrinking relative contribution",
+        "strategic_direction": "Management actively shifting mix toward high-margin chemicals"
+      },
+      "q4fy26_headline": {
+        "revenue_growth_pct": 7,
+        "note": "Healthy Q4FY26 per company announcement"
+      },
+      "key_revenue_drivers": [
+        "Refrigerant volumes — record sales in Q2FY26",
+        "Specialty chemicals custom synthesis order book",
+        "Fluoropolymer ramp-up (Chemours partnership from CY26)",
+        "HFO revenue from FY28"
+      ],
+      "revenue_headwinds": [
+        "BOPET/BOPP film pricing under pressure from Chinese exports",
+        "Tyre cord fabric demand softer from auto sector",
+        "Agrochemical channel destocking impacting specialty chemicals offtake"
+      ]
+    }
+  },
+  "catalysts": {
+    "section": "catalysts",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-05-31T00:00:00Z",
+    "sources": [
+      {
+        "title": "Chemours-SRF Strategic Agreement Aug 2025",
+        "url": "https://www.businesswire.com/news/home/20250819039600/en/Chemours-and-SRF-Limited-Announce-Strategic-Agreements-in-India-to-Support-Market-Needs-for-Essential-Applications-by-2026"
+      },
+      {
+        "title": "ICICI Direct SRF Research Report Q2FY26",
+        "url": "https://www.icicidirect.com/mailcontent/idirect_srf_q2fy26.pdf"
+      },
+      {
+        "title": "SRF Q3FY26 Results - Whalesbook Analysis",
+        "url": "https://www.whalesbook.com/news/English/chemicals/SRF-Q3-Chemical-Surge-Masks-Deeper-Segment-Cracks/6979e9b098511879499aa7b7"
+      },
+      {
+        "title": "SRF Q2 FY26 Earnings Call Highlights",
+        "url": "https://ca.finance.yahoo.com/news/srf-ltd-bom-503806-q2-190241510.html"
+      }
+    ],
+    "data": {
+      "near_term_catalysts_fy26_fy27": [
+        {
+          "catalyst": "Chemours Fluoropolymer Supply Revenue",
+          "timeline": "CY2026 (H2FY26/FY27)",
+          "description": "Production under Chemours partnership for fluoropolymers/fluoroelastomers commences CY26. No upfront capex from Chemours; SRF bears ₹295 crore capex for Chemours-specific grades.",
+          "impact": "New high-margin revenue stream; validates SRF as global fluoropolymer manufacturer",
+          "magnitude": "Moderate — building to meaningful contribution in FY27-28"
+        },
+        {
+          "catalyst": "Refrigerant Volume Recovery",
+          "timeline": "FY26-FY27",
+          "description": "Record refrigerant sales volumes in Q2FY26 indicate strong demand recovery post-HFC channel destocking. Summer seasonality benefits Q1/Q2.",
+          "impact": "Chemicals segment EBIT leverage — operating profit grew 36-96% YoY in Q2-Q3FY26",
+          "magnitude": "High — already materializing"
+        },
+        {
+          "catalyst": "Specialty Chemicals Order Book Recovery",
+          "timeline": "FY27",
+          "description": "Agrochemical channel destocking cycle expected to end; new product launches in pharma CDMO segment",
+          "impact": "Specialty chemicals revenue recovery to support overall chemicals segment growth",
+          "magnitude": "Moderate — dependent on global agrochemical demand"
+        }
+      ],
+      "medium_term_catalysts_fy27_fy28": [
+        {
+          "catalyst": "HFO Plant Commissioning",
+          "timeline": "FY2027 commissioning, FY2028 first revenue",
+          "description": "10,000 ton HFO capacity at ₹1,100 crore capex. HFOs are next-generation refrigerants with near-zero GWP replacing HFCs under Kigali Amendment.",
+          "impact": "Transformational — HFOs priced 3-5x HFCs; high margin product line with structural tailwind",
+          "magnitude": "Very High — single largest medium-term earnings driver"
+        },
+        {
+          "catalyst": "Odisha Greenfield Site Ramp-Up",
+          "timeline": "FY27-FY29",
+          "description": "New manufacturing site with ₹1,500–2,000 crore additional capex planned for HFO and specialty chemicals scale-up",
+          "impact": "Long-term capacity base for next decade of growth",
+          "magnitude": "High but back-ended"
+        },
+        {
+          "catalyst": "Pharma Intermediates Scaling",
+          "timeline": "FY27-FY28",
+          "description": "Reducing dependency on agrochemicals by building pharma CDMO book; higher margin and more stable than agro",
+          "impact": "Diversification and margin improvement in specialty chemicals",
+          "magnitude": "Moderate"
+        }
+      ],
+      "key_risks": [
+        {
+          "risk": "HFO Project Execution Delay",
+          "severity": "High",
+          "description": "Technology complexity of HFO manufacturing is significant. Any delay in commissioning (expected FY27) pushes revenue to FY29+ and weighs on valuation re-rating",
+          "probability": "Medium"
+        },
+        {
+          "risk": "Performance Films Margin Deterioration",
+          "severity": "Medium",
+          "description": "Continued Chinese overcapacity in BOPET/BOPP could further pressure realisations; films segment revenue declined 3% in Q3FY26",
+          "probability": "Medium-High"
+        },
+        {
+          "risk": "Specialty Chemicals Growth Moderation",
+          "severity": "Medium",
+          "description": "Management has moderated guidance below earlier 20% CAGR; agro destocking prolonged; pharma offtake uncertain",
+          "probability": "Medium"
+        },
+        {
+          "risk": "Valuation De-Rating",
+          "severity": "Medium",
+          "description": "P/E of 42.3x is demanding if earnings growth disappoints. Major brokerages (Citi, Jefferies) maintain Sell/Underperform",
+          "probability": "Medium"
+        },
+        {
+          "risk": "Raw Material Cost Inflation",
+          "severity": "Medium",
+          "description": "Fluorspar (key raw material for HF acid) price volatility; energy costs at Dahej and Bhiwadi plants",
+          "probability": "Low-Medium"
+        },
+        {
+          "risk": "Heavy Capex Balance Sheet Stress",
+          "severity": "Low-Medium",
+          "description": "₹2,200–2,300 crore FY26 capex plus Odisha site investments increases leverage. Debt/equity already at 0.362 (above Sharia threshold)",
+          "probability": "Low"
+        },
+        {
+          "risk": "Technical Textiles Structural Decline",
+          "severity": "Low",
+          "description": "EV transition may reduce tyre cord demand long-term; Chinese competition ongoing",
+          "probability": "Medium but low financial impact given small share"
+        }
+      ],
+      "upcoming_events": [
+        {
+          "event": "FY26 Full Year Results",
+          "expected_date": "May 2026",
+          "note": "Board decided to announce FY26 results and dividend on May 5, 2026"
+        },
+        {
+          "event": "Chemours Partnership Revenue Commencement",
+          "expected_date": "CY2026 H2"
+        },
+        {
+          "event": "HFO Plant Groundbreaking/Progress Update",
+          "expected_date": "FY27 Q1-Q2"
+        },
+        {
+          "event": "Odisha Site Capex Announcement",
+          "expected_date": "FY26-FY27"
+        }
+      ]
+    }
+  },
+  "cyclical": {
+    "section": "cyclical",
+    "symbol": "SRF.NS",
+    "updated_at": "2026-06-01T00:00:00Z",
+    "sources": [
+      {
+        "title": "SRF Limited Annual Report FY2024",
+        "url": "https://www.srf.com/investors/annual-reports"
+      },
+      {
+        "title": "SRF Q3FY26 Earnings Release",
+        "url": "https://www.srf.com/investors/quarterly-results"
+      },
+      {
+        "title": "BSE Filing SRF Limited",
+        "url": "https://www.bseindia.com/stock-share-price/srf-limited/srf/503806/"
+      }
+    ],
+    "data": {
+      "verdict": "Cyclical",
+      "confidence": "High",
+      "reason": "SRF Limited is a diversified industrial conglomerate with meaningful exposure to cyclical end-markets. Its Chemicals segment (refrigerants/HFCs) is subject to global commodity pricing cycles and regulatory-driven demand shifts, while Performance Films and Technical Textiles are tied to industrial capex and auto/packaging demand cycles. The 3-year revenue CAGR of only 2% versus a 10-year CAGR of 13% starkly illustrates the depth of the FY2023-24 downturn, where chemicals pricing collapsed globally. The multi-segment structure provides some diversification, but does not eliminate cyclicality — all segments except packaging faced headwinds simultaneously during the FY2024 trough, confirming high cross-segment correlation during macro downturns.",
+      "sector_basis": "Specialty and commodity chemicals are inherently cyclical due to capacity-driven price cycles, global trade sensitivity, and linkage to industrial production. Refrigerants face additional regulatory cycles (HFC phase-downs under Kigali Amendment), creating boom-bust pricing dynamics. Technical textiles and films are tied to auto OEM production and industrial packaging demand, both of which are pro-cyclical.",
+      "quantitative_signals": [
+        {
+          "metric": "Revenue CV (5yr)",
+          "value": "18%",
+          "signal": "Cyclical",
+          "note": "High coefficient of variation driven by FY2024 trough after FY2023 peak; reflects chemicals price cycle"
+        },
+        {
+          "metric": "Beta (3yr)",
+          "value": "1.35",
+          "signal": "Cyclical",
+          "note": "Above-market beta reflects industrial/chemicals exposure; stock amplifies broader market moves"
+        },
+        {
+          "metric": "Operating Leverage",
+          "value": "High",
+          "signal": "Cyclical",
+          "note": "Large fixed asset base in chemicals and films manufacturing means margins compress sharply on revenue declines"
+        },
+        {
+          "metric": "Earnings Volatility",
+          "value": "High",
+          "signal": "Cyclical",
+          "note": "PAT swung significantly FY2023-24 as chemicals margins collapsed; multi-year earnings reset observed"
+        },
+        {
+          "metric": "Peak-to-Trough Revenue",
+          "value": "-8%",
+          "signal": "Cyclical",
+          "note": "FY2023 peak to FY2024 trough across consolidated revenue; Chemicals and Films/Textiles declined simultaneously"
+        }
+      ],
+      "cycle_drivers": [
+        "Global refrigerant (HFC/HFO) pricing cycles tied to inventory restocking and regulatory phase-downs",
+        "Chinese capacity expansions creating oversupply in fluorochemicals and driving global price collapses",
+        "Industrial capex cycles driving demand for technical textiles (tyre cord, belting fabrics)",
+        "Packaging films demand tied to FMCG/food capex and consumer spend cycles",
+        "Commodity input costs (fluorspar, chlorine, ethylene) creating margin volatility"
+      ],
+      "defensive_factors": [
+        "Diversification across 4 segments reduces single-cycle concentration risk",
+        "Long-term customer contracts in Technical Textiles provide some revenue visibility",
+        "Packaging Films tied to relatively defensive food packaging demand",
+        "Ongoing shift toward HFO (next-gen refrigerants) creates structural growth layer above commodity cycle",
+        "10-year revenue CAGR of 13% demonstrates underlying secular growth despite cycles"
+      ],
+      "historical_cycle": "FY2023 represented a peak driven by post-COVID restocking and elevated HFC refrigerant prices; by FY2024 global fluorochemical oversupply (led by China) caused a sharp correction — SRF revenue grew only ~2% over FY2022-FY2024. Q3FY26 Chemicals recovery of +22% signals the next upcycle beginning, while Films (-3%) and Textiles (-11%) remain in their own troughs, illustrating segment-level asynchrony.",
+      "investor_implication": "Buy SRF during chemicals downcycles when Chemicals EBIT margins are compressed below 15% and inventory destocking is near completion — typically 12-18 months after a Chinese oversupply event. Avoid initiating at peak Chemical margins (>22%) or peak revenue growth. Size moderately (5-6%) given diversification, and monitor refrigerant spot prices, China HFC export data, and global auto production as leading indicators."
+    }
+  }
+}
