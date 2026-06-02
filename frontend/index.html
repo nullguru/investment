@@ -6,6 +6,7 @@
   <title>Stock Analysis</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -883,6 +884,10 @@
                       :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
                       x-text="perStockTabLabels[t]"></button>
             </template>
+            <button @click="perStockTab = 'charts'; fetchMetricsHistoryIfNeeded()"
+                    :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === 'charts' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']">
+              📈 Charts
+            </button>
           </div>
           <!-- Category: Research (web-research-backed) -->
           <div class="flex flex-wrap items-center gap-1">
@@ -1322,6 +1327,154 @@
                 <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-emerald-500"><h4 class="text-sm font-semibold text-emerald-600 mb-2">Bull Case (20% prob)</h4><p class="text-2xl font-bold text-emerald-600">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
               </div>
             </section>
+          </div>
+
+          <!-- Charts tab -->
+          <div x-show="perStockTab === 'charts'" x-cloak class="space-y-6"
+               x-init="$watch('perStockTab', t => { if (t === 'charts') {
+                         fetchMetricsHistoryIfNeeded();
+                         if (!priceHistory && perStockSymbol) fetchPriceHistory();
+                         if (metricsHistory && !metricsHistory.error) $nextTick(() => renderMetricCharts(metricsHistory));
+                         if (priceHistory && !priceHistory.error) $nextTick(() => renderPriceCharts(priceHistory));
+                       }});
+                       $watch('metricsHistory', d => { if (perStockTab === 'charts' && d && !d.error) $nextTick(() => renderMetricCharts(d)); });
+                       $watch('priceHistory',   d => { if (perStockTab === 'charts' && d && !d.error) $nextTick(() => renderPriceCharts(d)); })">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-800">Charts</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Price · Moving averages · Annual fundamental metrics</p>
+              </div>
+              <button @click="metricsHistory = null; priceHistory = null; fetchMetricsHistory(); fetchPriceHistory()"
+                      :disabled="metricsHistoryLoading || priceHistoryLoading"
+                      class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Refresh">↻</button>
+            </div>
+
+            <!-- Loading / error states -->
+            <div x-show="metricsHistoryLoading || priceHistoryLoading" class="text-slate-500 text-sm py-4 text-center">Loading…</div>
+            <div x-show="metricsHistory?.error" class="text-rose-600 text-sm" x-text="metricsHistory?.error"></div>
+            <div x-show="!metricsHistoryLoading && !priceHistoryLoading && !metricsHistory && !perStockSymbol" class="text-slate-400 text-sm">Select a symbol to load charts.</div>
+
+            <!-- Price / DMA section -->
+            <template x-if="priceHistory && !priceHistory.error">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Price & Moving Averages</h3>
+                  <!-- DMA summary chips -->
+                  <div class="flex gap-2 text-xs">
+                    <span class="px-2 py-1 rounded-full font-medium"
+                          :class="(priceHistory.summary?.vs_sma50_pct ?? 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+                          x-text="'vs 50 DMA: ' + ((priceHistory.summary?.vs_sma50_pct ?? 0) >= 0 ? '+' : '') + (priceHistory.summary?.vs_sma50_pct?.toFixed(1) ?? '—') + '%'">
+                    </span>
+                    <span class="px-2 py-1 rounded-full font-medium"
+                          :class="(priceHistory.summary?.vs_sma200_pct ?? 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+                          x-text="'vs 200 DMA: ' + ((priceHistory.summary?.vs_sma200_pct ?? 0) >= 0 ? '+' : '') + (priceHistory.summary?.vs_sma200_pct?.toFixed(1) ?? '—') + '%'">
+                    </span>
+                  </div>
+                </div>
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Price vs 50 & 200 DMA</h3>
+                    <p class="text-xs text-slate-400">2-year daily — trend context for fundamental entry</p>
+                  </div>
+                  <div class="h-64"><canvas id="chart-price-dma"></canvas></div>
+                </section>
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Volume</h3>
+                    <p class="text-xs text-slate-400">Green = up day · Red = down day</p>
+                  </div>
+                  <div class="h-36"><canvas id="chart-volume"></canvas></div>
+                </section>
+              </div>
+            </template>
+
+            <!-- Fundamental metrics section -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div>
+                <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4 pt-2 border-t border-slate-200">Fundamental Metrics — Annual</h3>
+              </div>
+            </template>
+
+            <!-- Chart grid -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Margins -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Profit Margins</h3>
+                    <p class="text-xs text-slate-400">Gross · Operating · Net — pricing power & cost discipline</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-margins"></canvas></div>
+                </section>
+
+                <!-- Returns -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Capital Returns</h3>
+                    <p class="text-xs text-slate-400">ROE · ROA · ROIC — quality of capital allocation</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-returns"></canvas></div>
+                </section>
+
+                <!-- Revenue & Net Income -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Revenue & Earnings</h3>
+                    <p class="text-xs text-slate-400">Annual revenue and net income (billions)</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-revenue"></canvas></div>
+                </section>
+
+                <!-- FCF Quality -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Cash Quality & Capital Spend</h3>
+                    <p class="text-xs text-slate-400">FCF conversion · Capex/Rev · R&D/Rev — earnings quality</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-fcf"></canvas></div>
+                </section>
+
+                <!-- Leverage -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Leverage & Coverage</h3>
+                    <p class="text-xs text-slate-400">D/E · Net Debt/EBITDA · Interest Coverage — balance sheet stress</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-leverage"></canvas></div>
+                </section>
+
+                <!-- Historical Valuation -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Valuation History</h3>
+                    <p class="text-xs text-slate-400">P/E · P/B · P/S — cheap or expensive vs. own history</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-valuation-hist"></canvas></div>
+                </section>
+
+              </div>
+            </template>
+
+            <!-- Insight callouts -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1">Gross Margin Trend</p>
+                  <p class="text-sm text-slate-600">Rising gross margin = pricing power compounding. Falling = competition or input cost pressure.</p>
+                </div>
+                <div class="bg-teal-50 border border-teal-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">ROIC vs. Cost of Capital</p>
+                  <p class="text-sm text-slate-600">ROIC expanding above ~10–12% WACC signals a compounding machine. Contracting ROIC = value destruction.</p>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">FCF Conversion</p>
+                  <p class="text-sm text-slate-600">&gt;90% FCF/Net Income = high-quality earnings. Diverging downward flags accruals or capex catch-up.</p>
+                </div>
+              </div>
+            </template>
           </div>
 
           <!-- Industry (research-backed) -->
@@ -3153,6 +3306,11 @@
         perStockTabLabels: { overview: 'Overview', market: 'Market', thesis: 'Thesis', financials: 'Financials', valuation: 'Valuation', industry: 'Industry', business: 'Business', management: 'Management', esg: 'ESG', ma: 'M&A', value: 'Value', faq: 'FAQ', credit: 'Credit', estimates: 'Estimates', revenue: 'Revenue', geofx: 'Geo/FX', capital: 'Capital', forensic: 'Forensic', iprd: 'IP & R&D', supply_chain: 'Supply Chain', catalysts: 'Catalysts', cyclical: 'Cyclicality' },
         perStockSectionData: {},
         perStockSectionLoading: {},
+        metricsHistory: null,
+        metricsHistoryLoading: false,
+        priceHistory: null,
+        priceHistoryLoading: false,
+        _chartInstances: {},
         yfSections: ['overview', 'market', 'financials', 'valuation'],
         researchSections: ['thesis', 'industry', 'business', 'management', 'esg', 'estimates', 'revenue', 'catalysts', 'cyclical'],
         researchAISections: ['thesis', 'industry', 'business', 'management', 'esg', 'estimates', 'revenue', 'catalysts', 'cyclical'],
@@ -3586,6 +3744,8 @@
           if (!resolved) return;
           this.perStockSymbol = resolved;
           this.perStockTab = 'overview';
+          this.metricsHistory = null;
+          this.priceHistory = null;
           this.symbolPickerState.home.query = '';
           this.symbolPickerState.home.open = false;
           this.symbolPickerState.per_stock.query = '';
@@ -4639,6 +4799,223 @@
             this.perStockSectionData[sym][section] = { error: e.message };
           } finally {
             this.perStockSectionLoading = { ...this.perStockSectionLoading, [section]: false };
+          }
+        },
+        fetchMetricsHistoryIfNeeded() {
+          if (!this.perStockSymbol) return;
+          if (this.metricsHistory && this.metricsHistory.symbol === this.perStockSymbol) return;
+          this.fetchMetricsHistory();
+        },
+        async fetchPriceHistory() {
+          if (!this.perStockSymbol) return;
+          const sym = this.perStockSymbol;
+          this.priceHistory = null;
+          this.priceHistoryLoading = true;
+          try {
+            const r = await fetch(API + '/symbol/' + encodeURIComponent(sym) + '/price/history?market=' + encodeURIComponent(this.market)).then(x => x.json());
+            if (this.perStockSymbol === sym) {
+              this.priceHistory = r;
+              this.$nextTick(() => this.renderPriceCharts(r));
+            }
+          } catch(e) {
+            if (this.perStockSymbol === sym) this.priceHistory = { error: e.message };
+          } finally {
+            this.priceHistoryLoading = false;
+          }
+        },
+        async fetchMetricsHistory() {
+          if (!this.perStockSymbol) return;
+          const sym = this.perStockSymbol;
+          this.metricsHistory = null;
+          this.metricsHistoryLoading = true;
+          try {
+            const r = await fetch(API + '/symbol/' + encodeURIComponent(sym) + '/metrics/history?market=' + encodeURIComponent(this.market)).then(x => x.json());
+            if (this.perStockSymbol === sym) {
+              this.metricsHistory = r;
+              this.$nextTick(() => this.renderMetricCharts(r));
+            }
+          } catch(e) {
+            if (this.perStockSymbol === sym) this.metricsHistory = { error: e.message };
+          } finally {
+            this.metricsHistoryLoading = false;
+          }
+        },
+        destroyChart(id) {
+          const existing = Chart.getChart(id);
+          if (existing) existing.destroy();
+        },
+        renderMetricCharts(data) {
+          if (!data || data.error || !data.years) return;
+          const years = data.years;
+          const COLORS = {
+            teal:   '#0d9488', blue: '#3b82f6', indigo: '#6366f1',
+            violet: '#7c3aed', rose: '#f43f5e', amber: '#f59e0b',
+            emerald:'#10b981', slate: '#64748b', sky: '#0ea5e9',
+          };
+          const makeLineChart = (id, datasets, opts = {}) => {
+            this.destroyChart(id);
+            const el = document.getElementById(id);
+            if (!el) return;
+            new Chart(el, {
+              type: 'line',
+              data: { labels: years, datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } },
+                scales: {
+                  x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                  y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, callback: opts.yFmt || (v => v != null ? v + (opts.pct ? '%' : '') : '') } }
+                },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false },
+                ...( opts.extra || {} )
+              }
+            });
+          };
+          const makeBarChart = (id, datasets, opts = {}) => {
+            this.destroyChart(id);
+            const el = document.getElementById(id);
+            if (!el) return;
+            new Chart(el, {
+              type: 'bar',
+              data: { labels: years, datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } },
+                scales: {
+                  x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                  y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, callback: opts.yFmt || (v => v) } }
+                },
+              }
+            });
+          };
+          const ds = (label, color, data, extra = {}) => ({
+            label, data,
+            borderColor: color, backgroundColor: color + '22',
+            borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
+            tension: 0.3, fill: false,
+            ...extra
+          });
+
+          // 1. Margins
+          makeLineChart('chart-margins', [
+            ds('Gross Margin', COLORS.teal,    data.margins?.gross),
+            ds('Operating Margin', COLORS.blue, data.margins?.operating),
+            ds('Net Margin', COLORS.indigo,    data.margins?.net),
+          ], { pct: true });
+
+          // 2. Returns
+          makeLineChart('chart-returns', [
+            ds('ROE', COLORS.violet,   data.returns?.roe),
+            ds('ROA', COLORS.sky,      data.returns?.roa),
+            ds('ROIC', COLORS.emerald, data.returns?.roic),
+          ], { pct: true });
+
+          // 3. Revenue & Net Income (bar)
+          const scaleRev = v => v != null ? +(v / 1e9).toFixed(2) : null;
+          makeBarChart('chart-revenue', [
+            { label: 'Revenue (B)', data: data.revenue?.map(scaleRev), backgroundColor: COLORS.teal + 'cc', borderColor: COLORS.teal, borderWidth: 1 },
+            { label: 'Net Income (B)', data: data.net_income?.map(scaleRev), backgroundColor: COLORS.indigo + 'cc', borderColor: COLORS.indigo, borderWidth: 1 },
+          ], { yFmt: v => v != null ? v + 'B' : '' });
+
+          // 4. FCF Quality
+          makeLineChart('chart-fcf', [
+            ds('FCF Conversion %', COLORS.emerald, data.cash_quality?.fcf_conversion),
+            ds('Capex / Revenue %', COLORS.rose,   data.cash_quality?.capex_to_revenue),
+            ds('R&D / Revenue %',   COLORS.amber,  data.cash_quality?.rd_to_revenue),
+          ], { pct: true });
+
+          // 5. Leverage
+          makeLineChart('chart-leverage', [
+            ds('Debt / Equity',       COLORS.rose,   data.leverage?.debt_to_equity),
+            ds('Net Debt / EBITDA',   COLORS.amber,  data.leverage?.net_debt_to_ebitda),
+            ds('Interest Coverage',   COLORS.slate,  data.leverage?.interest_coverage),
+          ]);
+
+          // 6. Valuation History
+          makeLineChart('chart-valuation-hist', [
+            ds('P/E',  COLORS.indigo, data.valuation_history?.pe),
+            ds('P/B',  COLORS.teal,   data.valuation_history?.pb),
+            ds('P/S',  COLORS.amber,  data.valuation_history?.ps),
+          ], { yFmt: v => v != null ? v + 'x' : '' });
+        },
+        renderPriceCharts(data) {
+          if (!data || data.error || !data.dates) return;
+          const dates  = data.dates;
+          const COLORS = { teal: '#0d9488', amber: '#f59e0b', slate: '#94a3b8', indigo: '#6366f1', rose: '#f43f5e' };
+
+          // Thin out labels so x-axis isn't crowded — show ~12 labels
+          const step = Math.max(1, Math.floor(dates.length / 12));
+          const tickCallback = (val, i) => i % step === 0 ? dates[i]?.slice(0, 7) : '';
+
+          // Chart 1: Price + 50 DMA + 200 DMA
+          this.destroyChart('chart-price-dma');
+          const el1 = document.getElementById('chart-price-dma');
+          if (el1) {
+            new Chart(el1, {
+              type: 'line',
+              data: {
+                labels: dates,
+                datasets: [
+                  { label: 'Price', data: data.price, borderColor: COLORS.slate, backgroundColor: COLORS.slate + '18',
+                    borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.1, order: 3 },
+                  { label: '50 DMA', data: data.sma50,  borderColor: COLORS.amber, borderWidth: 2,
+                    pointRadius: 0, fill: false, tension: 0.3, borderDash: [4,3], order: 2 },
+                  { label: '200 DMA', data: data.sma200, borderColor: COLORS.teal,  borderWidth: 2.5,
+                    pointRadius: 0, fill: false, tension: 0.3, order: 1 },
+                ],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                  tooltip: { mode: 'index', intersect: false, callbacks: {
+                    label: ctx => ctx.dataset.label + ': ' + (ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) : '—')
+                  }}
+                },
+                scales: {
+                  x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 12, callback: tickCallback } },
+                  y: { position: 'left', grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, callback: v => v != null ? v.toFixed(0) : '' } },
+                },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false },
+              }
+            });
+          }
+
+          // Chart 2: Volume bars
+          this.destroyChart('chart-volume');
+          const el2 = document.getElementById('chart-volume');
+          if (el2) {
+            // Colour volume bars: green if price up, red if down
+            const volColors = data.price.map((p, i) =>
+              i === 0 ? COLORS.slate + '99' : (p >= data.price[i-1] ? '#10b98166' : '#f43f5e66')
+            );
+            new Chart(el2, {
+              type: 'bar',
+              data: {
+                labels: dates,
+                datasets: [{
+                  label: 'Volume',
+                  data: data.volume,
+                  backgroundColor: volColors,
+                  borderWidth: 0,
+                  barPercentage: 1.0,
+                  categoryPercentage: 1.0,
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: { mode: 'index', intersect: false, callbacks: {
+                    label: ctx => 'Vol: ' + (ctx.parsed.y != null ? (ctx.parsed.y / 1e6).toFixed(2) + 'M' : '—')
+                  }}
+                },
+                scales: {
+                  x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 12, callback: tickCallback } },
+                  y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, callback: v => v != null ? (v/1e6).toFixed(0)+'M' : '' } },
+                },
+              }
+            });
           }
         },
         async fetchCompare() {

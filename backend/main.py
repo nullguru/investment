@@ -450,6 +450,22 @@ def api_symbol_section(symbol: str, section: str, force: bool = Query(False), ma
     return yf_get_section(symbol, section, force=force, market=market)
 
 
+@app.get("/api/symbol/{symbol}/metrics/history")
+def api_symbol_metrics_history(symbol: str, market: str = Query("india")):
+    """Multi-year financial metrics timeseries for chart rendering."""
+    from modules.market.yf import get_metrics_history
+    data = get_metrics_history(symbol, market=market)
+    return _sanitize(data)
+
+
+@app.get("/api/symbol/{symbol}/price/history")
+def api_symbol_price_history(symbol: str, market: str = Query("india")):
+    """2-year daily price, volume, 50 DMA, 200 DMA for charting."""
+    from modules.market.yf import get_price_history
+    data = get_price_history(symbol, market=market)
+    return _sanitize(data)
+
+
 @app.get("/api/symbol/{symbol}/research")
 def api_symbol_research_all(symbol: str):
     """All research sections for a symbol."""

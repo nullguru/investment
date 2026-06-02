@@ -414,6 +414,253 @@ def get_section_data(symbol: str, section: str, force: bool = False, market: str
         return {"error": str(e), "symbol": symbol}
 
 
+def get_price_history(symbol: str, market: str = "india") -> Dict[str, Any]:
+    """Return 2-year daily price + volume history with 50/200 DMA for charting."""
+    ticker_str = _ensure_ticker(symbol, market)
+    cache_key = (ticker_str, "price_history")
+    if cache_key in _YF_CACHE:
+        return _YF_CACHE[cache_key].copy()
+
+    try:
+        ticker = yf.Ticker(ticker_str)
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+    try:
+        hist = ticker.history(period="2y", interval="1d")
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+    if hist is None or hist.empty:
+        return {"error": "No price data available", "symbol": symbol}
+
+    close = hist["Close"]
+    volume = hist["Volume"] if "Volume" in hist.columns else pd.Series(dtype=float)
+
+    ma50  = close.rolling(50,  min_periods=1).mean()
+    ma200 = close.rolling(200, min_periods=1).mean()
+
+    def _fmt_date(ts) -> str:
+        try:
+            return ts.strftime("%Y-%m-%d")
+        except Exception:
+            return str(ts)[:10]
+
+    dates   = [_fmt_date(t) for t in hist.index]
+    prices  = [_safe_val(v) for v in close]
+    vol     = [_safe_val(v) for v in volume] if not volume.empty else [None] * len(dates)
+    sma50   = [round(float(v), 2) if not (isinstance(v, float) and (np.isnan(v) or np.isinf(v))) else None for v in ma50]
+    sma200  = [round(float(v), 2) if not (isinstance(v, float) and (np.isnan(v) or np.isinf(v))) else None for v in ma200]
+
+    # Current vs DMA summary — use last non-None value
+    last_price  = next((v for v in reversed(prices)  if v is not None), None)
+    last_sma50  = next((v for v in reversed(sma50)   if v is not None), None)
+    last_sma200 = next((v for v in reversed(sma200)  if v is not None), None)
+
+    vs50  = round((last_price / last_sma50  - 1) * 100, 2) if last_price and last_sma50  and last_sma50  != 0 else None
+    vs200 = round((last_price / last_sma200 - 1) * 100, 2) if last_price and last_sma200 and last_sma200 != 0 else None
+
+    result = {
+        "symbol": symbol,
+        "dates":  dates,
+        "price":  prices,
+        "sma50":  sma50,
+        "sma200": sma200,
+        "volume": vol,
+        "summary": {
+            "last_price": last_price,
+            "sma50": last_sma50,
+            "sma200": last_sma200,
+            "vs_sma50_pct": vs50,
+            "vs_sma200_pct": vs200,
+        },
+    }
+    _YF_CACHE[cache_key] = result.copy()
+    return result
+
+
+def get_metrics_history(symbol: str, market: str = "india") -> Dict[str, Any]:
+    """Return multi-year timeseries of financial metrics for chart rendering."""
+    ticker_str = _ensure_ticker(symbol, market)
+    cache_key = (ticker_str, "metrics_history")
+    if cache_key in _YF_CACHE:
+        return _YF_CACHE[cache_key].copy()
+
+    try:
+        ticker = yf.Ticker(ticker_str)
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+    inc = bal = cf = None
+    try:
+        inc = ticker.financials
+    except Exception:
+        pass
+    try:
+        bal = ticker.balance_sheet
+    except Exception:
+        pass
+    try:
+        cf = ticker.cashflow
+    except Exception:
+        pass
+
+    if inc is None or inc.empty:
+        return {"error": "No financial data available", "symbol": symbol}
+
+    def _row(df, *keys) -> Dict[str, Any]:
+        if df is None:
+            return {}
+        for k in keys:
+            if k in df.index:
+                return {str(c)[:4]: _safe_val(df.loc[k, c]) for c in df.columns}
+        return {}
+
+    revenue      = _row(inc, "Total Revenue")
+    gross_profit = _row(inc, "Gross Profit")
+    op_income    = _row(inc, "Operating Income", "EBIT")
+    net_income   = _row(inc, "Net Income", "Net Income From Continuing Operations")
+    ebitda_row   = _row(inc, "EBITDA", "Normalized EBITDA")
+    interest_exp = _row(inc, "Interest Expense", "Interest Expense Non Operating")
+    rd_exp       = _row(inc, "Research And Development", "Research Development")
+    tax_rate_row = _row(inc, "Tax Rate For Calcs")
+
+    total_equity = _row(bal, "Common Stock Equity", "Stockholders Equity", "Total Equity Gross Minority Interest")
+    total_assets = _row(bal, "Total Assets")
+    total_debt   = _row(bal, "Total Debt", "Long Term Debt And Capital Lease Obligation")
+    cash_row     = _row(bal, "Cash And Cash Equivalents", "Cash Cash Equivalents And Short Term Investments")
+    shares_row   = _row(bal, "Share Issued", "Ordinary Shares Number")
+
+    fcf_row   = _row(cf, "Free Cash Flow")
+    capex_row = _row(cf, "Capital Expenditure", "Capital Expenditure Reported")
+
+    years = sorted({y for d in [revenue, gross_profit, op_income, net_income] for y in d})
+
+    result_years = []
+    rev_series = []
+    ni_series = []
+    gross_margins = []
+    op_margins = []
+    net_margins = []
+    roe_series = []
+    roa_series = []
+    roic_series = []
+    fcf_conversion = []
+    capex_rev = []
+    rd_rev = []
+    de_ratio = []
+    net_debt_ebitda = []
+    int_coverage = []
+    pe_hist = []
+    pb_hist = []
+    ps_hist = []
+
+    for y in years:
+        rev = revenue.get(y)
+        gp  = gross_profit.get(y)
+        op  = op_income.get(y)
+        ni  = net_income.get(y)
+        eb  = ebitda_row.get(y)
+        ie  = interest_exp.get(y)
+        rd  = rd_exp.get(y)
+        tr  = tax_rate_row.get(y)
+        te  = total_equity.get(y)
+        ta  = total_assets.get(y)
+        td  = total_debt.get(y)
+        c   = cash_row.get(y)
+        sh  = shares_row.get(y)
+        f   = fcf_row.get(y)
+        cx  = capex_row.get(y)
+
+        result_years.append(y)
+        rev_series.append(rev)
+        ni_series.append(ni)
+
+        def _pct(a, b):
+            try:
+                return round(a / b * 100, 1) if a and b and float(b) != 0 else None
+            except Exception:
+                return None
+
+        gross_margins.append(_pct(gp, rev))
+        op_margins.append(_pct(op, rev))
+        net_margins.append(_pct(ni, rev))
+        roe_series.append(_pct(ni, te))
+        roa_series.append(_pct(ni, ta))
+
+        roic = None
+        try:
+            if op and te is not None and td is not None and c is not None:
+                tax = float(tr) if tr and 0 < float(tr) < 1 else 0.25
+                nopat = float(op) * (1 - tax)
+                ic = float(te) + float(td) - float(c)
+                roic = round(nopat / ic * 100, 1) if ic != 0 else None
+        except Exception:
+            pass
+        roic_series.append(roic)
+
+        fcf_conversion.append(_pct(f, ni))
+        capex_rev.append(round(abs(float(cx)) / float(rev) * 100, 1) if cx and rev and float(rev) != 0 else None)
+        rd_rev.append(_pct(rd, rev))
+
+        de_ratio.append(round(float(td) / float(te), 2) if td and te and float(te) != 0 else None)
+
+        try:
+            nd = float(td or 0) - float(c or 0) if td is not None else None
+            net_debt_ebitda.append(round(nd / float(eb), 2) if nd is not None and eb and float(eb) != 0 else None)
+        except Exception:
+            net_debt_ebitda.append(None)
+
+        try:
+            int_coverage.append(round(abs(float(op) / float(ie)), 1) if op and ie and float(ie) != 0 else None)
+        except Exception:
+            int_coverage.append(None)
+
+        pe_hist.append(None)
+        pb_hist.append(None)
+        ps_hist.append(None)
+
+    # Historical valuation: year-end price × per-share denominators
+    try:
+        price_hist = ticker.history(period="5y", interval="1mo")
+        if not price_hist.empty:
+            for i, y in enumerate(result_years):
+                yp = price_hist[price_hist.index.year == int(y)]
+                if yp.empty:
+                    continue
+                px = float(yp["Close"].iloc[-1])
+                sh = shares_row.get(y)
+                ni = ni_series[i]
+                rev = rev_series[i]
+                te = total_equity.get(y)
+                if sh and float(sh) > 0:
+                    if ni:
+                        eps = float(ni) / float(sh)
+                        pe_hist[i] = round(px / eps, 1) if eps > 0 else None
+                    if te:
+                        bvps = float(te) / float(sh)
+                        pb_hist[i] = round(px / bvps, 2) if bvps > 0 else None
+                    if rev:
+                        sps = float(rev) / float(sh)
+                        ps_hist[i] = round(px / sps, 2) if sps > 0 else None
+    except Exception:
+        pass
+
+    result = {
+        "symbol": symbol,
+        "years": result_years,
+        "revenue": [_safe_val(v) for v in rev_series],
+        "net_income": [_safe_val(v) for v in ni_series],
+        "margins": {"gross": gross_margins, "operating": op_margins, "net": net_margins},
+        "returns": {"roe": roe_series, "roa": roa_series, "roic": roic_series},
+        "cash_quality": {"fcf_conversion": fcf_conversion, "capex_to_revenue": capex_rev, "rd_to_revenue": rd_rev},
+        "leverage": {"debt_to_equity": de_ratio, "net_debt_to_ebitda": net_debt_ebitda, "interest_coverage": int_coverage},
+        "valuation_history": {"pe": pe_hist, "pb": pb_hist, "ps": ps_hist},
+    }
+    _YF_CACHE[cache_key] = result.copy()
+    return result
+
+
 def clear_cache(symbol: Optional[str] = None, section: Optional[str] = None) -> int:
     """Clear cache. If symbol/section given, clear only those. Returns count cleared."""
     if symbol is None and section is None:
