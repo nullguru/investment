@@ -267,25 +267,23 @@
         <p x-show="!allStocksRows.length && !loading" class="text-slate-600">No Sharia data yet. Open Compute Sharia data on Home.</p>
         <div x-show="loading" class="text-slate-500">Loading…</div>
         <div x-show="allStocksRows.length" class="space-y-3">
+          <!-- Search + filter toolbar -->
           <div class="flex flex-wrap items-center gap-2">
             <input type="text" x-model="tableSearchQuery" @input="applyTableSearch()"
-                   placeholder="Search across all columns…"
-                   class="flex-1 min-w-[200px] max-w-md rounded-lg border border-slate-200 px-3 py-2 text-sm placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
-            <button @click="shariaFilterOn = !shariaFilterOn; applyTableSearch()"
-                    :class="['px-4 py-2 rounded-lg text-sm font-medium transition', shariaFilterOn ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200']">
-              Sharia compliant only
+                   placeholder="Search by name, symbol, sector…"
+                   class="flex-1 min-w-[200px] max-w-sm rounded-lg border border-slate-200 px-3 py-2 text-sm placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+            <!-- Filters button -->
+            <button @click="stockFilterPanelOpen = !stockFilterPanelOpen"
+                    :class="['flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition',
+                      stockFilterActiveCount() > 0 ? 'bg-teal-600 text-white border-teal-600 hover:bg-teal-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50']">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+              Filters
+              <span x-show="stockFilterActiveCount() > 0"
+                    class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold"
+                    :class="stockFilterActiveCount() > 0 ? 'bg-white text-teal-700' : 'bg-teal-100 text-teal-700'"
+                    x-text="stockFilterActiveCount()"></span>
             </button>
-            <!-- Quality score filter controls -->
-            <template x-if="qualityLoaded">
-              <div class="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-lg px-3 py-1.5">
-                <span class="text-xs text-violet-600 font-medium whitespace-nowrap">Min quality:</span>
-                <input type="range" x-model.number="qualityFilterMinScore" min="0" max="100" step="5"
-                       @input="applyTableSearch()" class="w-24 accent-violet-600" />
-                <span class="text-xs font-bold text-violet-700 w-8 text-center" x-text="qualityFilterMinScore || 'All'"></span>
-                <button @click="qualityFilterMinScore = 0; applyTableSearch()" x-show="qualityFilterMinScore > 0"
-                        class="text-violet-400 hover:text-violet-600 text-xs" title="Reset">✕</button>
-              </div>
-            </template>
+            <!-- Quality scores loader -->
             <button x-show="!qualityLoaded && !qualityLoading" @click="fetchQualityScores()"
                     class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition">
               <span>✦</span> Load quality scores
@@ -294,6 +292,237 @@
               <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
               Loading scores…
             </span>
+            <!-- Clear all -->
+            <button x-show="stockFilterActiveCount() > 0" @click="clearAllStockFilters()"
+                    class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 transition">
+              Clear all
+            </button>
+          </div>
+
+          <!-- Active filter chips -->
+          <div x-show="stockFilterActiveCount() > 0" class="flex flex-wrap gap-1.5">
+            <template x-if="shariaFilterOn">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                Sharia compliant
+                <button @click="shariaFilterOn = false; applyTableSearch()" class="hover:text-emerald-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-for="ex in stockFilters.exchange" :key="ex">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span x-text="ex"></span>
+                <button @click="stockFilters.exchange = stockFilters.exchange.filter(e=>e!==ex); applyTableSearch()" class="hover:text-blue-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-for="sec in stockFilters.sector" :key="sec">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                <span x-text="sec"></span>
+                <button @click="stockFilters.sector = stockFilters.sector.filter(s=>s!==sec); applyTableSearch()" class="hover:text-orange-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.marketCapMin || stockFilters.marketCapMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                MCap: <span x-text="(stockFilters.marketCapMin||'0')+'–'+(stockFilters.marketCapMax||'∞')+' Cr'"></span>
+                <button @click="stockFilters.marketCapMin=''; stockFilters.marketCapMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.peMin || stockFilters.peMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                P/E: <span x-text="(stockFilters.peMin||'0')+'–'+(stockFilters.peMax||'∞')"></span>
+                <button @click="stockFilters.peMin=''; stockFilters.peMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.roeMin || stockFilters.roeMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                ROE: <span x-text="(stockFilters.roeMin||'0')+'–'+(stockFilters.roeMax||'∞')+'%'"></span>
+                <button @click="stockFilters.roeMin=''; stockFilters.roeMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.marginMin || stockFilters.marginMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Op.Margin: <span x-text="(stockFilters.marginMin||'0')+'–'+(stockFilters.marginMax||'∞')+'%'"></span>
+                <button @click="stockFilters.marginMin=''; stockFilters.marginMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.debtEquityMin || stockFilters.debtEquityMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                D/E: <span x-text="(stockFilters.debtEquityMin||'0')+'–'+(stockFilters.debtEquityMax||'∞')"></span>
+                <button @click="stockFilters.debtEquityMin=''; stockFilters.debtEquityMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.qualityMin">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-800">
+                Quality ≥ <span x-text="stockFilters.qualityMin"></span>
+                <button @click="stockFilters.qualityMin=''; applyTableSearch()" class="hover:text-violet-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.cashPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Cash/Assets ≤ <span x-text="stockFilters.cashPctMax+'%'"></span>
+                <button @click="stockFilters.cashPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.recPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Rec/Assets ≤ <span x-text="stockFilters.recPctMax+'%'"></span>
+                <button @click="stockFilters.recPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.otherRevPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Other Rev% ≤ <span x-text="stockFilters.otherRevPctMax+'%'"></span>
+                <button @click="stockFilters.otherRevPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+          </div>
+
+          <!-- Expandable filter panel -->
+          <div x-show="stockFilterPanelOpen" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+               class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-4">
+
+            <!-- Row 1: Compliance + Exchange + Sector -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <!-- Compliance -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Compliance</p>
+                <button @click="shariaFilterOn = !shariaFilterOn; applyTableSearch()"
+                        :class="['w-full px-3 py-2 rounded-lg text-sm font-medium border transition text-left',
+                          shariaFilterOn ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50']">
+                  ☪ Sharia compliant only
+                </button>
+              </div>
+              <!-- Exchange -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Exchange</p>
+                <div class="flex gap-2 flex-wrap">
+                  <template x-for="ex in ['NSE','BSE']" :key="ex">
+                    <button @click="toggleArrayFilter('exchange', ex); applyTableSearch()"
+                            :class="['px-3 py-1.5 rounded-lg text-sm font-medium border transition',
+                              stockFilters.exchange.includes(ex) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50']"
+                            x-text="ex"></button>
+                  </template>
+                </div>
+              </div>
+              <!-- Quality label (shown when loaded) -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Min Quality Score
+                  <span x-show="!qualityLoaded" class="text-slate-400 font-normal">(load scores first)</span>
+                </p>
+                <div class="flex gap-2 flex-wrap">
+                  <template x-for="opt in [{label:'Good+',val:65},{label:'Fair+',val:50},{label:'Exceptional',val:80}]" :key="opt.val">
+                    <button @click="stockFilters.qualityMin = stockFilters.qualityMin == opt.val ? '' : opt.val; applyTableSearch()"
+                            :disabled="!qualityLoaded"
+                            :class="['px-2.5 py-1.5 rounded-lg text-xs font-medium border transition',
+                              !qualityLoaded ? 'opacity-40 cursor-not-allowed bg-white text-slate-400 border-slate-200' :
+                              stockFilters.qualityMin == opt.val ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50']"
+                            x-text="opt.label"></button>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Sector multi-select -->
+            <div>
+              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Sector</p>
+              <div class="flex flex-wrap gap-1.5">
+                <template x-for="sec in allStocksSectors()" :key="sec">
+                  <button @click="toggleArrayFilter('sector', sec); applyTableSearch()"
+                          :class="['px-2.5 py-1 rounded-full text-xs font-medium border transition',
+                            stockFilters.sector.includes(sec) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-slate-600 border-slate-200 hover:bg-orange-50 hover:border-orange-200']"
+                          x-text="sec"></button>
+                </template>
+              </div>
+            </div>
+
+            <!-- Row 3: Financial ranges -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Market Cap -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Market Cap (₹ Cr)</p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.marketCapMin" @input="applyTableSearch()" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.marketCapMax" @input="applyTableSearch()" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                </div>
+                <div class="flex gap-1 mt-1.5 flex-wrap">
+                  <template x-for="preset in [{label:'Small',min:0,max:5000},{label:'Mid',min:5000,max:20000},{label:'Large',min:20000,max:''}]" :key="preset.label">
+                    <button @click="stockFilters.marketCapMin=preset.min||''; stockFilters.marketCapMax=preset.max||''; applyTableSearch()"
+                            class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 transition" x-text="preset.label"></button>
+                  </template>
+                </div>
+              </div>
+              <!-- P/E Ratio -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">P/E Ratio
+                  <span x-show="!qualityLoaded" class="text-slate-400 font-normal">(load scores)</span>
+                </p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.peMin" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.peMax" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                </div>
+              </div>
+              <!-- Debt/Equity -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Debt / Equity</p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.debtEquityMin" @input="applyTableSearch()" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.debtEquityMax" @input="applyTableSearch()" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                </div>
+              </div>
+              <!-- ROE -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">ROE (%)
+                  <span x-show="!qualityLoaded" class="text-slate-400 font-normal">(load scores)</span>
+                </p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.roeMin" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.roeMax" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                </div>
+              </div>
+              <!-- Operating Margin -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Operating Margin (%)
+                  <span x-show="!qualityLoaded" class="text-slate-400 font-normal">(load scores)</span>
+                </p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.marginMin" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.marginMax" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                </div>
+              </div>
+              <!-- PEG Ratio -->
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">PEG Ratio
+                  <span x-show="!qualityLoaded" class="text-slate-400 font-normal">(load scores)</span>
+                </p>
+                <div class="flex gap-2 items-center">
+                  <input type="number" x-model="stockFilters.pegMin" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Min" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                  <span class="text-slate-400 text-xs shrink-0">to</span>
+                  <input type="number" x-model="stockFilters.pegMax" @input="applyTableSearch()" :disabled="!qualityLoaded" placeholder="Max" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-40" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Sharia ratios -->
+            <div>
+              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Sharia Ratios (max thresholds)</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs text-slate-500 mb-1">Cash / Assets ≤ %</label>
+                  <input type="number" x-model="stockFilters.cashPctMax" @input="applyTableSearch()" placeholder="e.g. 33" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-500 mb-1">Receivables / Assets ≤ %</label>
+                  <input type="number" x-model="stockFilters.recPctMax" @input="applyTableSearch()" placeholder="e.g. 33" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-500 mb-1">Other Revenue % ≤ %</label>
+                  <input type="number" x-model="stockFilters.otherRevPctMax" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                </div>
+              </div>
+            </div>
           </div>
           <div id="all-stocks-table" class="rounded-xl border border-slate-200 overflow-x-auto overflow-hidden" style="min-width: 600px;"></div>
         </div>
@@ -1444,6 +1673,21 @@
         qualityFilterMinScore: 0,
         qualityLoaded: false,
         qualityLoading: false,
+        stockFilterPanelOpen: false,
+        stockFilters: {
+          exchange: [],
+          sector: [],
+          sharia: '',
+          marketCapMin: '', marketCapMax: '',
+          revenueMin: '', revenueMax: '',
+          debtEquityMin: '', debtEquityMax: '',
+          peMin: '', peMax: '',
+          pegMin: '', pegMax: '',
+          roeMin: '', roeMax: '',
+          marginMin: '', marginMax: '',
+          qualityMin: '',
+          cashPctMax: '', recPctMax: '', otherRevPctMax: '',
+        },
         perStockQuality: null,
         perStockQualityLoading: false,
         perStockSymbol: '',
@@ -1626,15 +1870,77 @@
           const tab = this.tabulators.all_stocks;
           if (!tab) return;
           const q = (this.tableSearchQuery || '').toLowerCase().trim();
+          const f = this.stockFilters;
           const shariaOnly = !!this.shariaFilterOn;
-          const minScore = this.qualityFilterMinScore || 0;
-          if (!q && !shariaOnly && !minScore) { tab.clearFilter(); return; }
-          tab.setFilter(function(data) {
-            if (shariaOnly && (data.Sharia || data.sharia) !== 'Yes') return false;
-            if (minScore > 0 && (data.total_score == null || data.total_score < minScore)) return false;
+          const hasFilter = q || shariaOnly || this.stockFilterActiveCount() > 0;
+          if (!hasFilter) { tab.clearFilter(); return; }
+          const num = v => (v == null || v === '' || isNaN(Number(v))) ? null : Number(v);
+          tab.setFilter(function(d) {
+            if (shariaOnly && (d.Sharia || d.sharia) !== 'Yes') return false;
+            if (f.exchange.length && !f.exchange.includes(d.exchange)) return false;
+            if (f.sector.length && !f.sector.includes(d.sector)) return false;
+            const mc = num(d.market_cap);
+            if (f.marketCapMin !== '' && (mc == null || mc < Number(f.marketCapMin) * 1e7)) return false;
+            if (f.marketCapMax !== '' && (mc == null || mc > Number(f.marketCapMax) * 1e7)) return false;
+            const de = num(d.debt_to_equity_ratio);
+            if (f.debtEquityMin !== '' && (de == null || de < Number(f.debtEquityMin))) return false;
+            if (f.debtEquityMax !== '' && (de == null || de > Number(f.debtEquityMax))) return false;
+            const cashPct = num(d.cash_to_assets_pct);
+            if (f.cashPctMax !== '' && (cashPct == null || cashPct > Number(f.cashPctMax))) return false;
+            const recPct = num(d.receivables_to_assets_pct);
+            if (f.recPctMax !== '' && (recPct == null || recPct > Number(f.recPctMax))) return false;
+            const otherPct = num(d.other_revenue_to_revenue_pct);
+            if (f.otherRevPctMax !== '' && (otherPct == null || otherPct > Number(f.otherRevPctMax))) return false;
+            const qs = num(d.total_score);
+            if (f.qualityMin !== '' && (qs == null || qs < Number(f.qualityMin))) return false;
+            const pe = num(d.trailing_pe);
+            if (f.peMin !== '' && (pe == null || pe < Number(f.peMin))) return false;
+            if (f.peMax !== '' && (pe == null || pe > Number(f.peMax))) return false;
+            const peg = num(d.peg_ratio);
+            if (f.pegMin !== '' && (peg == null || peg < Number(f.pegMin))) return false;
+            if (f.pegMax !== '' && (peg == null || peg > Number(f.pegMax))) return false;
+            const roe = num(d.roe);
+            if (f.roeMin !== '' && (roe == null || roe * 100 < Number(f.roeMin))) return false;
+            if (f.roeMax !== '' && (roe == null || roe * 100 > Number(f.roeMax))) return false;
+            const margin = num(d.operating_margin);
+            if (f.marginMin !== '' && (margin == null || margin * 100 < Number(f.marginMin))) return false;
+            if (f.marginMax !== '' && (margin == null || margin * 100 > Number(f.marginMax))) return false;
             if (!q) return true;
-            return Object.values(data).some(v => String(v ?? '').toLowerCase().includes(q));
+            return Object.values(d).some(v => String(v ?? '').toLowerCase().includes(q));
           });
+        },
+        stockFilterActiveCount() {
+          const f = this.stockFilters;
+          let n = 0;
+          if (this.shariaFilterOn) n++;
+          if (f.exchange.length) n += f.exchange.length;
+          if (f.sector.length) n += f.sector.length;
+          if (f.marketCapMin || f.marketCapMax) n++;
+          if (f.debtEquityMin || f.debtEquityMax) n++;
+          if (f.peMin || f.peMax) n++;
+          if (f.pegMin || f.pegMax) n++;
+          if (f.roeMin || f.roeMax) n++;
+          if (f.marginMin || f.marginMax) n++;
+          if (f.qualityMin) n++;
+          if (f.cashPctMax) n++;
+          if (f.recPctMax) n++;
+          if (f.otherRevPctMax) n++;
+          return n;
+        },
+        clearAllStockFilters() {
+          this.shariaFilterOn = false;
+          this.stockFilters = { exchange: [], sector: [], sharia: '', marketCapMin: '', marketCapMax: '', revenueMin: '', revenueMax: '', debtEquityMin: '', debtEquityMax: '', peMin: '', peMax: '', pegMin: '', pegMax: '', roeMin: '', roeMax: '', marginMin: '', marginMax: '', qualityMin: '', cashPctMax: '', recPctMax: '', otherRevPctMax: '' };
+          this.applyTableSearch();
+        },
+        toggleArrayFilter(key, val) {
+          const arr = this.stockFilters[key];
+          const idx = arr.indexOf(val);
+          if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+        },
+        allStocksSectors() {
+          const seen = new Set();
+          (this.allStocksRows || []).forEach(r => { if (r.sector) seen.add(r.sector); });
+          return [...seen].sort();
         },
         onPageChange() {
           this.destroyAllTabulators();
