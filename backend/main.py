@@ -1270,3 +1270,168 @@ def api_cache_status(market: str = Query("india")):
             "skill": "Use the investment skill to refresh data",
         },
     }
+
+
+# =============================================================================
+# TRADE LEDGER
+# =============================================================================
+
+from modules.trades import (
+    load_trades, add_trade, update_trade, delete_trade,
+    get_trades_for_symbol, get_open_positions, compute_realized_pnl, Trade,
+)
+from modules.trades.pretrade import run_pretrade_check
+
+
+class TradeBody(BaseModel):
+    symbol: str
+    action: str                        # BUY | SELL | PARTIAL_SELL
+    units: float
+    price: float
+    currency: str = "INR"
+    date: str = ""
+    status: str = "planned"
+    conviction: str = "medium"
+    reasoning: str = ""
+    thesis_section: str = ""
+    risks_acknowledged: list = []
+    exit_plan: dict = {}
+    emotion_check: str = "patient"
+    pre_trade_check: dict = {}
+
+
+class TradeUpdateBody(BaseModel):
+    status: str | None = None
+    reasoning: str | None = None
+    risks_acknowledged: list | None = None
+    exit_plan: dict | None = None
+    emotion_check: str | None = None
+    conviction: str | None = None
+    outcome_notes: str | None = None
+    closed_at: str | None = None
+    pre_trade_check: dict | None = None
+
+
+@app.get("/api/trades")
+def api_list_trades(
+    symbol: str = Query(None),
+    status: str = Query(None),
+    action: str = Query(None),
+    limit: int = Query(100),
+):
+    """List all trades with optional filters."""
+    trades = load_trades()
+    if symbol:
+        trades = [t for t in trades if t.get("symbol", "").upper() == symbol.upper()]
+    if status:
+        trades = [t for t in trades if t.get("status") == status]
+    if action:
+        trades = [t for t in trades if t.get("action", "").upper() == action.upper()]
+    return {"trades": trades[:limit], "total": len(trades)}
+
+
+@app.post("/api/trades")
+def api_add_trade(body: TradeBody, market: str = Query("india")):
+    """
+    Record a new trade. If pre_trade_check is empty, runs it automatically.
+    Returns saved trade + pre-trade report.
+    """
+    # Auto-run pre-trade check if caller didn't supply one
+    check = body.pre_trade_check
+    if not check:
+        try:
+            check = run_pretrade_check(body.symbol, body.action, body.price, market=market)
+        except Exception as e:
+            check = {"error": str(e)}
+
+    trade = Trade(
+        symbol=body.symbol.upper(),
+        action=body.action.upper(),
+        units=body.units,
+        price=body.price,
+        currency=body.currency,
+        date=body.date,
+        status=body.status,
+        conviction=body.conviction,
+        reasoning=body.reasoning,
+        thesis_section=body.thesis_section,
+        risks_acknowledged=body.risks_acknowledged,
+        exit_plan=body.exit_plan,
+        emotion_check=body.emotion_check,
+        pre_trade_check=check,
+    )
+    saved = add_trade(trade)
+    return {"trade": saved, "pre_trade_check": check}
+
+
+@app.get("/api/trades/pretrade-check")
+def api_pretrade_check(
+    symbol: str = Query(...),
+    action: str = Query("BUY"),
+    price: float = Query(...),
+    market: str = Query("india"),
+):
+    """
+    Run pre-trade health check for symbol at price without recording a trade.
+    Frontend calls this first so user can review before committing.
+    """
+    return run_pretrade_check(symbol, action, price, market=market)
+
+
+@app.get("/api/trades/positions")
+def api_positions(market: str = Query("india")):
+    """Derive current open positions from the ledger (AVCO method)."""
+    positions = get_open_positions()
+    # Enrich with current price
+    enriched = []
+    for sym, pos in positions.items():
+        try:
+            mkt = yf_get_section(sym, "market", market=market)
+            current_price = mkt.get("currentPrice") or mkt.get("regularMarketPrice")
+            if current_price:
+                cp = float(current_price)
+                pos["current_price"] = round(cp, 2)
+                pos["current_value"] = round(cp * pos["units"], 2)
+                pos["unrealized_pnl"] = round((cp - pos["avg_cost"]) * pos["units"], 2)
+                pos["unrealized_pnl_pct"] = round((cp - pos["avg_cost"]) / pos["avg_cost"] * 100, 2) if pos["avg_cost"] > 0 else 0
+        except Exception:
+            pass
+        enriched.append({"symbol": sym, **pos})
+    return {"positions": enriched}
+
+
+@app.get("/api/trades/pnl")
+def api_realized_pnl():
+    """Realized P&L from all executed sell trades."""
+    results = compute_realized_pnl()
+    total_pnl = sum(r["realized_pnl"] for r in results)
+    return {"realized_trades": results, "total_realized_pnl": round(total_pnl, 2)}
+
+
+@app.get("/api/trades/{trade_id}")
+def api_get_trade(trade_id: str):
+    """Get a single trade by id."""
+    trades = load_trades()
+    for t in trades:
+        if t.get("id") == trade_id:
+            return t
+    raise HTTPException(404, "Trade not found")
+
+
+@app.patch("/api/trades/{trade_id}")
+def api_update_trade(trade_id: str, body: TradeUpdateBody):
+    """Update status, reasoning, emotion check, or outcome notes on a trade."""
+    updates = {k: v for k, v in body.dict().items() if v is not None}
+    result = update_trade(trade_id, updates)
+    if not result:
+        raise HTTPException(404, "Trade not found")
+    return result
+
+
+@app.delete("/api/trades/{trade_id}")
+def api_delete_trade(trade_id: str):
+    """Delete a trade from the ledger."""
+    ok = delete_trade(trade_id)
+    if not ok:
+        raise HTTPException(404, "Trade not found")
+    return {"ok": True}
