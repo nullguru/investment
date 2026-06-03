@@ -888,6 +888,10 @@
                     :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === 'charts' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']">
               📈 Charts
             </button>
+            <button @click="perStockTab = 'scorecard'; fetchScorecard(perStockSymbol)"
+                    :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === 'scorecard' ? 'bg-violet-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']">
+              🎯 Scorecard
+            </button>
           </div>
           <!-- Category: Research (web-research-backed) -->
           <div class="flex flex-wrap items-center gap-1">
@@ -2281,6 +2285,153 @@
                 </div>
               </template>
             </section>
+          </div>
+
+
+          <!-- ── SCORECARD TAB ─────────────────────────────────────────────── -->
+          <div x-show="perStockTab === 'scorecard'" x-cloak class="space-y-5"
+               x-init="$watch('perStockTab', v => { if (v === 'scorecard' && perStockSymbol) fetchScorecard(perStockSymbol); })">
+
+            <!-- Loading -->
+            <div x-show="scorecardLoading" class="text-center py-10 text-slate-400 text-sm">Running scorecard…</div>
+            <div x-show="!scorecardLoading && !scorecardData && perStockSymbol" class="text-center py-10 text-slate-400 text-sm">
+              <button @click="fetchScorecard(perStockSymbol)" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm rounded-lg transition">Run Scorecard</button>
+            </div>
+
+            <template x-if="scorecardData">
+              <div class="space-y-5">
+
+                <!-- Composite banner -->
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-5">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <p class="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Composite Score</p>
+                      <div class="flex items-baseline gap-3">
+                        <span class="text-4xl font-bold" :class="scoreTextClass(scorecardData.composite_color)"
+                              x-text="scorecardData.composite_score != null ? scorecardData.composite_score + '/100' : '—'"></span>
+                        <span class="text-lg font-semibold" :class="scoreTextClass(scorecardData.composite_color)"
+                              x-text="scorecardData.composite_label"></span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs text-slate-500" x-text="scorecardData.dimensions_scored + ' / ' + scorecardData.dimensions_total + ' dimensions scored'"></p>
+                      <button @click="fetchScorecard(perStockSymbol)" class="mt-2 text-xs text-teal-400 hover:text-teal-300">↻ Refresh</button>
+                    </div>
+                  </div>
+                  <!-- Full progress bar -->
+                  <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500" :class="scoreColorClass(scorecardData.composite_color)"
+                         :style="'width:' + scoreBarWidth(scorecardData.composite_score)"></div>
+                  </div>
+                  <!-- Thematic tags -->
+                  <div x-show="scorecardData.thematic_tags && scorecardData.thematic_tags.length" class="flex flex-wrap gap-2 mt-3">
+                    <template x-for="tag in scorecardData.thematic_tags" :key="tag.id">
+                      <span class="text-xs px-2 py-0.5 bg-teal-900/50 border border-teal-700 text-teal-300 rounded-full"
+                            x-text="(tag.emoji||'🏷️') + ' ' + tag.name"></span>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Composite dimensions -->
+                <div class="space-y-3">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dimensions</p>
+                  <template x-for="dim in scorecardData.composite_dimensions" :key="dim.lens_id">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-4" x-data="{ open: false }">
+                      <div class="flex items-center gap-3 cursor-pointer" @click="open = !open">
+                        <span class="text-lg" x-text="dim.emoji || '📊'"></span>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-sm font-semibold text-slate-200" x-text="dim.lens_name"></span>
+                            <div class="flex items-center gap-2">
+                              <span class="text-xs font-mono" :class="scoreTextClass(dim.color)"
+                                    x-text="dim.score != null ? dotBar(dim.score) : '— no data'"></span>
+                              <span class="text-xs font-bold tabular-nums" :class="scoreTextClass(dim.color)"
+                                    x-text="dim.score != null ? dim.score + '/100' : '—'"></span>
+                              <span class="text-xs px-1.5 py-0.5 rounded border text-xs"
+                                    :class="'border-' + (dim.color||'slate') + '-700 text-' + (dim.color||'slate') + '-400'"
+                                    x-text="dim.label"></span>
+                            </div>
+                          </div>
+                          <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all" :class="scoreColorClass(dim.color)"
+                                 :style="'width:' + scoreBarWidth(dim.score)"></div>
+                          </div>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-500 flex-shrink-0 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      </div>
+                      <!-- Component breakdown -->
+                      <div x-show="open" class="mt-3 pt-3 border-t border-slate-700 space-y-2">
+                        <!-- Quantitative components -->
+                        <template x-for="comp in (dim.components||[])" :key="comp.screen">
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500" x-text="comp.screen + (comp.invert ? ' (inverted)' : '')"></span>
+                            <div class="flex items-center gap-3">
+                              <span class="text-slate-400" x-text="comp.available ? comp.effective_pct + '%' : 'no data'"></span>
+                              <span class="text-slate-500 w-16 text-right" x-text="'×' + Math.round(comp.weight * 100) + '%'"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <!-- Governance signals -->
+                        <template x-for="sig in (dim.signals||[])" :key="sig.field">
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500" x-text="sig.field"></span>
+                            <div class="flex items-center gap-2">
+                              <span x-show="sig.ai_needed && sig.value == null" class="text-xs text-violet-400">✦ AI needed</span>
+                              <span x-show="sig.value != null" :class="(sig.score||0) >= 70 ? 'text-emerald-400' : (sig.score||0) >= 40 ? 'text-amber-400' : 'text-red-400'"
+                                    x-text="sig.value"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <p x-show="dim.coverage_pct < 100" class="text-xs text-amber-400 mt-1">
+                          ⚠ <span x-text="dim.coverage_pct + '%'"></span> data coverage — run screener to compute missing screens.
+                        </p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Custom lenses -->
+                <div x-show="scorecardData.custom_lenses && scorecardData.custom_lenses.length" class="space-y-3">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Custom Lenses</p>
+                  <template x-for="cl in scorecardData.custom_lenses" :key="cl.id">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span x-text="cl.emoji || '🔧'"></span>
+                        <span class="text-sm text-slate-200" x-text="cl.name"></span>
+                        <span class="text-xs text-slate-500 font-mono" x-text="cl.expression"></span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span x-show="cl.error" class="text-xs text-red-400" x-text="cl.error"></span>
+                        <span x-show="!cl.error && cl.type === 'filter'"
+                              class="text-xs font-semibold px-2 py-0.5 rounded"
+                              :class="cl.passed ? 'bg-emerald-900/50 text-emerald-300' : 'bg-red-900/50 text-red-300'"
+                              x-text="cl.passed ? '✓ Pass' : '✗ Fail'"></span>
+                        <span x-show="!cl.error && cl.type === 'score'"
+                              class="text-xs font-bold" :class="(cl.score||0) >= 65 ? 'text-emerald-400' : 'text-amber-400'"
+                              x-text="cl.score + '/100'"></span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Raw screen scores reference -->
+                <div class="space-y-2">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Individual Screens</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <template x-for="[k, v] in Object.entries(scorecardData.raw_screens)" :key="k">
+                      <div class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2">
+                        <p class="text-xs text-slate-500 capitalize" x-text="k.replace('_', ' ')"></p>
+                        <p class="text-sm font-semibold mt-0.5"
+                           :class="(v.passed) ? 'text-emerald-400' : 'text-amber-400'"
+                           x-text="v.score != null ? (v.pct != null ? v.pct.toFixed(0) + '%' : v.score) : '—'"></p>
+                        <p class="text-xs text-slate-600" x-text="v.label || ''"></p>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+              </div>
+            </template>
           </div>
 
           <!-- More (AI) tabs — generic renderer for all extended research sections -->
@@ -3783,6 +3934,326 @@
 
       </div><!-- /trades -->
 
+      <!-- ════════════════════════════════════════════════════════════════
+           LENS LIBRARY
+           ════════════════════════════════════════════════════════════════ -->
+      <div x-show="page === 'lenses'" x-cloak class="space-y-6">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-100">Lens Library</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Your personal investment knowledge base — every framework, insight, and idea you accumulate over time becomes an executable lens.</p>
+          </div>
+        </div>
+
+        <!-- Tab bar -->
+        <div class="flex gap-2 flex-wrap border-b border-slate-700 pb-2">
+          <template x-for="[id, label, emoji] in [['composite','Composite Lenses','📐'],['thematic','Thematic Lists','🏷️'],['ideas','Ideas Inbox','💡'],['custom','Custom Formulas','🔧']]" :key="id">
+            <button @click="lensActiveTab = id"
+                    :class="lensActiveTab === id ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
+              <span x-text="emoji"></span><span x-text="label"></span>
+              <span x-show="id==='composite'" class="text-xs opacity-70" x-text="'(' + lensCompositeLenses.length + ')'"></span>
+              <span x-show="id==='thematic'" class="text-xs opacity-70" x-text="'(' + lensThematics.length + ')'"></span>
+              <span x-show="id==='ideas'" class="text-xs opacity-70" x-text="'(' + lensIdeas.length + ')'"></span>
+              <span x-show="id==='custom'" class="text-xs opacity-70" x-text="'(' + lensCustom.length + ')'"></span>
+            </button>
+          </template>
+        </div>
+
+        <!-- ── COMPOSITE LENSES ────────────────────────────────────────────── -->
+        <div x-show="lensActiveTab === 'composite'" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-400">Weighted combinations of quantitative screens — each encodes a dimension of stock quality. Applied in the per-stock Scorecard tab.</p>
+            <button @click="openLensForm('composite')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Composite</button>
+          </div>
+          <template x-for="lens in lensCompositeLenses" :key="lens.id">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5" x-data="{ open: false }">
+              <div class="flex items-start justify-between cursor-pointer" @click="open = !open">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl" x-text="lens.emoji || '📐'"></span>
+                  <div>
+                    <p class="font-semibold text-slate-100" x-text="lens.name"></p>
+                    <p class="text-xs text-slate-400 mt-0.5" x-text="lens.description"></p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <span x-show="lens.requires_ai_research" class="text-xs text-violet-400">✦ AI</span>
+                  <span class="text-xs text-slate-500" x-text="(lens.components||[]).length + ' components'"></span>
+                  <button @click.stop="openLensForm('composite', lens)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
+                  <button @click.stop="deleteLens('composite', lens.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                  <svg class="w-4 h-4 text-slate-500 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div x-show="open" class="mt-4 pt-4 border-t border-slate-700 space-y-3">
+                <p class="text-xs text-slate-500 italic" x-text="'Source: ' + (lens.source || '—')"></p>
+                <div class="space-y-1">
+                  <template x-for="comp in (lens.components||[])" :key="comp.screen">
+                    <div class="flex items-center justify-between text-xs bg-slate-900/50 rounded-lg px-3 py-2">
+                      <span class="text-slate-300 font-mono" x-text="comp.screen"></span>
+                      <span class="text-slate-500" x-text="(comp.invert ? 'inverted · ' : '') + (comp.weight * 100).toFixed(0) + '% weight'"></span>
+                      <span class="text-slate-600 italic" x-text="comp.note || ''"></span>
+                    </div>
+                  </template>
+                </div>
+                <template x-for="qf in (lens.qualitative_fields||[])" :key="qf.field">
+                  <div class="flex items-center justify-between text-xs bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-800/30">
+                    <span class="text-violet-300 font-mono" x-text="qf.field"></span>
+                    <span class="text-violet-400 text-xs">✦ qualitative</span>
+                    <span class="text-slate-600 italic" x-text="qf.note || ''"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+          <p x-show="lensCompositeLenses.length === 0" class="text-slate-500 text-sm text-center py-8">No composite lenses defined.</p>
+        </div>
+
+        <!-- ── THEMATIC LISTS ──────────────────────────────────────────────── -->
+        <div x-show="lensActiveTab === 'thematic'" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-400">Curated stock lists by investment theme. Membership is manual — you decide which stocks belong. Tags appear in the per-stock Scorecard.</p>
+            <button @click="openLensForm('thematic')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Theme</button>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <template x-for="theme in lensThematics" :key="theme.id">
+              <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+                <div class="flex items-start justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl" x-text="theme.emoji || '🏷️'"></span>
+                    <div>
+                      <p class="font-semibold text-slate-100" x-text="theme.name"></p>
+                      <p class="text-xs text-slate-400" x-text="(theme.symbols||[]).length + ' stocks'"></p>
+                    </div>
+                  </div>
+                  <div class="flex gap-1">
+                    <button @click="openLensForm('thematic', theme)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
+                    <button @click="deleteLens('thematic', theme.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-400 mb-3" x-text="theme.description"></p>
+                <p class="text-xs text-slate-600 italic mb-3" x-text="theme.source ? 'Source: ' + theme.source : ''"></p>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="sym in (theme.symbols||[])" :key="sym">
+                    <span class="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full cursor-pointer hover:bg-slate-600"
+                          @click="perStockSymbol = sym; go('per_stock')"
+                          x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+          <p x-show="lensThematics.length === 0" class="text-slate-500 text-sm text-center py-8">No thematic lists yet. Start adding ideas from articles, reports, or your own observations.</p>
+        </div>
+
+        <!-- ── IDEAS INBOX ─────────────────────────────────────────────────── -->
+        <div x-show="lensActiveTab === 'ideas'" class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <p class="text-xs text-slate-400">Raw investment ideas — from articles, books, podcasts, or your own observations. Capture first, formalize later.</p>
+            <button @click="openLensForm('ideas')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ Capture Idea</button>
+          </div>
+          <!-- Status filter -->
+          <div class="flex gap-2 flex-wrap">
+            <template x-for="[val, label] in [['all','All'],['raw','Raw'],['exploring','Exploring'],['promoted','Promoted'],['dismissed','Dismissed']]" :key="val">
+              <button @click="lensIdeaFilter = val"
+                      :class="lensIdeaFilter === val ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
+                      class="px-3 py-1 rounded-lg text-xs font-medium transition" x-text="label"></button>
+            </template>
+          </div>
+          <div class="space-y-3">
+            <template x-for="idea in lensIdeasFiltered()" :key="idea.id">
+              <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5" x-data="{ open: false }">
+                <div class="flex items-start justify-between cursor-pointer" @click="open = !open">
+                  <div class="flex-1 min-w-0 pr-4">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-xs px-2 py-0.5 rounded-full border"
+                            :class="{ raw: 'border-slate-600 text-slate-400', exploring: 'border-amber-600 text-amber-400', promoted: 'border-emerald-600 text-emerald-400', dismissed: 'border-slate-700 text-slate-600' }[idea.status]"
+                            x-text="idea.status"></span>
+                      <span class="text-xs text-slate-600" x-text="idea.source_type"></span>
+                      <span class="text-xs text-slate-600" x-text="idea.created_at ? idea.created_at.slice(0,10) : ''"></span>
+                    </div>
+                    <p class="font-semibold text-slate-100" x-text="idea.title"></p>
+                    <p class="text-xs text-slate-400 mt-0.5 line-clamp-2" x-text="idea.hypothesis"></p>
+                  </div>
+                  <svg class="w-4 h-4 text-slate-500 flex-shrink-0 transition-transform mt-1" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <div x-show="open" class="mt-4 pt-4 border-t border-slate-700 space-y-3">
+                  <p x-show="idea.hypothesis" class="text-sm text-slate-300 leading-relaxed" x-text="idea.hypothesis"></p>
+                  <p x-show="idea.source" class="text-xs text-slate-500 italic" x-text="'Source: ' + idea.source"></p>
+                  <p x-show="idea.notes" class="text-xs text-slate-400" x-text="idea.notes"></p>
+                  <div x-show="idea.symbols && idea.symbols.length" class="flex flex-wrap gap-1.5">
+                    <span class="text-xs text-slate-500">Related stocks:</span>
+                    <template x-for="sym in (idea.symbols||[])" :key="sym">
+                      <span class="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full cursor-pointer hover:bg-slate-600"
+                            @click="perStockSymbol = sym; go('per_stock')"
+                            x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                    </template>
+                  </div>
+                  <div class="flex items-center gap-2 pt-1 flex-wrap">
+                    <span class="text-xs text-slate-500">Move to:</span>
+                    <button @click="updateIdeaStatus(idea.id, 'raw')" :disabled="idea.status === 'raw'"
+                            class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-slate-300 rounded transition">Raw</button>
+                    <button @click="updateIdeaStatus(idea.id, 'exploring')" :disabled="idea.status === 'exploring'"
+                            class="text-xs px-2 py-1 bg-amber-900/50 hover:bg-amber-800/50 disabled:opacity-30 text-amber-300 rounded transition">Exploring</button>
+                    <button @click="updateIdeaStatus(idea.id, 'promoted')" :disabled="idea.status === 'promoted'"
+                            class="text-xs px-2 py-1 bg-emerald-900/50 hover:bg-emerald-800/50 disabled:opacity-30 text-emerald-300 rounded transition">Promoted</button>
+                    <button @click="updateIdeaStatus(idea.id, 'dismissed')" :disabled="idea.status === 'dismissed'"
+                            class="text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-500 rounded transition">Dismiss</button>
+                    <span class="ml-auto flex gap-2">
+                      <button @click="openLensForm('ideas', idea)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
+                      <button @click="deleteLens('ideas', idea.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+          <p x-show="lensIdeasFiltered().length === 0" class="text-slate-500 text-sm text-center py-8">No ideas yet. Read an article? Hear a thesis? Capture it here.</p>
+        </div>
+
+        <!-- ── CUSTOM FORMULAS ─────────────────────────────────────────────── -->
+        <div x-show="lensActiveTab === 'custom'" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-slate-400">Python-safe expressions evaluated against each stock's metrics. Build filters or scoring formulas from any available field.</p>
+            <button @click="openLensForm('custom')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Formula</button>
+          </div>
+          <template x-for="lens in lensCustom" :key="lens.id">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="text-xl" x-text="lens.emoji || '🔧'"></span>
+                  <div>
+                    <p class="font-semibold text-slate-100" x-text="lens.name"></p>
+                    <p class="text-xs text-slate-400 mt-0.5" x-text="lens.description"></p>
+                  </div>
+                </div>
+                <div class="flex gap-1">
+                  <span class="text-xs px-2 py-0.5 rounded border border-slate-600 text-slate-400" x-text="lens.type"></span>
+                  <button @click="openLensForm('custom', lens)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
+                  <button @click="deleteLens('custom', lens.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                </div>
+              </div>
+              <div class="mt-3 bg-slate-900/70 rounded-lg px-4 py-2.5 font-mono text-sm text-emerald-300 border border-slate-700" x-text="lens.expression"></div>
+              <p x-show="lens.source" class="text-xs text-slate-600 italic mt-2" x-text="'Source: ' + lens.source"></p>
+            </div>
+          </template>
+          <!-- Available fields reference -->
+          <details class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+            <summary class="text-xs font-semibold text-slate-400 cursor-pointer">Available fields for expressions (<span x-text="lensCustomFields.length"></span> total)</summary>
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              <template x-for="f in lensCustomFields" :key="f">
+                <span class="text-xs font-mono px-2 py-0.5 bg-slate-700 text-slate-300 rounded cursor-pointer hover:bg-slate-600"
+                      @click="lensForm.expression = (lensForm.expression||'') + f" x-text="f"></span>
+              </template>
+            </div>
+          </details>
+          <p x-show="lensCustom.length === 0" class="text-slate-500 text-sm text-center py-8">No custom formulas yet. Examples: <code class="text-teal-400">roe > 0.20 and debt_to_equity < 0.3</code> or <code class="text-teal-400">roe * 40 + fcf_conversion * 30 + (1 - debt_to_equity) * 30</code></p>
+        </div>
+
+        <!-- ════ LENS FORM MODAL ════════════════════════════════════════════ -->
+        <div x-show="lensFormOpen"
+             class="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-4 px-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
+             @keydown.escape.window="lensFormOpen = false">
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+              <h2 class="text-base font-semibold text-slate-100" x-text="{composite:'Composite Lens', thematic:'Thematic List', ideas:'Capture Idea', custom:'Custom Formula'}[lensFormType] || 'Lens'"></h2>
+              <button @click="lensFormOpen = false" class="text-slate-500 hover:text-slate-300 text-xl">&times;</button>
+            </div>
+            <div class="px-6 py-5 space-y-4">
+
+              <!-- Shared: emoji + name -->
+              <div class="grid grid-cols-5 gap-3">
+                <div class="col-span-1">
+                  <label class="text-xs text-slate-400 block mb-1">Emoji</label>
+                  <input x-model="lensForm.emoji" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500 text-center" placeholder="🏷️" />
+                </div>
+                <div class="col-span-4">
+                  <label class="text-xs text-slate-400 block mb-1" x-text="lensFormType === 'ideas' ? 'Title' : 'Name'"></label>
+                  <input x-model="lensForm[lensFormType === 'ideas' ? 'title' : 'name']"
+                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                         placeholder="e.g. AI Supply Chain India" />
+                </div>
+              </div>
+
+              <!-- Description / hypothesis -->
+              <div>
+                <label class="text-xs text-slate-400 block mb-1" x-text="lensFormType === 'ideas' ? 'Hypothesis' : 'Description'"></label>
+                <textarea x-model="lensForm[lensFormType === 'ideas' ? 'hypothesis' : 'description']" rows="2"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          placeholder="What is this lens measuring? What insight does it encode?"></textarea>
+              </div>
+
+              <!-- Source -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs text-slate-400 block mb-1">Source</label>
+                  <input x-model="lensForm.source" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                         placeholder="Book, article, podcast…" />
+                </div>
+                <!-- Ideas: source type -->
+                <div x-show="lensFormType === 'ideas'">
+                  <label class="text-xs text-slate-400 block mb-1">Source Type</label>
+                  <select x-model="lensForm.source_type" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="article">Article</option>
+                    <option value="book">Book</option>
+                    <option value="podcast">Podcast</option>
+                    <option value="observation">Personal Observation</option>
+                    <option value="earnings_call">Earnings Call</option>
+                  </select>
+                </div>
+                <!-- Custom: type -->
+                <div x-show="lensFormType === 'custom'">
+                  <label class="text-xs text-slate-400 block mb-1">Output Type</label>
+                  <select x-model="lensForm.type" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="filter">Filter (pass/fail)</option>
+                    <option value="score">Score (0-100)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Thematic / Ideas: symbols -->
+              <div x-show="lensFormType === 'thematic' || lensFormType === 'ideas'">
+                <label class="text-xs text-slate-400 block mb-1">Symbols (one per line or comma-separated)</label>
+                <textarea x-model="lensForm._symbolsText" rows="3"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          placeholder="KAYNES.NS&#10;DIXON.NS&#10;TATAELXSI.NS"></textarea>
+              </div>
+
+              <!-- Custom: expression -->
+              <div x-show="lensFormType === 'custom'">
+                <label class="text-xs text-slate-400 block mb-1">Expression</label>
+                <textarea x-model="lensForm.expression" rows="3"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none bg-slate-950"
+                          placeholder="roe > 0.20 and debt_to_equity < 0.3 and piotroski_pct > 55"></textarea>
+                <p class="text-xs text-slate-600 mt-1">Click any field name below to insert it.</p>
+                <div class="flex flex-wrap gap-1 mt-2 max-h-24 overflow-y-auto">
+                  <template x-for="f in lensCustomFields" :key="f">
+                    <span class="text-xs font-mono px-1.5 py-0.5 bg-slate-700 text-slate-400 rounded cursor-pointer hover:bg-slate-600 hover:text-slate-200"
+                          @click="lensForm.expression = (lensForm.expression||'') + f" x-text="f"></span>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Ideas: notes -->
+              <div x-show="lensFormType === 'ideas'">
+                <label class="text-xs text-slate-400 block mb-1">Notes</label>
+                <textarea x-model="lensForm.notes" rows="2"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          placeholder="Any follow-up actions, things to check…"></textarea>
+              </div>
+
+            </div>
+            <div class="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">
+              <button @click="lensFormOpen = false" class="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
+              <button @click="saveLensForm()"
+                      class="px-5 py-2 text-sm font-medium bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition">Save</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /lenses -->
+
       <!-- Watchlist -->
       <div x-show="page === 'watchlist'" x-cloak class="space-y-4">
         <div class="flex items-center justify-between">
@@ -3954,7 +4425,7 @@
         reportPeriods: ['All periods', '31st March 2025'],
         counts: {},
         tickers: [],
-        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', watchlist: 'Watchlist' },
+        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', lenses: 'Lens Library', watchlist: 'Watchlist' },
         tabulators: {},
         loading: false,
         allStocksRows: [],
@@ -4096,7 +4567,21 @@
           exit_target: '', exit_stop: '', exit_horizon: '', exit_trigger: '',
           thesis_section: '',
         },
-        usdInrRate: null,
+        // Lens Library state
+        scorecardData: null,
+        scorecardLoading: false,
+        scorecardSymbol: '',
+        lensCompositeLenses: [],
+        lensThematics: [],
+        lensIdeas: [],
+        lensCustom: [],
+        lensActiveTab: 'composite',   // composite | thematic | ideas | custom
+        lensFormOpen: false,
+        lensFormType: null,           // type of form open
+        lensForm: {},
+        lensIdeaFilter: 'all',
+        lensCustomFields: [],
+                usdInrRate: null,
         usdInrUpdated: '',
         personalIndexHoldingsRows: [],
         watchlistText: '',
@@ -4140,6 +4625,11 @@
           await this.fetchCounts();
           await this.fetchSymbolsMissing();
           await this.fetchCacheStatus();
+          // Restore stockFilters from localStorage (merge so new keys keep defaults)
+          const savedFilters = this.lsGetJSON('stockFilters', null);
+          if (savedFilters) this.stockFilters = { ...this.stockFilters, ...savedFilters };
+          // Persist stockFilters whenever they change
+          this.$watch('stockFilters', v => this.lsSetJSON('stockFilters', v), { deep: true });
           this.onPageChange();
         },
         async fetchSettings() {
@@ -4424,6 +4914,115 @@
             this.fetchTrades();
             if (!this.tradePositions.length) this.fetchTradePositions();
           }
+          else if (this.page === 'lenses') {
+            this.fetchLensLibrary();
+          }
+        },
+
+        // ── Lens Library ─────────────────────────────────────────────────────
+        async fetchLensLibrary() {
+          const [comp, them, ideas, cust, fields] = await Promise.all([
+            fetch(API + '/lenses/composite').then(r => r.json()),
+            fetch(API + '/lenses/thematic').then(r => r.json()),
+            fetch(API + '/lenses/ideas').then(r => r.json()),
+            fetch(API + '/lenses/custom').then(r => r.json()),
+            fetch(API + '/lenses/custom/fields').then(r => r.json()),
+          ]);
+          this.lensCompositeLenses = comp.lenses || [];
+          this.lensThematics = them.themes || [];
+          this.lensIdeas = ideas.ideas || [];
+          this.lensCustom = cust.lenses || [];
+          this.lensCustomFields = fields.fields || [];
+        },
+        async fetchScorecard(symbol) {
+          if (!symbol) return;
+          this.scorecardLoading = true;
+          this.scorecardData = null;
+          this.scorecardSymbol = symbol;
+          try {
+            const r = await fetch(API + '/scorecard/' + encodeURIComponent(symbol) + '?market=' + this.market).then(r => r.json());
+            this.scorecardData = r;
+          } catch(e) { console.error(e); }
+          finally { this.scorecardLoading = false; }
+        },
+        scoreBarWidth(score) {
+          return score != null ? Math.round(score) + '%' : '0%';
+        },
+        scoreColorClass(color) {
+          const map = {
+            emerald: 'bg-emerald-500', teal: 'bg-teal-500',
+            amber: 'bg-amber-500', orange: 'bg-orange-500', red: 'bg-red-500', slate: 'bg-slate-600'
+          };
+          return map[color] || 'bg-slate-500';
+        },
+        scoreTextClass(color) {
+          const map = {
+            emerald: 'text-emerald-400', teal: 'text-teal-400',
+            amber: 'text-amber-400', orange: 'text-orange-400', red: 'text-red-400', slate: 'text-slate-400'
+          };
+          return map[color] || 'text-slate-400';
+        },
+        dotBar(score) {
+          if (score == null) return '○○○○○○○○○○';
+          const filled = Math.round(score / 10);
+          return '●'.repeat(filled) + '○'.repeat(10 - filled);
+        },
+        openLensForm(type, existing = null) {
+          this.lensFormType = type;
+          if (existing) {
+            this.lensForm = JSON.parse(JSON.stringify(existing));
+            // Normalise symbols array to newline-joined string for textarea
+            if (Array.isArray(this.lensForm.symbols)) this.lensForm._symbolsText = this.lensForm.symbols.join('
+');
+          } else {
+            const defaults = {
+              thematic: { name: '', emoji: '🏷️', description: '', source: '', symbols: [], _symbolsText: '', tags: [] },
+              ideas: { title: '', hypothesis: '', source: '', source_type: 'article', status: 'raw', symbols: [], _symbolsText: '', notes: '' },
+              custom: { name: '', emoji: '🔧', description: '', source: '', expression: '', type: 'filter' },
+              composite: { name: '', emoji: '📐', description: '', source: '', components: [], thresholds: [] },
+            };
+            this.lensForm = defaults[type] || {};
+          }
+          this.lensFormOpen = true;
+        },
+        async saveLensForm() {
+          const type = this.lensFormType;
+          const form = { ...this.lensForm };
+          // Convert _symbolsText back to symbols array
+          if (form._symbolsText !== undefined) {
+            form.symbols = form._symbolsText.split(/[
+,]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+            delete form._symbolsText;
+          }
+          try {
+            await fetch(API + '/lenses/' + type, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(form),
+            }).then(r => r.json());
+            this.lensFormOpen = false;
+            this.fetchLensLibrary();
+          } catch(e) { alert('Save failed: ' + e.message); }
+        },
+        async deleteLens(type, id) {
+          if (!confirm('Delete this lens?')) return;
+          await fetch(API + '/lenses/' + type + '/' + id, { method: 'DELETE' });
+          this.fetchLensLibrary();
+        },
+        async updateIdeaStatus(id, status) {
+          await fetch(API + '/lenses/ideas/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status }),
+          });
+          this.fetchLensLibrary();
+        },
+        ideaStatusColor(s) {
+          return { raw: 'text-slate-400', exploring: 'text-amber-400', promoted: 'text-emerald-400', dismissed: 'text-slate-600' }[s] || 'text-slate-400';
+        },
+        lensIdeasFiltered() {
+          if (this.lensIdeaFilter === 'all') return this.lensIdeas;
+          return this.lensIdeas.filter(i => i.status === this.lensIdeaFilter);
         },
 
         // ── Trade Journal ────────────────────────────────────────────────────
@@ -4577,9 +5176,11 @@
         },
         fmtPct(v, digits = 1) { return v == null || isNaN(v) ? '—' : (Number(v) * 100).toFixed(digits) + '%'; },
         fmtMoney(v) { return v == null || isNaN(v) ? '—' : '₹' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }); },
-        // ── Session storage helpers (tab-switching state, not settings) ───
-        sessionSet(key, val) { try { sessionStorage.setItem('inv_' + key, val == null ? '' : String(val)); } catch(_) {} },
-        sessionGet(key) { try { return sessionStorage.getItem('inv_' + key) || ''; } catch(_) { return ''; } },
+        // ── Local storage helpers (persists across browser restarts) ────────
+        sessionSet(key, val) { try { localStorage.setItem('inv_' + key, val == null ? '' : String(val)); } catch(_) {} },
+        sessionGet(key) { try { return localStorage.getItem('inv_' + key) || ''; } catch(_) { return ''; } },
+        lsSetJSON(key, val) { try { localStorage.setItem('inv_' + key, JSON.stringify(val)); } catch(_) {} },
+        lsGetJSON(key, fallback) { try { const s = localStorage.getItem('inv_' + key); return s ? JSON.parse(s) : fallback; } catch(_) { return fallback; } },
         // Generic number formatter — trims trailing zeros, handles null/NaN/Inf
         fmtNum(v, decimals = 2) {
           if (v == null) return '—';

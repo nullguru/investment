@@ -1,0 +1,128 @@
+[
+  {
+    "id": "financial_quality",
+    "name": "Financial Quality",
+    "emoji": "💎",
+    "description": "Overall business quality: profitability, cash generation, financial strength, and valuation efficiency.",
+    "source": "4-dimension quality framework (ROE, FCF conversion, D/E, PEG)",
+    "components": [
+      {"screen": "quality",    "field": "pct",  "weight": 0.45, "invert": false, "note": "Quality score 0-100"},
+      {"screen": "piotroski",  "field": "pct",  "weight": 0.35, "invert": false, "note": "F-Score 0-9 → 0-100%"},
+      {"screen": "red_flags",  "field": "pct",  "weight": 0.20, "invert": true,  "note": "Red flags: fewer = better, so invert"}
+    ],
+    "thresholds": [
+      {"label": "Exceptional", "min": 80, "color": "emerald"},
+      {"label": "Good",        "min": 65, "color": "teal"},
+      {"label": "Fair",        "min": 50, "color": "amber"},
+      {"label": "Weak",        "min": 35, "color": "orange"},
+      {"label": "Poor",        "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true
+  },
+  {
+    "id": "earnings_integrity",
+    "name": "Earnings Integrity",
+    "emoji": "🔍",
+    "description": "How trustworthy are the reported numbers? Detects manipulation, aggressive accruals, and sudden ratio changes.",
+    "source": "Beneish M-Score (earnings manipulation) + Piotroski accruals signal + Red Flag accruals",
+    "components": [
+      {"screen": "beneish_m",  "field": "pct",  "weight": 0.60, "invert": false, "note": "M-Score: higher pct = cleaner books (already inverted in screen)"},
+      {"screen": "piotroski",  "field": "pct",  "weight": 0.25, "invert": false, "note": "Piotroski includes accruals quality signal"},
+      {"screen": "red_flags",  "field": "pct",  "weight": 0.15, "invert": true,  "note": "Red flags: invert"}
+    ],
+    "thresholds": [
+      {"label": "Exceptional", "min": 80, "color": "emerald"},
+      {"label": "Good",        "min": 65, "color": "teal"},
+      {"label": "Fair",        "min": 50, "color": "amber"},
+      {"label": "Weak",        "min": 35, "color": "orange"},
+      {"label": "Poor",        "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true
+  },
+  {
+    "id": "safety_solvency",
+    "name": "Safety & Solvency",
+    "emoji": "🛡️",
+    "description": "Bankruptcy risk and balance sheet resilience. Can the company survive a downturn?",
+    "source": "Altman Z-Score (5-variable bankruptcy model) + Red Flags (FCF, debt signals)",
+    "components": [
+      {"screen": "altman_z",  "field": "pct",  "weight": 0.65, "invert": false, "note": "Z-Score: higher = safer"},
+      {"screen": "red_flags", "field": "pct",  "weight": 0.35, "invert": true,  "note": "Fewer red flags = safer"}
+    ],
+    "thresholds": [
+      {"label": "Exceptional", "min": 80, "color": "emerald"},
+      {"label": "Good",        "min": 65, "color": "teal"},
+      {"label": "Fair",        "min": 50, "color": "amber"},
+      {"label": "Weak",        "min": 35, "color": "orange"},
+      {"label": "Poor",        "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true
+  },
+  {
+    "id": "valuation",
+    "name": "Valuation",
+    "emoji": "💰",
+    "description": "Is the stock cheap relative to its earnings power and book value? Combines formula-based and earnings-yield approaches.",
+    "source": "Greenblatt Magic Formula (ROCE + Earnings Yield) + Graham Number margin of safety",
+    "components": [
+      {"screen": "magic_formula", "field": "pct", "weight": 0.55, "invert": false, "note": "Quality-at-price: higher = better"},
+      {"screen": "graham_number", "field": "pct", "weight": 0.45, "invert": false, "note": "Margin of safety vs Graham Number"}
+    ],
+    "thresholds": [
+      {"label": "Exceptional", "min": 80, "color": "emerald"},
+      {"label": "Good",        "min": 65, "color": "teal"},
+      {"label": "Fair",        "min": 50, "color": "amber"},
+      {"label": "Weak",        "min": 35, "color": "orange"},
+      {"label": "Poor",        "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true
+  },
+  {
+    "id": "momentum_timing",
+    "name": "Momentum & Timing",
+    "emoji": "📈",
+    "description": "Entry timing signals: how far is the stock from highs/lows, 200 DMA position, and RSI. Useful for dip-buying quality stocks.",
+    "source": "Momentum screen: 52W high discount + vs 200 DMA + RSI. Low score = oversold = better entry.",
+    "components": [
+      {"screen": "momentum", "field": "pct", "weight": 1.0, "invert": true, "note": "Momentum screen: low = oversold = good entry → invert so high score = good entry opportunity"}
+    ],
+    "thresholds": [
+      {"label": "Deeply oversold (best entry)", "min": 70, "color": "emerald"},
+      {"label": "Oversold",                     "min": 55, "color": "teal"},
+      {"label": "Neutral",                      "min": 40, "color": "amber"},
+      {"label": "Extended",                     "min": 20, "color": "orange"},
+      {"label": "Overbought",                   "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true
+  },
+  {
+    "id": "corporate_governance",
+    "name": "Corporate Governance",
+    "emoji": "🏛️",
+    "description": "India-specific governance health: pledged shares, board independence, promoter trend, RPT abuse, auditor quality. Partially AI-filled.",
+    "source": "SEBI Governance Framework + Kotak Institutional research on India RPT patterns + Forensic accounting signals",
+    "components": [],
+    "qualitative_fields": [
+      {"field": "pledgedSharesPct",         "section": "overview",  "weight": 0.25, "good_below": 5,  "bad_above": 20, "note": "Promoter pledge: >20% is a red flag"},
+      {"field": "boardIndependencePct",     "section": "overview",  "weight": 0.20, "good_above": 50, "bad_below": 33, "note": "SEBI requires >50% independent directors for listed cos"},
+      {"field": "promoterHolding",          "section": "overview",  "weight": 0.15, "good_above": 40, "bad_below": 25, "note": "Promoter skin in the game"},
+      {"field": "relatedPartyTransactions", "section": "overview",  "weight": 0.20, "good_below": 5,  "bad_above": 15, "note": "RPT as % of revenue: >15% is abusive"},
+      {"field": "forensic_score",           "section": "research",  "weight": 0.20, "note": "From AI forensic research section (0-10 sub-score)"}
+    ],
+    "thresholds": [
+      {"label": "Exceptional", "min": 80, "color": "emerald"},
+      {"label": "Good",        "min": 65, "color": "teal"},
+      {"label": "Fair",        "min": 50, "color": "amber"},
+      {"label": "Weak",        "min": 35, "color": "orange"},
+      {"label": "Poor",        "min": 0,  "color": "red"}
+    ],
+    "created_at": "2026-06-03",
+    "active": true,
+    "requires_ai_research": true
+  }
+]

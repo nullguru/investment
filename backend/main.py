@@ -1273,6 +1273,183 @@ def api_cache_status(market: str = Query("india")):
 
 
 # =============================================================================
+# LENS LIBRARY
+# =============================================================================
+
+from modules.lenses import (
+    load_composite_lenses, save_composite_lens, compute_composite_score,
+    load_thematics, save_thematic, delete_thematic, get_symbol_themes,
+    load_ideas, save_idea, delete_idea, update_idea,
+    load_custom_lenses, save_custom_lens, delete_custom_lens, evaluate_custom_lens,
+    compute_scorecard,
+)
+
+
+class ThematicBody(BaseModel):
+    id: str | None = None
+    name: str
+    emoji: str = "🏷️"
+    description: str = ""
+    source: str = ""
+    symbols: list = []
+    tags: list = []
+    active: bool = True
+
+
+class IdeaBody(BaseModel):
+    id: str | None = None
+    title: str
+    hypothesis: str = ""
+    source: str = ""
+    source_type: str = "article"    # article | book | podcast | observation | earnings_call
+    status: str = "raw"             # raw | exploring | promoted | dismissed
+    symbols: list = []
+    notes: str = ""
+
+
+class CustomLensBody(BaseModel):
+    id: str | None = None
+    name: str
+    emoji: str = "🔧"
+    description: str = ""
+    source: str = ""
+    expression: str                 # Python-safe expression using AVAILABLE_FIELDS
+    type: str = "filter"            # filter | score
+    active: bool = True
+
+
+class CompositeLensBody(BaseModel):
+    id: str | None = None
+    name: str
+    emoji: str = "📐"
+    description: str = ""
+    source: str = ""
+    components: list = []
+    thresholds: list = []
+    active: bool = True
+
+
+# ── Scorecard ─────────────────────────────────────────────────────────────────
+
+@app.get("/api/scorecard/{symbol}")
+def api_scorecard(symbol: str, market: str = Query("india")):
+    """Full investment scorecard for a symbol — all lenses applied."""
+    return compute_scorecard(symbol.upper(), market=market)
+
+
+# ── Composite lenses ──────────────────────────────────────────────────────────
+
+@app.get("/api/lenses/composite")
+def api_list_composite():
+    return {"lenses": load_composite_lenses()}
+
+
+@app.post("/api/lenses/composite")
+def api_save_composite(body: CompositeLensBody):
+    return save_composite_lens(body.dict())
+
+
+@app.delete("/api/lenses/composite/{lens_id}")
+def api_delete_composite(lens_id: str):
+    ok = delete_composite_lens(lens_id)
+    if not ok: raise HTTPException(404, "Lens not found")
+    return {"ok": True}
+
+
+@app.get("/api/lenses/composite/{lens_id}/score/{symbol}")
+def api_composite_score(lens_id: str, symbol: str, market: str = Query("india")):
+    lenses = load_composite_lenses()
+    lens = next((l for l in lenses if l["id"] == lens_id), None)
+    if not lens: raise HTTPException(404, "Lens not found")
+    from modules.lenses.composite import compute_composite_score, compute_governance_score
+    if lens_id == "corporate_governance":
+        return compute_governance_score(symbol.upper())
+    return compute_composite_score(lens, symbol.upper())
+
+
+# ── Thematic lenses ───────────────────────────────────────────────────────────
+
+@app.get("/api/lenses/thematic")
+def api_list_thematic():
+    return {"themes": load_thematics()}
+
+
+@app.post("/api/lenses/thematic")
+def api_save_thematic(body: ThematicBody):
+    return save_thematic(body.dict())
+
+
+@app.delete("/api/lenses/thematic/{theme_id}")
+def api_delete_thematic(theme_id: str):
+    ok = delete_thematic(theme_id)
+    if not ok: raise HTTPException(404, "Theme not found")
+    return {"ok": True}
+
+
+# ── Ideas ─────────────────────────────────────────────────────────────────────
+
+@app.get("/api/lenses/ideas")
+def api_list_ideas(status: str = Query(None)):
+    ideas = load_ideas()
+    if status:
+        ideas = [i for i in ideas if i.get("status") == status]
+    return {"ideas": ideas}
+
+
+@app.post("/api/lenses/ideas")
+def api_save_idea(body: IdeaBody):
+    return save_idea(body.dict())
+
+
+@app.patch("/api/lenses/ideas/{idea_id}")
+def api_update_idea(idea_id: str, body: dict):
+    result = update_idea(idea_id, body)
+    if not result: raise HTTPException(404, "Idea not found")
+    return result
+
+
+@app.delete("/api/lenses/ideas/{idea_id}")
+def api_delete_idea(idea_id: str):
+    ok = delete_idea(idea_id)
+    if not ok: raise HTTPException(404, "Idea not found")
+    return {"ok": True}
+
+
+# ── Custom lenses ─────────────────────────────────────────────────────────────
+
+@app.get("/api/lenses/custom")
+def api_list_custom():
+    return {"lenses": load_custom_lenses()}
+
+
+@app.post("/api/lenses/custom")
+def api_save_custom(body: CustomLensBody):
+    return save_custom_lens(body.dict())
+
+
+@app.delete("/api/lenses/custom/{lens_id}")
+def api_delete_custom(lens_id: str):
+    ok = delete_custom_lens(lens_id)
+    if not ok: raise HTTPException(404, "Lens not found")
+    return {"ok": True}
+
+
+@app.get("/api/lenses/custom/{lens_id}/evaluate/{symbol}")
+def api_evaluate_custom(lens_id: str, symbol: str):
+    lenses = load_custom_lenses()
+    lens = next((l for l in lenses if l["id"] == lens_id), None)
+    if not lens: raise HTTPException(404, "Lens not found")
+    return evaluate_custom_lens(lens, symbol.upper())
+
+
+@app.get("/api/lenses/custom/fields")
+def api_custom_fields():
+    """Return all fields available in custom lens expressions."""
+    from modules.lenses.custom import AVAILABLE_FIELDS
+    return {"fields": AVAILABLE_FIELDS}
+
+
+# =============================================================================
 # TRADE LEDGER
 # =============================================================================
 
