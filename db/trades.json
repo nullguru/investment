@@ -1,0 +1,55 @@
+[
+  {
+    "symbol": "INFY.NS",
+    "action": "BUY",
+    "units": 24.0,
+    "price": 1549.0,
+    "currency": "INR",
+    "date": "2024-11-15",
+    "status": "executed",
+    "conviction": "high",
+    "pre_trade_check": {
+      "symbol": "INFY.NS",
+      "action": "BUY",
+      "check_price": 1549.0,
+      "sharia_status": "Compliant",
+      "sharia_detail": {
+        "debt_to_equity": 0.10530849574674275,
+        "cash_to_assets": 19.09,
+        "non_halal_revenue": 0.0,
+        "industry_compliant": true,
+        "period": "2025-12-31"
+      },
+      "quality_score": null,
+      "quality_label": null,
+      "red_flag_count": null,
+      "red_flags_detail": [],
+      "piotroski_score": 5.0,
+      "vs_200dma_pct": null,
+      "dcf_mos_pct": null,
+      "thesis_snippet": null,
+      "current_position": null,
+      "warnings": [],
+      "blocks": []
+    },
+    "reasoning": "Entering after Q3 beat. Trading below 200 DMA. Long-term IT services moat intact. WACC stress-tested at 14%.",
+    "thesis_section": "",
+    "risks_acknowledged": [
+      "USD/INR headwind if rupee strengthens",
+      "Deal ramp delays in BFSI vertical"
+    ],
+    "exit_plan": {
+      "target_price": 1900,
+      "stop_loss": 1350,
+      "horizon": "18-24 months",
+      "exit_trigger": "If D/E crosses 0.5 or Sharia fails 2 consecutive periods"
+    },
+    "emotion_check": "patient",
+    "outcome_notes": "",
+    "closed_at": "",
+    "id": "b70a2291",
+    "created_at": "2026-06-03T14:23:04.673720+00:00",
+    "updated_at": "2026-06-03T14:23:04.673740+00:00",
+    "total_value": 37176.0
+  }
+]

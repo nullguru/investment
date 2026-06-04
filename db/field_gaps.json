@@ -192,6 +192,29 @@
         "filled_by": null,
         "filled_at": null
       }
+    },
+    "financials": {
+      "returnOnCapitalEmployed": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:22:02.629854+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "freeCashFlowYield": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:22:02.629854+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "workingCapitalDays": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:22:02.629854+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
     }
   },
   "HINDUNILVR.NS": {
@@ -418,6 +441,50 @@
         "status": "not_found_in_api",
         "provider": "yfinance",
         "checked_at": "2026-06-02T19:11:34.881844+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "overview": {
+      "pledgedSharesPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardSize": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardIndependencePct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "promoterHolding": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "managementTurnoverRisk": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "relatedPartyTransactions": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-03T14:50:17.419689+00:00",
         "filled_by": null,
         "filled_at": null
       }

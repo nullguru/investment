@@ -4972,8 +4972,7 @@
           if (existing) {
             this.lensForm = JSON.parse(JSON.stringify(existing));
             // Normalise symbols array to newline-joined string for textarea
-            if (Array.isArray(this.lensForm.symbols)) this.lensForm._symbolsText = this.lensForm.symbols.join('
-');
+            if (Array.isArray(this.lensForm.symbols)) this.lensForm._symbolsText = this.lensForm.symbols.join('\n');
           } else {
             const defaults = {
               thematic: { name: '', emoji: '🏷️', description: '', source: '', symbols: [], _symbolsText: '', tags: [] },
@@ -4990,8 +4989,7 @@
           const form = { ...this.lensForm };
           // Convert _symbolsText back to symbols array
           if (form._symbolsText !== undefined) {
-            form.symbols = form._symbolsText.split(/[
-,]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+            form.symbols = form._symbolsText.split(/[\n,]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
             delete form._symbolsText;
           }
           try {
