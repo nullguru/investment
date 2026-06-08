@@ -2714,7 +2714,7 @@
       </div>
 
       <!-- Portfolio -->
-      <div x-show="page === 'portfolio'" x-cloak class="space-y-6" x-init="fetchUsdInrRate()">
+      <div x-show="page === 'portfolio'" x-cloak class="space-y-6" x-init="fetchUsdInrRate(); fetchPortfolioPerformance()">
         <div class="flex items-center justify-between flex-wrap gap-3">
           <h1 class="text-xl font-semibold text-slate-800">Portfolio</h1>
 
@@ -2929,6 +2929,117 @@
               No Sharia data for: <span x-text="portfolioMissing.join(', ')"></span>
               <button @click="computePortfolioMissing()" :disabled="computeRunning" class="ml-1 text-xs underline hover:no-underline disabled:opacity-50">Fetch now</button>
             </span>
+          </div>
+        </section>
+
+        <!-- Section: Performance vs benchmarks -->
+        <section x-show="personalIndexInputRows.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 class="text-base font-semibold text-slate-800">Performance vs Benchmarks</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Simple return from avg buy price vs indices, inflation, and USD-real (FX-adjusted). Not XIRR.</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <label class="text-xs text-slate-500 font-medium">Invested since</label>
+              <input type="date"
+                     x-model="portfolioInvestedSince"
+                     @change="saveSettings(); fetchPortfolioPerformance()"
+                     class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-teal-500" />
+              <button @click="fetchPortfolioPerformance()"
+                      :disabled="performanceLoading || !personalIndexInputRows.length"
+                      class="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-medium hover:bg-violet-700 disabled:opacity-50 transition">
+                <span x-show="!performanceLoading">Refresh</span>
+                <span x-show="performanceLoading">Computing…</span>
+              </button>
+            </div>
+          </div>
+
+          <div x-show="performanceLoading" class="px-6 py-10 text-center text-sm text-slate-400">Fetching benchmark returns…</div>
+
+          <div x-show="!performanceLoading && performanceError" class="px-6 py-6">
+            <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3" x-text="performanceError"></p>
+          </div>
+
+          <template x-if="performanceData && !performanceLoading">
+            <div class="p-6 space-y-6">
+              <!-- Period + portfolio summary -->
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Period</p>
+                  <p class="text-sm font-medium text-slate-800 mt-1"
+                     x-text="performanceData.period_days + ' days (' + performanceData.period_years + ' yr)'"></p>
+                  <p class="text-[10px] text-slate-400 mt-0.5"
+                     x-text="performanceData.anchor_date + ' → ' + performanceData.as_of_date"></p>
+                </div>
+                <div class="rounded-xl border border-teal-200 bg-teal-50/50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-teal-700 font-semibold">Your portfolio (INR)</p>
+                  <p class="text-2xl font-bold mt-1"
+                     :class="(performanceData.portfolio?.return_pct_inr ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                     x-text="performanceData.portfolio?.return_pct_inr != null ? (performanceData.portfolio.return_pct_inr >= 0 ? '+' : '') + performanceData.portfolio.return_pct_inr.toFixed(1) + '%' : '—'"></p>
+                  <p class="text-[10px] text-slate-500 mt-0.5"
+                     x-text="'₹' + (performanceData.portfolio?.cost_basis_inr || 0).toLocaleString(undefined,{maximumFractionDigits:0}) + ' → ₹' + (performanceData.portfolio?.current_value_inr || 0).toLocaleString(undefined,{maximumFractionDigits:0})"></p>
+                </div>
+                <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-indigo-700 font-semibold">USD-real return</p>
+                  <p class="text-2xl font-bold mt-1"
+                     :class="(performanceData.portfolio?.return_pct_usd ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                     x-text="performanceData.portfolio?.return_pct_usd != null ? (performanceData.portfolio.return_pct_usd >= 0 ? '+' : '') + performanceData.portfolio.return_pct_usd.toFixed(1) + '%' : '—'"></p>
+                  <p class="text-[10px] text-slate-500 mt-0.5"
+                     x-text="'$' + (performanceData.portfolio?.cost_basis_usd || 0).toLocaleString(undefined,{maximumFractionDigits:0}) + ' → $' + (performanceData.portfolio?.current_value_usd || 0).toLocaleString(undefined,{maximumFractionDigits:0})"></p>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">USD/INR</p>
+                  <p class="text-sm font-medium text-slate-800 mt-1"
+                     x-text="performanceData.fx?.usd_inr_anchor && performanceData.fx?.usd_inr_now ? '₹' + performanceData.fx.usd_inr_anchor.toFixed(2) + ' → ₹' + performanceData.fx.usd_inr_now.toFixed(2) : '—'"></p>
+                  <p class="text-[10px] text-slate-500 mt-0.5"
+                     x-text="performanceData.fx?.rupee_depreciation_pct != null ? 'Rupee ' + (performanceData.fx.rupee_depreciation_pct >= 0 ? 'depreciation' : 'appreciation') + ': ' + Math.abs(performanceData.fx.rupee_depreciation_pct).toFixed(1) + '%' : ''"></p>
+                </div>
+              </div>
+
+              <!-- Benchmark comparison table -->
+              <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-sm min-w-[640px]">
+                  <thead>
+                    <tr class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                      <th class="text-left px-4 py-2.5">Benchmark</th>
+                      <th class="text-right px-4 py-2.5">Return</th>
+                      <th class="text-right px-4 py-2.5">Alpha vs you</th>
+                      <th class="text-left px-4 py-2.5 hidden md:table-cell">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <template x-for="b in (performanceData.benchmarks || [])" :key="b.id">
+                      <tr class="hover:bg-slate-50/60">
+                        <td class="px-4 py-2.5 font-medium text-slate-800" x-text="b.name"></td>
+                        <td class="px-4 py-2.5 text-right"
+                            :class="(b.return_pct ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                            x-text="b.return_pct != null ? (b.return_pct >= 0 ? '+' : '') + b.return_pct.toFixed(1) + '%' : '—'"></td>
+                        <td class="px-4 py-2.5 text-right font-medium"
+                            :class="(b.alpha_vs_portfolio_inr_pct ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                            x-text="b.alpha_vs_portfolio_inr_pct != null ? (b.alpha_vs_portfolio_inr_pct >= 0 ? '+' : '') + b.alpha_vs_portfolio_inr_pct.toFixed(1) + ' pp' : '—'"></td>
+                        <td class="px-4 py-2.5 text-xs text-slate-400 hidden md:table-cell">
+                          <span x-show="b.type === 'inflation'" x-text="'Assumed ' + (b.annual_pct || 6) + '% CPI p.a.'"></span>
+                          <span x-show="b.type === 'index' && b.error" x-text="b.error" class="text-amber-600"></span>
+                          <span x-show="b.type === 'index' && !b.error && b.ticker" x-text="b.ticker"></span>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+
+              <p x-show="performanceData.warnings?.length" class="text-xs text-amber-700">
+                <template x-for="(w, i) in (performanceData.warnings || [])" :key="i">
+                  <span x-text="w"></span><br/>
+                </template>
+              </p>
+              <p class="text-[10px] text-slate-400" x-text="performanceData.method_note"></p>
+            </div>
+          </template>
+
+          <div x-show="!performanceLoading && !performanceData && !performanceError && personalIndexInputRows.length"
+               class="px-6 py-8 text-center text-sm text-slate-400">
+            Set an <strong>Invested since</strong> date and click Refresh to compare returns.
           </div>
         </section>
 
@@ -3477,10 +3588,132 @@
             <h1 class="text-xl font-semibold text-slate-100">Trade Journal</h1>
             <p class="text-xs text-slate-400 mt-0.5">Every decision — with the reasoning, the risks, and the emotional temperature at the time.</p>
           </div>
-          <button @click="openTradeForm()"
-                  class="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium rounded-lg transition">
-            + Record Trade
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button @click="openTradeForm()"
+                    class="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium rounded-lg transition">
+              + Record Trade
+            </button>
+            <button @click="openImportModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-lg transition border border-slate-600">
+              📥 Import from Broker
+            </button>
+          </div>
+        </div>
+
+        <!-- Broker Import Modal -->
+        <div x-show="importModalOpen" x-cloak
+             class="fixed inset-0 bg-black/60 z-50 flex items-start justify-center pt-16 px-4"
+             @keydown.escape.window="importModalOpen = false">
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 flex-shrink-0">
+              <div>
+                <h2 class="text-base font-semibold text-slate-100">📥 Import Broker Order History</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Preview and import executed orders from your broker export</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <label class="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg cursor-pointer border border-slate-600 transition">
+                  📂 Upload File
+                  <input type="file" accept=".xlsx,.xls" class="hidden" @change="handleImportFile($event)">
+                </label>
+                <button @click="importModalOpen = false" class="text-slate-500 hover:text-slate-300 text-xl leading-none">&times;</button>
+              </div>
+            </div>
+
+            <!-- Stats bar -->
+            <div x-show="importRows.length > 0" class="flex items-center gap-6 px-6 py-3 bg-slate-800/60 border-b border-slate-700 text-xs flex-shrink-0">
+              <span class="text-slate-300"><span class="font-semibold text-slate-100" x-text="importRows.length"></span> rows</span>
+              <span class="text-emerald-400"><span class="font-semibold" x-text="importRows.filter(r => !r.already_imported).length"></span> new</span>
+              <span class="text-slate-500"><span class="font-semibold" x-text="importRows.filter(r => r.already_imported).length"></span> already imported</span>
+              <label class="ml-auto flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" x-model="importHideExisting" class="rounded">
+                <span class="text-slate-400">Hide already imported</span>
+              </label>
+            </div>
+
+            <!-- Loading -->
+            <div x-show="importLoading" class="flex items-center justify-center py-12 text-slate-400 text-sm flex-shrink-0">
+              <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+              Loading preview…
+            </div>
+
+            <!-- Error -->
+            <div x-show="importError" class="px-6 py-3 bg-red-900/30 border-b border-red-700 text-red-300 text-xs flex-shrink-0" x-text="importError"></div>
+
+            <!-- Preview table -->
+            <div x-show="!importLoading && importRows.length > 0" class="overflow-y-auto flex-1">
+              <table class="w-full text-xs">
+                <thead class="sticky top-0 bg-slate-800 z-10">
+                  <tr class="text-slate-400 text-left">
+                    <th class="px-4 py-2 font-medium">Symbol</th>
+                    <th class="px-4 py-2 font-medium">Action</th>
+                    <th class="px-4 py-2 font-medium text-right">Qty</th>
+                    <th class="px-4 py-2 font-medium text-right">Price</th>
+                    <th class="px-4 py-2 font-medium text-right">Value</th>
+                    <th class="px-4 py-2 font-medium">Exchange</th>
+                    <th class="px-4 py-2 font-medium">Date</th>
+                    <th class="px-4 py-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="row in importRowsFiltered()" :key="row.order_id">
+                    <tr :class="row.already_imported ? 'opacity-40' : 'hover:bg-slate-800/50'"
+                        class="border-t border-slate-800 transition-colors">
+                      <td class="px-4 py-2 font-mono text-slate-200" x-text="row.symbol"></td>
+                      <td class="px-4 py-2">
+                        <span :class="row.action === 'BUY' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-red-900/60 text-red-300'"
+                              class="px-1.5 py-0.5 rounded text-xs font-semibold" x-text="row.action"></span>
+                      </td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="row.quantity"></td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="'₹' + row.price.toFixed(2)"></td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="'₹' + row.value.toLocaleString('en-IN', {maximumFractionDigits:2})"></td>
+                      <td class="px-4 py-2 text-slate-400" x-text="row.exchange"></td>
+                      <td class="px-4 py-2 text-slate-400" x-text="row.date"></td>
+                      <td class="px-4 py-2">
+                        <span x-show="row.already_imported" class="text-slate-500 text-xs">✓ imported</span>
+                        <span x-show="!row.already_imported" class="text-emerald-400 text-xs">new</span>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty state -->
+            <div x-show="!importLoading && importRows.length === 0 && !importError" class="flex flex-col items-center justify-center py-16 text-slate-500 text-sm flex-shrink-0">
+              <p class="text-2xl mb-2">📂</p>
+              <p>Click "Load default file" or upload a broker Excel export</p>
+              <button @click="loadImportPreview()" class="mt-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg border border-slate-600 transition">
+                Load default file
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between px-6 py-4 border-t border-slate-700 flex-shrink-0">
+              <div x-show="importResult" class="text-xs">
+                <span class="text-emerald-400">✓ <span x-text="importResult && importResult.imported"></span> imported</span>
+                <span x-show="importResult && importResult.duplicate > 0" class="text-slate-400 ml-3">
+                  <span x-text="importResult && importResult.duplicate"></span> duplicates skipped
+                </span>
+                <span x-show="importResult && importResult.errors && importResult.errors.length > 0" class="text-red-400 ml-3">
+                  <span x-text="importResult && importResult.errors.length"></span> errors
+                </span>
+              </div>
+              <div x-show="!importResult" class="text-xs text-slate-500">All prices derived as value ÷ quantity from broker data</div>
+              <div class="flex items-center gap-3">
+                <button @click="importModalOpen = false" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm rounded-lg border border-slate-600 transition">
+                  Close
+                </button>
+                <button @click="runImport()"
+                        x-show="importRows.filter(r => !r.already_imported).length > 0 && !importResult"
+                        :disabled="importRunning"
+                        class="px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition flex items-center gap-2">
+                  <span x-show="importRunning" class="animate-spin text-xs">⟳</span>
+                  Import <span x-text="importRows.filter(r => !r.already_imported).length"></span> trades
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Open Positions strip -->
@@ -3937,106 +4170,109 @@
       <!-- ════════════════════════════════════════════════════════════════
            LENS LIBRARY
            ════════════════════════════════════════════════════════════════ -->
-      <div x-show="page === 'lenses'" x-cloak class="space-y-6">
+      <div x-show="page === 'lenses'" x-cloak class="max-w-4xl mx-auto space-y-6">
 
         <!-- Header -->
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 class="text-xl font-semibold text-slate-100">Lens Library</h1>
-            <p class="text-xs text-slate-400 mt-0.5">Your personal investment knowledge base — every framework, insight, and idea you accumulate over time becomes an executable lens.</p>
-          </div>
+        <div>
+          <h1 class="text-xl font-semibold text-slate-800">Lens Library</h1>
+          <p class="text-sm text-slate-500 mt-1 max-w-2xl">Your personal investment knowledge base — every framework, insight, and idea you accumulate over time becomes an executable lens.</p>
         </div>
 
         <!-- Tab bar -->
-        <div class="flex gap-2 flex-wrap border-b border-slate-700 pb-2">
+        <div class="flex gap-2 flex-wrap">
           <template x-for="[id, label, emoji] in [['composite','Composite Lenses','📐'],['thematic','Thematic Lists','🏷️'],['ideas','Ideas Inbox','💡'],['custom','Custom Formulas','🔧']]" :key="id">
             <button @click="lensActiveTab = id"
-                    :class="lensActiveTab === id ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
-                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
+                    :class="lensActiveTab === id ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'"
+                    class="px-3 py-1.5 rounded-lg text-sm font-medium transition inline-flex items-center gap-1.5">
               <span x-text="emoji"></span><span x-text="label"></span>
-              <span x-show="id==='composite'" class="text-xs opacity-70" x-text="'(' + lensCompositeLenses.length + ')'"></span>
-              <span x-show="id==='thematic'" class="text-xs opacity-70" x-text="'(' + lensThematics.length + ')'"></span>
-              <span x-show="id==='ideas'" class="text-xs opacity-70" x-text="'(' + lensIdeas.length + ')'"></span>
-              <span x-show="id==='custom'" class="text-xs opacity-70" x-text="'(' + lensCustom.length + ')'"></span>
+              <span class="text-xs opacity-75 tabular-nums"
+                    x-text="'(' + ({composite: lensCompositeLenses.length, thematic: lensThematics.length, ideas: lensIdeas.length, custom: lensCustom.length}[id] || 0) + ')'"></span>
             </button>
           </template>
         </div>
 
         <!-- ── COMPOSITE LENSES ────────────────────────────────────────────── -->
         <div x-show="lensActiveTab === 'composite'" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <p class="text-xs text-slate-400">Weighted combinations of quantitative screens — each encodes a dimension of stock quality. Applied in the per-stock Scorecard tab.</p>
-            <button @click="openLensForm('composite')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Composite</button>
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Weighted combinations of quantitative screens — each encodes a dimension of stock quality. Applied in the per-stock Scorecard tab.</p>
+            <button @click="openLensForm('composite')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Composite</button>
           </div>
-          <template x-for="lens in lensCompositeLenses" :key="lens.id">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5" x-data="{ open: false }">
-              <div class="flex items-start justify-between cursor-pointer" @click="open = !open">
-                <div class="flex items-center gap-3">
-                  <span class="text-2xl" x-text="lens.emoji || '📐'"></span>
-                  <div>
-                    <p class="font-semibold text-slate-100" x-text="lens.name"></p>
-                    <p class="text-xs text-slate-400 mt-0.5" x-text="lens.description"></p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                  <span x-show="lens.requires_ai_research" class="text-xs text-violet-400">✦ AI</span>
-                  <span class="text-xs text-slate-500" x-text="(lens.components||[]).length + ' components'"></span>
-                  <button @click.stop="openLensForm('composite', lens)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
-                  <button @click.stop="deleteLens('composite', lens.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
-                  <svg class="w-4 h-4 text-slate-500 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </div>
-              </div>
-              <div x-show="open" class="mt-4 pt-4 border-t border-slate-700 space-y-3">
-                <p class="text-xs text-slate-500 italic" x-text="'Source: ' + (lens.source || '—')"></p>
-                <div class="space-y-1">
-                  <template x-for="comp in (lens.components||[])" :key="comp.screen">
-                    <div class="flex items-center justify-between text-xs bg-slate-900/50 rounded-lg px-3 py-2">
-                      <span class="text-slate-300 font-mono" x-text="comp.screen"></span>
-                      <span class="text-slate-500" x-text="(comp.invert ? 'inverted · ' : '') + (comp.weight * 100).toFixed(0) + '% weight'"></span>
-                      <span class="text-slate-600 italic" x-text="comp.note || ''"></span>
+          <div class="grid gap-3">
+            <template x-for="lens in lensCompositeLenses" :key="lens.id">
+              <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" x-data="{ open: false }">
+                <button type="button" class="w-full text-left px-4 py-4 hover:bg-slate-50/80 transition" @click="open = !open">
+                  <div class="flex items-start gap-3">
+                    <span class="text-2xl leading-none mt-0.5 shrink-0" x-text="lens.emoji || '📐'"></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-3">
+                        <p class="font-semibold text-slate-800 leading-snug" x-text="lens.name"></p>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 mt-0.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      </div>
+                      <p class="text-sm text-slate-500 mt-1 leading-relaxed" x-text="lens.description"></p>
+                      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-xs text-slate-400">
+                        <span x-text="(lens.components||[]).length + ' components'"></span>
+                        <span x-show="lens.requires_ai_research" class="text-violet-600 font-medium">✦ AI-assisted</span>
+                        <span class="flex items-center gap-2 ml-auto sm:ml-0">
+                          <button type="button" @click.stop="openLensForm('composite', lens)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
+                          <span class="text-slate-300">·</span>
+                          <button type="button" @click.stop="deleteLens('composite', lens.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                        </span>
+                      </div>
                     </div>
-                  </template>
-                </div>
-                <template x-for="qf in (lens.qualitative_fields||[])" :key="qf.field">
-                  <div class="flex items-center justify-between text-xs bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-800/30">
-                    <span class="text-violet-300 font-mono" x-text="qf.field"></span>
-                    <span class="text-violet-400 text-xs">✦ qualitative</span>
-                    <span class="text-slate-600 italic" x-text="qf.note || ''"></span>
                   </div>
-                </template>
+                </button>
+                <div x-show="open" x-collapse class="px-4 pb-4 border-t border-slate-100 bg-slate-50/50">
+                  <p class="text-xs text-slate-500 italic pt-3 mb-3" x-text="'Source: ' + (lens.source || '—')"></p>
+                  <div class="space-y-1.5">
+                    <template x-for="comp in (lens.components||[])" :key="comp.screen">
+                      <div class="grid grid-cols-[minmax(0,7rem)_minmax(0,5.5rem)_1fr] gap-x-3 items-baseline text-xs bg-white rounded-lg px-3 py-2 border border-slate-100">
+                        <span class="text-slate-700 font-mono font-medium truncate" x-text="comp.screen"></span>
+                        <span class="text-slate-500 tabular-nums whitespace-nowrap" x-text="(comp.invert ? 'inv · ' : '') + (comp.weight * 100).toFixed(0) + '%'"></span>
+                        <span class="text-slate-400 italic truncate" x-text="comp.note || ''"></span>
+                      </div>
+                    </template>
+                    <template x-for="qf in (lens.qualitative_fields||[])" :key="qf.field">
+                      <div class="grid grid-cols-[minmax(0,7rem)_minmax(0,5.5rem)_1fr] gap-x-3 items-baseline text-xs bg-violet-50 rounded-lg px-3 py-2 border border-violet-100">
+                        <span class="text-violet-800 font-mono font-medium truncate" x-text="qf.field"></span>
+                        <span class="text-violet-600 whitespace-nowrap">qualitative</span>
+                        <span class="text-slate-500 italic truncate" x-text="qf.note || ''"></span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
               </div>
-            </div>
-          </template>
-          <p x-show="lensCompositeLenses.length === 0" class="text-slate-500 text-sm text-center py-8">No composite lenses defined.</p>
+            </template>
+          </div>
+          <p x-show="lensCompositeLenses.length === 0" class="text-slate-500 text-sm text-center py-12 bg-white border border-dashed border-slate-200 rounded-xl">No composite lenses defined.</p>
         </div>
 
         <!-- ── THEMATIC LISTS ──────────────────────────────────────────────── -->
         <div x-show="lensActiveTab === 'thematic'" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <p class="text-xs text-slate-400">Curated stock lists by investment theme. Membership is manual — you decide which stocks belong. Tags appear in the per-stock Scorecard.</p>
-            <button @click="openLensForm('thematic')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Theme</button>
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Curated stock lists by investment theme. Membership is manual — you decide which stocks belong. Tags appear in the per-stock Scorecard.</p>
+            <button @click="openLensForm('thematic')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Theme</button>
           </div>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid sm:grid-cols-2 gap-3">
             <template x-for="theme in lensThematics" :key="theme.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-                <div class="flex items-start justify-between mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-xl" x-text="theme.emoji || '🏷️'"></span>
-                    <div>
-                      <p class="font-semibold text-slate-100" x-text="theme.name"></p>
-                      <p class="text-xs text-slate-400" x-text="(theme.symbols||[]).length + ' stocks'"></p>
+              <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 flex flex-col">
+                <div class="flex items-start gap-2.5 mb-2">
+                  <span class="text-xl leading-none shrink-0" x-text="theme.emoji || '🏷️'"></span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                      <p class="font-semibold text-slate-800 leading-snug" x-text="theme.name"></p>
+                      <div class="flex gap-2 shrink-0 text-xs">
+                        <button @click="openLensForm('thematic', theme)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
+                        <button @click="deleteLens('thematic', theme.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                      </div>
                     </div>
-                  </div>
-                  <div class="flex gap-1">
-                    <button @click="openLensForm('thematic', theme)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
-                    <button @click="deleteLens('thematic', theme.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                    <p class="text-xs text-slate-400 mt-0.5" x-text="(theme.symbols||[]).length + ' stocks'"></p>
                   </div>
                 </div>
-                <p class="text-xs text-slate-400 mb-3" x-text="theme.description"></p>
-                <p class="text-xs text-slate-600 italic mb-3" x-text="theme.source ? 'Source: ' + theme.source : ''"></p>
-                <div class="flex flex-wrap gap-1.5">
+                <p class="text-sm text-slate-500 mb-2 leading-relaxed flex-1" x-text="theme.description"></p>
+                <p x-show="theme.source" class="text-xs text-slate-400 italic mb-3" x-text="'Source: ' + theme.source"></p>
+                <div class="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-slate-100">
                   <template x-for="sym in (theme.symbols||[])" :key="sym">
-                    <span class="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full cursor-pointer hover:bg-slate-600"
+                    <span class="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full cursor-pointer hover:bg-teal-50 hover:text-teal-800 transition"
                           @click="perStockSymbol = sym; go('per_stock')"
                           x-text="sym.replace('.NS','').replace('.BO','')"></span>
                   </template>
@@ -4044,157 +4280,163 @@
               </div>
             </template>
           </div>
-          <p x-show="lensThematics.length === 0" class="text-slate-500 text-sm text-center py-8">No thematic lists yet. Start adding ideas from articles, reports, or your own observations.</p>
+          <p x-show="lensThematics.length === 0" class="text-slate-500 text-sm text-center py-12 bg-white border border-dashed border-slate-200 rounded-xl">No thematic lists yet. Start adding ideas from articles, reports, or your own observations.</p>
         </div>
 
         <!-- ── IDEAS INBOX ─────────────────────────────────────────────────── -->
         <div x-show="lensActiveTab === 'ideas'" class="space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-3">
-            <p class="text-xs text-slate-400">Raw investment ideas — from articles, books, podcasts, or your own observations. Capture first, formalize later.</p>
-            <button @click="openLensForm('ideas')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ Capture Idea</button>
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Raw investment ideas — from articles, books, podcasts, or your own observations. Capture first, formalize later.</p>
+            <button @click="openLensForm('ideas')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ Capture Idea</button>
           </div>
           <!-- Status filter -->
           <div class="flex gap-2 flex-wrap">
             <template x-for="[val, label] in [['all','All'],['raw','Raw'],['exploring','Exploring'],['promoted','Promoted'],['dismissed','Dismissed']]" :key="val">
               <button @click="lensIdeaFilter = val"
-                      :class="lensIdeaFilter === val ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
+                      :class="lensIdeaFilter === val ? 'bg-teal-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'"
                       class="px-3 py-1 rounded-lg text-xs font-medium transition" x-text="label"></button>
             </template>
           </div>
-          <div class="space-y-3">
+          <div class="grid gap-3">
             <template x-for="idea in lensIdeasFiltered()" :key="idea.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5" x-data="{ open: false }">
-                <div class="flex items-start justify-between cursor-pointer" @click="open = !open">
-                  <div class="flex-1 min-w-0 pr-4">
-                    <div class="flex items-center gap-2 mb-1">
-                      <span class="text-xs px-2 py-0.5 rounded-full border"
-                            :class="{ raw: 'border-slate-600 text-slate-400', exploring: 'border-amber-600 text-amber-400', promoted: 'border-emerald-600 text-emerald-400', dismissed: 'border-slate-700 text-slate-600' }[idea.status]"
-                            x-text="idea.status"></span>
-                      <span class="text-xs text-slate-600" x-text="idea.source_type"></span>
-                      <span class="text-xs text-slate-600" x-text="idea.created_at ? idea.created_at.slice(0,10) : ''"></span>
+              <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" x-data="{ open: false }">
+                <button type="button" class="w-full text-left px-4 py-4 hover:bg-slate-50/80 transition" @click="open = !open">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium"
+                              :class="{ raw: 'border-slate-300 text-slate-500 bg-slate-50', exploring: 'border-amber-300 text-amber-700 bg-amber-50', promoted: 'border-emerald-300 text-emerald-700 bg-emerald-50', dismissed: 'border-slate-200 text-slate-400 bg-slate-50' }[idea.status]"
+                              x-text="idea.status"></span>
+                        <span class="text-xs text-slate-400" x-text="idea.source_type"></span>
+                        <span class="text-xs text-slate-400" x-text="idea.created_at ? idea.created_at.slice(0,10) : ''"></span>
+                      </div>
+                      <p class="font-semibold text-slate-800 leading-snug" x-text="idea.title"></p>
+                      <p class="text-sm text-slate-500 mt-1 line-clamp-2 leading-relaxed" x-text="idea.hypothesis"></p>
                     </div>
-                    <p class="font-semibold text-slate-100" x-text="idea.title"></p>
-                    <p class="text-xs text-slate-400 mt-0.5 line-clamp-2" x-text="idea.hypothesis"></p>
+                    <svg class="w-4 h-4 text-slate-400 shrink-0 mt-1 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </div>
-                  <svg class="w-4 h-4 text-slate-500 flex-shrink-0 transition-transform mt-1" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </div>
-                <div x-show="open" class="mt-4 pt-4 border-t border-slate-700 space-y-3">
-                  <p x-show="idea.hypothesis" class="text-sm text-slate-300 leading-relaxed" x-text="idea.hypothesis"></p>
+                </button>
+                <div x-show="open" class="px-4 pb-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
+                  <p x-show="idea.hypothesis" class="text-sm text-slate-600 leading-relaxed pt-3" x-text="idea.hypothesis"></p>
                   <p x-show="idea.source" class="text-xs text-slate-500 italic" x-text="'Source: ' + idea.source"></p>
-                  <p x-show="idea.notes" class="text-xs text-slate-400" x-text="idea.notes"></p>
-                  <div x-show="idea.symbols && idea.symbols.length" class="flex flex-wrap gap-1.5">
-                    <span class="text-xs text-slate-500">Related stocks:</span>
+                  <p x-show="idea.notes" class="text-xs text-slate-500" x-text="idea.notes"></p>
+                  <div x-show="idea.symbols && idea.symbols.length" class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs text-slate-400">Related:</span>
                     <template x-for="sym in (idea.symbols||[])" :key="sym">
-                      <span class="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full cursor-pointer hover:bg-slate-600"
+                      <span class="text-xs px-2 py-0.5 bg-white border border-slate-200 text-slate-600 rounded-full cursor-pointer hover:bg-teal-50 hover:text-teal-800 transition"
                             @click="perStockSymbol = sym; go('per_stock')"
                             x-text="sym.replace('.NS','').replace('.BO','')"></span>
                     </template>
                   </div>
-                  <div class="flex items-center gap-2 pt-1 flex-wrap">
-                    <span class="text-xs text-slate-500">Move to:</span>
+                  <div class="flex items-center gap-2 pt-2 flex-wrap border-t border-slate-100">
+                    <span class="text-xs text-slate-400">Move to:</span>
                     <button @click="updateIdeaStatus(idea.id, 'raw')" :disabled="idea.status === 'raw'"
-                            class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-slate-300 rounded transition">Raw</button>
+                            class="text-xs px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30 text-slate-600 rounded transition">Raw</button>
                     <button @click="updateIdeaStatus(idea.id, 'exploring')" :disabled="idea.status === 'exploring'"
-                            class="text-xs px-2 py-1 bg-amber-900/50 hover:bg-amber-800/50 disabled:opacity-30 text-amber-300 rounded transition">Exploring</button>
+                            class="text-xs px-2 py-1 bg-amber-50 border border-amber-200 hover:bg-amber-100 disabled:opacity-30 text-amber-800 rounded transition">Exploring</button>
                     <button @click="updateIdeaStatus(idea.id, 'promoted')" :disabled="idea.status === 'promoted'"
-                            class="text-xs px-2 py-1 bg-emerald-900/50 hover:bg-emerald-800/50 disabled:opacity-30 text-emerald-300 rounded transition">Promoted</button>
+                            class="text-xs px-2 py-1 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-30 text-emerald-800 rounded transition">Promoted</button>
                     <button @click="updateIdeaStatus(idea.id, 'dismissed')" :disabled="idea.status === 'dismissed'"
-                            class="text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-500 rounded transition">Dismiss</button>
-                    <span class="ml-auto flex gap-2">
-                      <button @click="openLensForm('ideas', idea)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
-                      <button @click="deleteLens('ideas', idea.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
+                            class="text-xs px-2 py-1 bg-slate-50 border border-slate-200 hover:bg-slate-100 disabled:opacity-30 text-slate-500 rounded transition">Dismiss</button>
+                    <span class="ml-auto flex gap-2 text-xs">
+                      <button @click="openLensForm('ideas', idea)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
+                      <button @click="deleteLens('ideas', idea.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
                     </span>
                   </div>
                 </div>
               </div>
             </template>
           </div>
-          <p x-show="lensIdeasFiltered().length === 0" class="text-slate-500 text-sm text-center py-8">No ideas yet. Read an article? Hear a thesis? Capture it here.</p>
+          <p x-show="lensIdeasFiltered().length === 0" class="text-slate-500 text-sm text-center py-12 bg-white border border-dashed border-slate-200 rounded-xl">No ideas yet. Read an article? Hear a thesis? Capture it here.</p>
         </div>
 
         <!-- ── CUSTOM FORMULAS ─────────────────────────────────────────────── -->
         <div x-show="lensActiveTab === 'custom'" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <p class="text-xs text-slate-400">Python-safe expressions evaluated against each stock's metrics. Build filters or scoring formulas from any available field.</p>
-            <button @click="openLensForm('custom')" class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-lg transition">+ New Formula</button>
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Python-safe expressions evaluated against each stock's metrics. Build filters or scoring formulas from any available field.</p>
+            <button @click="openLensForm('custom')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Formula</button>
           </div>
-          <template x-for="lens in lensCustom" :key="lens.id">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-              <div class="flex items-start justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="text-xl" x-text="lens.emoji || '🔧'"></span>
-                  <div>
-                    <p class="font-semibold text-slate-100" x-text="lens.name"></p>
-                    <p class="text-xs text-slate-400 mt-0.5" x-text="lens.description"></p>
+          <div class="grid gap-3">
+            <template x-for="lens in lensCustom" :key="lens.id">
+              <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
+                <div class="flex items-start gap-3">
+                  <span class="text-xl leading-none shrink-0" x-text="lens.emoji || '🔧'"></span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="min-w-0">
+                        <p class="font-semibold text-slate-800 leading-snug" x-text="lens.name"></p>
+                        <p class="text-sm text-slate-500 mt-1 leading-relaxed" x-text="lens.description"></p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0 text-xs">
+                        <span class="px-2 py-0.5 rounded-md border border-slate-200 text-slate-500 bg-slate-50" x-text="lens.type"></span>
+                        <button @click="openLensForm('custom', lens)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
+                        <button @click="deleteLens('custom', lens.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                      </div>
+                    </div>
+                    <div class="mt-3 bg-slate-900 rounded-lg px-3 py-2.5 font-mono text-sm text-emerald-300 overflow-x-auto" x-text="lens.expression"></div>
+                    <p x-show="lens.source" class="text-xs text-slate-400 italic mt-2" x-text="'Source: ' + lens.source"></p>
                   </div>
                 </div>
-                <div class="flex gap-1">
-                  <span class="text-xs px-2 py-0.5 rounded border border-slate-600 text-slate-400" x-text="lens.type"></span>
-                  <button @click="openLensForm('custom', lens)" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1 rounded">Edit</button>
-                  <button @click="deleteLens('custom', lens.id)" class="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded">Delete</button>
-                </div>
               </div>
-              <div class="mt-3 bg-slate-900/70 rounded-lg px-4 py-2.5 font-mono text-sm text-emerald-300 border border-slate-700" x-text="lens.expression"></div>
-              <p x-show="lens.source" class="text-xs text-slate-600 italic mt-2" x-text="'Source: ' + lens.source"></p>
-            </div>
-          </template>
+            </template>
+          </div>
           <!-- Available fields reference -->
-          <details class="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-            <summary class="text-xs font-semibold text-slate-400 cursor-pointer">Available fields for expressions (<span x-text="lensCustomFields.length"></span> total)</summary>
+          <details class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <summary class="text-sm font-medium text-slate-600 cursor-pointer select-none">Available fields for expressions (<span x-text="lensCustomFields.length"></span> total)</summary>
             <div class="mt-3 flex flex-wrap gap-1.5">
               <template x-for="f in lensCustomFields" :key="f">
-                <span class="text-xs font-mono px-2 py-0.5 bg-slate-700 text-slate-300 rounded cursor-pointer hover:bg-slate-600"
+                <span class="text-xs font-mono px-2 py-0.5 bg-slate-100 text-slate-600 rounded cursor-pointer hover:bg-teal-50 hover:text-teal-800 transition"
                       @click="lensForm.expression = (lensForm.expression||'') + f" x-text="f"></span>
               </template>
             </div>
           </details>
-          <p x-show="lensCustom.length === 0" class="text-slate-500 text-sm text-center py-8">No custom formulas yet. Examples: <code class="text-teal-400">roe > 0.20 and debt_to_equity < 0.3</code> or <code class="text-teal-400">roe * 40 + fcf_conversion * 30 + (1 - debt_to_equity) * 30</code></p>
+          <p x-show="lensCustom.length === 0" class="text-slate-500 text-sm text-center py-12 bg-white border border-dashed border-slate-200 rounded-xl">No custom formulas yet. Examples: <code class="text-teal-700 bg-teal-50 px-1 rounded">roe > 0.20 and debt_to_equity < 0.3</code></p>
         </div>
 
         <!-- ════ LENS FORM MODAL ════════════════════════════════════════════ -->
         <div x-show="lensFormOpen"
-             class="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-4 px-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
+             class="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-4 px-4 bg-black/50 backdrop-blur-sm overflow-y-auto"
              @keydown.escape.window="lensFormOpen = false">
-          <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700">
-              <h2 class="text-base font-semibold text-slate-100" x-text="{composite:'Composite Lens', thematic:'Thematic List', ideas:'Capture Idea', custom:'Custom Formula'}[lensFormType] || 'Lens'"></h2>
-              <button @click="lensFormOpen = false" class="text-slate-500 hover:text-slate-300 text-xl">&times;</button>
+          <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <h2 class="text-base font-semibold text-slate-800" x-text="{composite:'Composite Lens', thematic:'Thematic List', ideas:'Capture Idea', custom:'Custom Formula'}[lensFormType] || 'Lens'"></h2>
+              <button @click="lensFormOpen = false" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
             </div>
-            <div class="px-6 py-5 space-y-4">
+            <div class="px-5 py-4 space-y-4">
 
               <!-- Shared: emoji + name -->
               <div class="grid grid-cols-5 gap-3">
                 <div class="col-span-1">
-                  <label class="text-xs text-slate-400 block mb-1">Emoji</label>
-                  <input x-model="lensForm.emoji" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500 text-center" placeholder="🏷️" />
+                  <label class="text-xs font-medium text-slate-500 block mb-1">Emoji</label>
+                  <input x-model="lensForm.emoji" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 text-center" placeholder="🏷️" />
                 </div>
                 <div class="col-span-4">
-                  <label class="text-xs text-slate-400 block mb-1" x-text="lensFormType === 'ideas' ? 'Title' : 'Name'"></label>
+                  <label class="text-xs font-medium text-slate-500 block mb-1" x-text="lensFormType === 'ideas' ? 'Title' : 'Name'"></label>
                   <input x-model="lensForm[lensFormType === 'ideas' ? 'title' : 'name']"
-                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                         class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
                          placeholder="e.g. AI Supply Chain India" />
                 </div>
               </div>
 
               <!-- Description / hypothesis -->
               <div>
-                <label class="text-xs text-slate-400 block mb-1" x-text="lensFormType === 'ideas' ? 'Hypothesis' : 'Description'"></label>
+                <label class="text-xs font-medium text-slate-500 block mb-1" x-text="lensFormType === 'ideas' ? 'Hypothesis' : 'Description'"></label>
                 <textarea x-model="lensForm[lensFormType === 'ideas' ? 'hypothesis' : 'description']" rows="2"
-                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                           placeholder="What is this lens measuring? What insight does it encode?"></textarea>
               </div>
 
               <!-- Source -->
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="text-xs text-slate-400 block mb-1">Source</label>
-                  <input x-model="lensForm.source" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                  <label class="text-xs font-medium text-slate-500 block mb-1">Source</label>
+                  <input x-model="lensForm.source" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
                          placeholder="Book, article, podcast…" />
                 </div>
                 <!-- Ideas: source type -->
                 <div x-show="lensFormType === 'ideas'">
-                  <label class="text-xs text-slate-400 block mb-1">Source Type</label>
-                  <select x-model="lensForm.source_type" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                  <label class="text-xs font-medium text-slate-500 block mb-1">Source Type</label>
+                  <select x-model="lensForm.source_type" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <option value="article">Article</option>
                     <option value="book">Book</option>
                     <option value="podcast">Podcast</option>
@@ -4204,8 +4446,8 @@
                 </div>
                 <!-- Custom: type -->
                 <div x-show="lensFormType === 'custom'">
-                  <label class="text-xs text-slate-400 block mb-1">Output Type</label>
-                  <select x-model="lensForm.type" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                  <label class="text-xs font-medium text-slate-500 block mb-1">Output Type</label>
+                  <select x-model="lensForm.type" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <option value="filter">Filter (pass/fail)</option>
                     <option value="score">Score (0-100)</option>
                   </select>
@@ -4214,22 +4456,22 @@
 
               <!-- Thematic / Ideas: symbols -->
               <div x-show="lensFormType === 'thematic' || lensFormType === 'ideas'">
-                <label class="text-xs text-slate-400 block mb-1">Symbols (one per line or comma-separated)</label>
+                <label class="text-xs font-medium text-slate-500 block mb-1">Symbols (one per line or comma-separated)</label>
                 <textarea x-model="lensForm._symbolsText" rows="3"
-                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                           placeholder="KAYNES.NS&#10;DIXON.NS&#10;TATAELXSI.NS"></textarea>
               </div>
 
               <!-- Custom: expression -->
               <div x-show="lensFormType === 'custom'">
-                <label class="text-xs text-slate-400 block mb-1">Expression</label>
+                <label class="text-xs font-medium text-slate-500 block mb-1">Expression</label>
                 <textarea x-model="lensForm.expression" rows="3"
-                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none bg-slate-950"
+                          class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                           placeholder="roe > 0.20 and debt_to_equity < 0.3 and piotroski_pct > 55"></textarea>
-                <p class="text-xs text-slate-600 mt-1">Click any field name below to insert it.</p>
+                <p class="text-xs text-slate-400 mt-1">Click any field name below to insert it.</p>
                 <div class="flex flex-wrap gap-1 mt-2 max-h-24 overflow-y-auto">
                   <template x-for="f in lensCustomFields" :key="f">
-                    <span class="text-xs font-mono px-1.5 py-0.5 bg-slate-700 text-slate-400 rounded cursor-pointer hover:bg-slate-600 hover:text-slate-200"
+                    <span class="text-xs font-mono px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded cursor-pointer hover:bg-teal-50 hover:text-teal-800 transition"
                           @click="lensForm.expression = (lensForm.expression||'') + f" x-text="f"></span>
                   </template>
                 </div>
@@ -4237,17 +4479,17 @@
 
               <!-- Ideas: notes -->
               <div x-show="lensFormType === 'ideas'">
-                <label class="text-xs text-slate-400 block mb-1">Notes</label>
+                <label class="text-xs font-medium text-slate-500 block mb-1">Notes</label>
                 <textarea x-model="lensForm.notes" rows="2"
-                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                           placeholder="Any follow-up actions, things to check…"></textarea>
               </div>
 
             </div>
-            <div class="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">
-              <button @click="lensFormOpen = false" class="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
+            <div class="px-5 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 rounded-b-2xl">
+              <button @click="lensFormOpen = false" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">Cancel</button>
               <button @click="saveLensForm()"
-                      class="px-5 py-2 text-sm font-medium bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition">Save</button>
+                      class="px-5 py-2 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition">Save</button>
             </div>
           </div>
         </div>
@@ -4529,6 +4771,10 @@
         holdingDraftMarket: 'IN',
         portfolioMarketFilter: 'all',
         holdingMarkets: {},
+        portfolioInvestedSince: '',
+        performanceData: null,
+        performanceLoading: false,
+        performanceError: '',
         _nonShariaCache: [],
         // Metric explainer popover
         learningMode: false,
@@ -4559,6 +4805,15 @@
         tradeCheckRunning: false,
         tradeCheckResult: null,
         tradeCheckError: '',
+        // Broker import state
+        importModalOpen: false,
+        importLoading: false,
+        importRunning: false,
+        importRows: [],
+        importError: null,
+        importResult: null,
+        importHideExisting: true,
+        _importUploadFile: null,
         tradeForm: {
           symbol: '', action: 'BUY', units: '', price: '',
           currency: 'INR', date: '', status: 'executed',
@@ -4647,6 +4902,7 @@
             if (r.watchlistText != null) this.watchlistText = r.watchlistText;
             if (r.personalIndexHoldingsText != null) this.personalIndexHoldingsText = r.personalIndexHoldingsText;
             if (r.holdingMarkets != null) this.holdingMarkets = r.holdingMarkets;
+            if (r.portfolioInvestedSince != null) this.portfolioInvestedSince = r.portfolioInvestedSince;
             if (r.tableColumns && Object.keys(r.tableColumns).length) this.tableColumns = r.tableColumns;
             else if (r.shariaVisibleColumns && Object.keys(r.shariaVisibleColumns).length) this.tableColumns = { all_stocks: r.shariaVisibleColumns };
             if (r.computeN != null) this.computeN = r.computeN;
@@ -4667,6 +4923,7 @@
                 watchlistText: this.watchlistText,
                 personalIndexHoldingsText: this.personalIndexHoldingsText,
                 holdingMarkets: this.holdingMarkets,
+                portfolioInvestedSince: this.portfolioInvestedSince,
                 computeN: this.computeN,
                 computeWorkers: this.computeWorkers
               })
@@ -4899,8 +5156,10 @@
                   this.initTable('portfolio_sym_' + sym, elId, rows, { columnOrder: symTableCols, pagination: false });
                 }
               });
+              this.fetchPortfolioPerformance();
             } else {
               this.fetchPortfolioData(); this.fetchPortfolioPrices();
+              this.fetchPortfolioPerformance();
             }
           }
           else if (this.page === 'watchlist') {
@@ -5165,6 +5424,70 @@
         },
         convictionColor(c) {
           return { high: 'text-emerald-400', medium: 'text-amber-400', low: 'text-slate-400' }[c] || '';
+        },
+        // ── Broker import ────────────────────────────────────────────────────
+        async openImportModal() {
+          this.importModalOpen = true;
+          this.importResult = null;
+          this._importUploadFile = null;
+          if (this.importRows.length === 0) await this.loadImportPreview();
+        },
+        async loadImportPreview() {
+          this.importLoading = true;
+          this.importError = null;
+          this.importRows = [];
+          try {
+            const r = await fetch('/api/trades/import/preview');
+            const d = await r.json();
+            if (d.error) { this.importError = d.error; }
+            else { this.importRows = d.rows || []; }
+          } catch(e) { this.importError = 'Failed to load preview: ' + e.message; }
+          this.importLoading = false;
+        },
+        importRowsFiltered() {
+          if (this.importHideExisting) return this.importRows.filter(r => !r.already_imported);
+          return this.importRows;
+        },
+        async handleImportFile(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          this._importUploadFile = file;
+          this.importLoading = true;
+          this.importError = null;
+          this.importRows = [];
+          this.importResult = null;
+          // Preview by uploading then fetching positions isn't direct — we upload in runImport
+          // For preview, send to a temp preview endpoint
+          const fd = new FormData();
+          fd.append('file', file);
+          try {
+            const r = await fetch('/api/trades/import/upload', { method: 'POST', body: fd });
+            const d = await r.json();
+            this.importResult = d;
+            await this.loadImportPreview(); // reload to show updated state
+          } catch(e) { this.importError = 'Upload failed: ' + e.message; }
+          this.importLoading = false;
+        },
+        async runImport() {
+          this.importRunning = true;
+          this.importError = null;
+          try {
+            let r, d;
+            if (this._importUploadFile) {
+              const fd = new FormData();
+              fd.append('file', this._importUploadFile);
+              r = await fetch('/api/trades/import/upload', { method: 'POST', body: fd });
+            } else {
+              r = await fetch('/api/trades/import/run', { method: 'POST' });
+            }
+            d = await r.json();
+            this.importResult = d;
+            // Refresh preview and trade list
+            await this.loadImportPreview();
+            await this.fetchTrades();
+            await this.fetchTradePositions();
+          } catch(e) { this.importError = 'Import failed: ' + e.message; }
+          this.importRunning = false;
         },
         checkSignalColor(val, goodHigh, badLow) {
           // goodHigh: higher is better (e.g. quality score)
@@ -5961,6 +6284,39 @@
           this.personalIndexInputRows = this.personalIndexInputRows.filter((_, idx) => idx !== index);
           
           this.syncPersonalIndexTextFromRows(true);
+        },
+        async fetchPortfolioPerformance() {
+          const text = this.serializePersonalIndexRows('cost_basis');
+          if (!text.trim()) {
+            this.performanceData = null;
+            this.performanceError = '';
+            return;
+          }
+          this.performanceLoading = true;
+          this.performanceError = '';
+          try {
+            const r = await fetch(API + '/portfolio/performance', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                holdings_text: text,
+                holding_markets: this.holdingMarkets || {},
+                anchor_date: this.portfolioInvestedSince || null,
+              }),
+            });
+            const data = await r.json();
+            if (!r.ok) {
+              this.performanceData = null;
+              this.performanceError = data.detail || data.error || 'Performance calculation failed';
+              return;
+            }
+            this.performanceData = data;
+          } catch (e) {
+            this.performanceData = null;
+            this.performanceError = 'Could not reach performance API';
+          } finally {
+            this.performanceLoading = false;
+          }
         },
         async fetchUsdInrRate() {
           try {

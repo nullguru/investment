@@ -19,7 +19,7 @@ if str(ROOT) not in sys.path:
 import math
 import pandas as pd
 import numpy as np
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -46,7 +46,14 @@ from modules.sharia import (
 )
 from modules.universe import load_universe
 from modules.market import get_section_data as yf_get_section
-from modules.portfolio import analyze_personal_index, list_benchmarks, load_benchmark, parse_holdings_text
+from modules.portfolio import (
+    analyze_personal_index,
+    list_benchmarks,
+    load_benchmark,
+    parse_holdings_text,
+    compute_portfolio_performance,
+    list_performance_benchmarks,
+)
 from modules.quality import (
     compute_quality_score,
     batch_compute_quality,
@@ -70,6 +77,7 @@ DEFAULT_SETTINGS = {
     "personalIndexBenchmark": "nifty50",
     "personalIndexSipAmount": 0.0,
     "personalIndexStrictNoSell": True,
+    "portfolioInvestedSince": "",
     "computeN": 50,
     "computeWorkers": 5,
 }
@@ -201,6 +209,7 @@ class SettingsBody(BaseModel):
     personalIndexBenchmark: str = "nifty50"
     personalIndexSipAmount: float = 0.0
     personalIndexStrictNoSell: bool = True
+    portfolioInvestedSince: str = ""
     computeN: int = 50
     computeWorkers: int = 5
 
@@ -260,6 +269,48 @@ def api_personal_index_analyze(body: PersonalIndexBody):
         return _sanitize(result)
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+class PortfolioPerformanceBody(BaseModel):
+    holdings_text: str = ""
+    holding_markets: dict[str, str] = {}
+    anchor_date: str | None = None
+    benchmark_ids: list[str] | None = None
+
+
+@app.get("/api/portfolio/performance/options")
+def api_portfolio_performance_options():
+    """Index tickers and inflation assumption for performance comparison."""
+    return {
+        "benchmarks": list_performance_benchmarks(),
+        "default_anchor_fallback": "1 year before today if anchor_date omitted",
+        "notes": [
+            "Set portfolioInvestedSince in settings or pass anchor_date on each request.",
+            "Portfolio return uses avg buy price × units vs live price (simple, not XIRR).",
+            "USD-real return converts INR holdings using USDINR at anchor vs today.",
+        ],
+    }
+
+
+@app.post("/api/portfolio/performance")
+def api_portfolio_performance(body: PortfolioPerformanceBody):
+    """Compare portfolio simple return vs indices, inflation, and USD-real."""
+    holdings = parse_holdings_text(body.holdings_text)
+    if not holdings:
+        raise HTTPException(400, "Provide holdings as lines like 'TCS.NS 9 3015'")
+    anchor = body.anchor_date
+    if not anchor:
+        settings = _load_settings()
+        anchor = (settings.get("portfolioInvestedSince") or "").strip() or None
+    result = compute_portfolio_performance(
+        holdings=holdings,
+        anchor_date=anchor,
+        benchmark_ids=body.benchmark_ids,
+        holding_markets=body.holding_markets or {},
+    )
+    if result.get("error") and not result.get("portfolio"):
+        raise HTTPException(400, result["error"])
+    return _sanitize(result)
 
 
 @app.get("/api/universe")
@@ -1612,3 +1663,39 @@ def api_delete_trade(trade_id: str):
     if not ok:
         raise HTTPException(404, "Trade not found")
     return {"ok": True}
+
+
+# ─── Broker Import ────────────────────────────────────────────────────────────
+
+@app.get("/api/trades/import/preview")
+def api_trades_import_preview():
+    """Preview rows from the default broker Excel export without importing."""
+    from modules.trades.importer import preview_xlsx
+    return preview_xlsx()
+
+
+@app.post("/api/trades/import/run")
+def api_trades_import_run():
+    """Import all new (non-duplicate) rows from the default broker Excel export."""
+    from modules.trades.importer import import_from_xlsx
+    return import_from_xlsx()
+
+
+@app.post("/api/trades/import/upload")
+async def api_trades_import_upload(file: UploadFile = File(...)):
+    """Upload a broker Excel file and import trades from it."""
+    import tempfile, shutil
+    from pathlib import Path
+    from modules.trades.importer import import_from_xlsx
+
+    suffix = Path(file.filename or "upload.xlsx").suffix or ".xlsx"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        tmp_path = Path(tmp.name)
+
+    try:
+        result = import_from_xlsx(tmp_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+    return result
