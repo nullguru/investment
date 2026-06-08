@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stock Analysis</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script>
@@ -4195,49 +4196,65 @@
         </div>
 
         <!-- ── COMPOSITE LENSES ────────────────────────────────────────────── -->
-        <div x-show="lensActiveTab === 'composite'" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Weighted combinations of quantitative screens — each encodes a dimension of stock quality. Applied in the per-stock Scorecard tab.</p>
-            <button @click="openLensForm('composite')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Composite</button>
+        <div x-show="lensActiveTab === 'composite'" class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-400 max-w-xl leading-relaxed">Weighted combinations of quantitative screens — each encodes a dimension of stock quality.</p>
+            <button @click="openLensForm('composite')" class="shrink-0 flex items-center gap-1.5 text-sm px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition font-medium shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Composite
+            </button>
           </div>
-          <div class="grid gap-3">
+          <div class="grid gap-2">
             <template x-for="lens in lensCompositeLenses" :key="lens.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-sm overflow-hidden" x-data="{ open: false }">
-                <button type="button" class="w-full text-left px-4 py-4 hover:bg-slate-700/50 transition" @click="open = !open">
-                  <div class="flex items-start gap-3">
-                    <span class="text-2xl leading-none mt-0.5 shrink-0" x-text="lens.emoji || '📐'"></span>
+              <div class="rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/60 backdrop-blur-sm" x-data="{ open: false }">
+                <!-- Card header — click anywhere to expand -->
+                <button type="button" class="w-full text-left px-5 py-4 group" @click="open = !open">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-slate-700/80 flex items-center justify-center text-xl shrink-0 border border-slate-600/50" x-text="lens.emoji || '📐'"></div>
                     <div class="flex-1 min-w-0">
-                      <div class="flex items-start justify-between gap-3">
-                        <p class="font-semibold text-slate-100 leading-snug" x-text="lens.name"></p>
-                        <svg class="w-4 h-4 text-slate-500 shrink-0 mt-0.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      <div class="flex items-baseline gap-2">
+                        <p class="font-semibold text-slate-100 text-[15px]" x-text="lens.name"></p>
+                        <span x-show="lens.requires_ai_research" class="text-[10px] font-semibold text-violet-400 bg-violet-900/40 px-1.5 py-0.5 rounded-full border border-violet-700/40">AI</span>
                       </div>
-                      <p class="text-sm text-slate-400 mt-1 leading-relaxed" x-text="lens.description"></p>
-                      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2.5 text-xs text-slate-400">
-                        <span x-text="(lens.components||[]).length + ' components'"></span>
-                        <span x-show="lens.requires_ai_research" class="text-violet-600 font-medium">✦ AI-assisted</span>
-                        <span class="flex items-center gap-2 ml-auto sm:ml-0">
-                          <button type="button" @click.stop="openLensForm('composite', lens)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
-                          <span class="text-slate-300">·</span>
-                          <button type="button" @click.stop="deleteLens('composite', lens.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
-                        </span>
-                      </div>
+                      <p class="text-sm text-slate-400 mt-0.5 leading-snug line-clamp-1" x-text="lens.description"></p>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                      <span class="hidden sm:inline text-xs text-slate-500 tabular-nums" x-text="(lens.components||[]).length + ' components'"></span>
+                      <!-- Edit / Delete icon buttons -->
+                      <button type="button"
+                              @click.stop="openLensForm('composite', lens)"
+                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-teal-400 hover:bg-teal-900/30 transition"
+                              title="Edit">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button type="button"
+                              @click.stop="deleteLens('composite', lens.id)"
+                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-900/30 transition"
+                              title="Delete">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                      <svg class="w-4 h-4 text-slate-600 transition-transform duration-200 ml-1" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                   </div>
                 </button>
-                <div x-show="open" x-collapse class="px-4 pb-4 border-t border-slate-700 bg-slate-900/30">
-                  <p class="text-xs text-slate-500 italic pt-3 mb-3" x-text="'Source: ' + (lens.source || '—')"></p>
-                  <div class="space-y-1.5">
+                <!-- Expandable breakdown -->
+                <div x-show="open" x-collapse class="border-t border-slate-700/70">
+                  <div class="px-5 py-4 bg-slate-900/40 space-y-2">
+                    <p x-show="lens.source" class="text-xs text-slate-500 italic mb-3" x-text="'Source: ' + lens.source"></p>
                     <template x-for="comp in (lens.components||[])" :key="comp.screen">
-                      <div class="grid grid-cols-[minmax(0,7rem)_minmax(0,5.5rem)_1fr] gap-x-3 items-baseline text-xs bg-slate-900/60 rounded-lg px-3 py-2 border border-slate-700">
-                        <span class="text-slate-700 font-mono font-medium truncate" x-text="comp.screen"></span>
-                        <span class="text-slate-500 tabular-nums whitespace-nowrap" x-text="(comp.invert ? 'inv · ' : '') + (comp.weight * 100).toFixed(0) + '%'"></span>
-                        <span class="text-slate-400 italic truncate" x-text="comp.note || ''"></span>
+                      <div class="flex items-center gap-3 text-xs">
+                        <span class="w-32 shrink-0 font-mono text-teal-400 truncate" x-text="comp.screen"></span>
+                        <div class="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div class="h-full bg-teal-600/70 rounded-full" :style="'width:' + (comp.weight * 100).toFixed(0) + '%'"></div>
+                        </div>
+                        <span class="w-12 text-right text-slate-400 tabular-nums" x-text="(comp.weight * 100).toFixed(0) + '%'"></span>
+                        <span x-show="comp.invert" class="text-[10px] text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full border border-amber-700/30">inv</span>
+                        <span class="hidden sm:inline text-slate-500 italic truncate max-w-[12rem]" x-text="comp.note || ''"></span>
                       </div>
                     </template>
                     <template x-for="qf in (lens.qualitative_fields||[])" :key="qf.field">
-                      <div class="grid grid-cols-[minmax(0,7rem)_minmax(0,5.5rem)_1fr] gap-x-3 items-baseline text-xs bg-violet-900/20 rounded-lg px-3 py-2 border border-violet-700/40">
-                        <span class="text-violet-800 font-mono font-medium truncate" x-text="qf.field"></span>
-                        <span class="text-violet-600 whitespace-nowrap">qualitative</span>
+                      <div class="flex items-center gap-3 text-xs">
+                        <span class="w-32 shrink-0 font-mono text-violet-400 truncate" x-text="qf.field"></span>
+                        <span class="text-[10px] text-violet-400 bg-violet-900/30 px-1.5 py-0.5 rounded-full border border-violet-700/30">qualitative</span>
                         <span class="text-slate-500 italic truncate" x-text="qf.note || ''"></span>
                       </div>
                     </template>
@@ -4246,36 +4263,44 @@
               </div>
             </template>
           </div>
-          <p x-show="lensCompositeLenses.length === 0" class="text-slate-500 text-sm text-center py-12 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl">No composite lenses defined.</p>
+          <p x-show="lensCompositeLenses.length === 0" class="text-slate-500 text-sm text-center py-16 bg-slate-800/30 border border-dashed border-slate-700 rounded-2xl">No composite lenses defined yet.</p>
         </div>
 
         <!-- ── THEMATIC LISTS ──────────────────────────────────────────────── -->
-        <div x-show="lensActiveTab === 'thematic'" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Curated stock lists by investment theme. Membership is manual — you decide which stocks belong. Tags appear in the per-stock Scorecard.</p>
-            <button @click="openLensForm('thematic')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Theme</button>
+        <div x-show="lensActiveTab === 'thematic'" class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-400 max-w-xl leading-relaxed">Curated stock lists by investment theme. Tags appear in the per-stock Scorecard.</p>
+            <button @click="openLensForm('thematic')" class="shrink-0 flex items-center gap-1.5 text-sm px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition font-medium shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Theme
+            </button>
           </div>
           <div class="grid sm:grid-cols-2 gap-3">
             <template x-for="theme in lensThematics" :key="theme.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-sm p-4 flex flex-col">
-                <div class="flex items-start gap-2.5 mb-2">
-                  <span class="text-xl leading-none shrink-0" x-text="theme.emoji || '🏷️'"></span>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-2">
-                      <p class="font-semibold text-slate-100 leading-snug" x-text="theme.name"></p>
-                      <div class="flex gap-2 shrink-0 text-xs">
-                        <button @click="openLensForm('thematic', theme)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
-                        <button @click="deleteLens('thematic', theme.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
-                      </div>
+              <div class="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 flex flex-col gap-3 group">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-slate-700/80 flex items-center justify-center text-lg shrink-0 border border-slate-600/50" x-text="theme.emoji || '🏷️'"></div>
+                    <div class="min-w-0">
+                      <p class="font-semibold text-slate-100 text-[15px] leading-tight" x-text="theme.name"></p>
+                      <p class="text-xs text-slate-500 mt-0.5" x-text="(theme.symbols||[]).length + ' stocks'"></p>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5" x-text="(theme.symbols||[]).length + ' stocks'"></p>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button @click="openLensForm('thematic', theme)"
+                            class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-teal-400 hover:bg-teal-900/30 transition" title="Edit">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                    <button @click="deleteLens('thematic', theme.id)"
+                            class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-900/30 transition" title="Delete">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
                   </div>
                 </div>
-                <p class="text-sm text-slate-400 mb-2 leading-relaxed flex-1" x-text="theme.description"></p>
-                <p x-show="theme.source" class="text-xs text-slate-400 italic mb-3" x-text="'Source: ' + theme.source"></p>
-                <div class="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-slate-700">
+                <p class="text-sm text-slate-400 leading-relaxed flex-1" x-text="theme.description"></p>
+                <p x-show="theme.source" class="text-xs text-slate-500 italic" x-text="'Source: ' + theme.source"></p>
+                <div class="flex flex-wrap gap-1.5 pt-3 border-t border-slate-700/60">
                   <template x-for="sym in (theme.symbols||[])" :key="sym">
-                    <span class="text-xs px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 transition"
+                    <span class="text-xs px-2.5 py-1 bg-slate-700/70 text-slate-300 rounded-lg cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 border border-slate-600/50 transition font-mono"
                           @click="perStockSymbol = sym; go('per_stock')"
                           x-text="sym.replace('.NS','').replace('.BO','')"></span>
                   </template>
@@ -4283,117 +4308,149 @@
               </div>
             </template>
           </div>
-          <p x-show="lensThematics.length === 0" class="text-slate-500 text-sm text-center py-12 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl">No thematic lists yet. Start adding ideas from articles, reports, or your own observations.</p>
+          <p x-show="lensThematics.length === 0" class="text-slate-500 text-sm text-center py-16 bg-slate-800/30 border border-dashed border-slate-700 rounded-2xl">No thematic lists yet.</p>
         </div>
 
         <!-- ── IDEAS INBOX ─────────────────────────────────────────────────── -->
-        <div x-show="lensActiveTab === 'ideas'" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Raw investment ideas — from articles, books, podcasts, or your own observations. Capture first, formalize later.</p>
-            <button @click="openLensForm('ideas')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ Capture Idea</button>
+        <div x-show="lensActiveTab === 'ideas'" class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-400 max-w-xl leading-relaxed">Raw investment ideas from articles, books, podcasts. Capture first, formalize later.</p>
+            <button @click="openLensForm('ideas')" class="shrink-0 flex items-center gap-1.5 text-sm px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition font-medium shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Capture Idea
+            </button>
           </div>
           <!-- Status filter -->
-          <div class="flex gap-2 flex-wrap">
-            <template x-for="[val, label] in [['all','All'],['raw','Raw'],['exploring','Exploring'],['promoted','Promoted'],['dismissed','Dismissed']]" :key="val">
+          <div class="flex gap-1.5 flex-wrap">
+            <template x-for="[val, label, color] in [['all','All','slate'],['raw','Raw','slate'],['exploring','Exploring','amber'],['promoted','Promoted','emerald'],['dismissed','Dismissed','slate']]" :key="val">
               <button @click="lensIdeaFilter = val"
-                      :class="lensIdeaFilter === val ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
-                      class="px-3 py-1 rounded-lg text-xs font-medium transition" x-text="label"></button>
+                      :class="lensIdeaFilter === val ? 'bg-teal-600 text-white border-teal-600' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border-slate-700'"
+                      class="px-3 py-1.5 rounded-xl text-xs font-medium transition border" x-text="label"></button>
             </template>
           </div>
-          <div class="grid gap-3">
+          <div class="grid gap-2">
             <template x-for="idea in lensIdeasFiltered()" :key="idea.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-sm overflow-hidden" x-data="{ open: false }">
-                <button type="button" class="w-full text-left px-4 py-4 hover:bg-slate-700/50 transition" @click="open = !open">
-                  <div class="flex items-start gap-3">
+              <div class="rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/60 group" x-data="{ open: false }">
+                <button type="button" class="w-full text-left px-5 py-4" @click="open = !open">
+                  <div class="flex items-start gap-4">
                     <div class="flex-1 min-w-0">
-                      <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                        <span class="text-xs px-2 py-0.5 rounded-full border font-medium"
-                              :class="{ raw: 'border-slate-600 text-slate-400 bg-slate-800', exploring: 'border-amber-600 text-amber-300 bg-amber-900/30', promoted: 'border-emerald-600 text-emerald-300 bg-emerald-900/30', dismissed: 'border-slate-700 text-slate-500 bg-slate-800' }[idea.status]"
+                      <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border"
+                              :class="{
+                                raw: 'border-slate-600 text-slate-400 bg-slate-700/50',
+                                exploring: 'border-amber-600/60 text-amber-300 bg-amber-900/30',
+                                promoted: 'border-emerald-600/60 text-emerald-300 bg-emerald-900/30',
+                                dismissed: 'border-slate-700 text-slate-600 bg-slate-800'
+                              }[idea.status]"
                               x-text="idea.status"></span>
-                        <span class="text-xs text-slate-400" x-text="idea.source_type"></span>
-                        <span class="text-xs text-slate-400" x-text="idea.created_at ? idea.created_at.slice(0,10) : ''"></span>
+                        <span class="text-xs text-slate-500" x-text="idea.source_type?.replace('_',' ')"></span>
+                        <span class="text-xs text-slate-600" x-text="idea.created_at ? idea.created_at.slice(0,10) : ''"></span>
                       </div>
-                      <p class="font-semibold text-slate-100 leading-snug" x-text="idea.title"></p>
+                      <p class="font-semibold text-slate-100" x-text="idea.title"></p>
                       <p class="text-sm text-slate-400 mt-1 line-clamp-2 leading-relaxed" x-text="idea.hypothesis"></p>
                     </div>
-                    <svg class="w-4 h-4 text-slate-400 shrink-0 mt-1 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button type="button"
+                              @click.stop="openLensForm('ideas', idea)"
+                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-600 hover:text-teal-400 hover:bg-teal-900/30 transition opacity-0 group-hover:opacity-100" title="Edit">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button type="button"
+                              @click.stop="deleteLens('ideas', idea.id)"
+                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-900/30 transition opacity-0 group-hover:opacity-100" title="Delete">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                      <svg class="w-4 h-4 text-slate-600 transition-transform duration-200 ml-1" :class="open ? 'rotate-180 text-slate-400' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
                   </div>
                 </button>
-                <div x-show="open" class="px-4 pb-4 border-t border-slate-700 bg-slate-900/30 space-y-3">
-                  <p x-show="idea.hypothesis" class="text-sm text-slate-300 leading-relaxed pt-3" x-text="idea.hypothesis"></p>
-                  <p x-show="idea.source" class="text-xs text-slate-500 italic" x-text="'Source: ' + idea.source"></p>
-                  <p x-show="idea.notes" class="text-xs text-slate-500" x-text="idea.notes"></p>
-                  <div x-show="idea.symbols && idea.symbols.length" class="flex flex-wrap items-center gap-1.5">
-                    <span class="text-xs text-slate-400">Related:</span>
-                    <template x-for="sym in (idea.symbols||[])" :key="sym">
-                      <span class="text-xs px-2 py-0.5 bg-slate-700 border border-slate-600 text-slate-300 rounded-full cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 transition"
-                            @click="perStockSymbol = sym; go('per_stock')"
-                            x-text="sym.replace('.NS','').replace('.BO','')"></span>
-                    </template>
-                  </div>
-                  <div class="flex items-center gap-2 pt-2 flex-wrap border-t border-slate-700">
-                    <span class="text-xs text-slate-400">Move to:</span>
-                    <button @click="updateIdeaStatus(idea.id, 'raw')" :disabled="idea.status === 'raw'"
-                            class="text-xs px-2 py-1 bg-slate-700 border border-slate-600 hover:bg-slate-600 disabled:opacity-30 text-slate-300 rounded transition">Raw</button>
-                    <button @click="updateIdeaStatus(idea.id, 'exploring')" :disabled="idea.status === 'exploring'"
-                            class="text-xs px-2 py-1 bg-amber-900/30 border border-amber-700/50 hover:bg-amber-800/40 disabled:opacity-30 text-amber-300 rounded transition">Exploring</button>
-                    <button @click="updateIdeaStatus(idea.id, 'promoted')" :disabled="idea.status === 'promoted'"
-                            class="text-xs px-2 py-1 bg-emerald-900/30 border border-emerald-700/50 hover:bg-emerald-800/40 disabled:opacity-30 text-emerald-300 rounded transition">Promoted</button>
-                    <button @click="updateIdeaStatus(idea.id, 'dismissed')" :disabled="idea.status === 'dismissed'"
-                            class="text-xs px-2 py-1 bg-slate-700 border border-slate-600 hover:bg-slate-600 disabled:opacity-30 text-slate-400 rounded transition">Dismiss</button>
-                    <span class="ml-auto flex gap-2 text-xs">
-                      <button @click="openLensForm('ideas', idea)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
-                      <button @click="deleteLens('ideas', idea.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
-                    </span>
+                <div x-show="open" x-collapse class="border-t border-slate-700/70">
+                  <div class="px-5 py-4 bg-slate-900/40 space-y-3">
+                    <p x-show="idea.source" class="text-xs text-slate-500 italic" x-text="'Source: ' + idea.source"></p>
+                    <p x-show="idea.notes" class="text-sm text-slate-400 leading-relaxed" x-text="idea.notes"></p>
+                    <div x-show="idea.symbols && idea.symbols.length" class="flex flex-wrap items-center gap-1.5">
+                      <span class="text-xs text-slate-500">Related:</span>
+                      <template x-for="sym in (idea.symbols||[])" :key="sym">
+                        <span class="text-xs px-2 py-0.5 font-mono bg-slate-700/70 text-slate-300 rounded-lg cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 border border-slate-600/50 transition"
+                              @click="perStockSymbol = sym; go('per_stock')"
+                              x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                      </template>
+                    </div>
+                    <!-- Status workflow -->
+                    <div class="flex items-center gap-2 pt-3 border-t border-slate-700/60 flex-wrap">
+                      <span class="text-xs text-slate-500 mr-1">Status:</span>
+                      <button @click="updateIdeaStatus(idea.id, 'raw')" :disabled="idea.status === 'raw'"
+                              class="text-xs px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-25 bg-slate-700/60 text-slate-300 hover:bg-slate-600 border border-slate-600/50">Raw</button>
+                      <button @click="updateIdeaStatus(idea.id, 'exploring')" :disabled="idea.status === 'exploring'"
+                              class="text-xs px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-25 bg-amber-900/30 text-amber-300 hover:bg-amber-800/40 border border-amber-700/30">Exploring</button>
+                      <button @click="updateIdeaStatus(idea.id, 'promoted')" :disabled="idea.status === 'promoted'"
+                              class="text-xs px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-25 bg-emerald-900/30 text-emerald-300 hover:bg-emerald-800/40 border border-emerald-700/30">Promoted</button>
+                      <button @click="updateIdeaStatus(idea.id, 'dismissed')" :disabled="idea.status === 'dismissed'"
+                              class="text-xs px-3 py-1.5 rounded-lg font-medium transition disabled:opacity-25 bg-slate-700/40 text-slate-500 hover:bg-slate-600 border border-slate-700/50">Dismiss</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </template>
           </div>
-          <p x-show="lensIdeasFiltered().length === 0" class="text-slate-500 text-sm text-center py-12 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl">No ideas yet. Read an article? Hear a thesis? Capture it here.</p>
+          <p x-show="lensIdeasFiltered().length === 0" class="text-slate-500 text-sm text-center py-16 bg-slate-800/30 border border-dashed border-slate-700 rounded-2xl">No ideas yet. Read an article? Hear a thesis? Capture it here.</p>
         </div>
 
         <!-- ── CUSTOM FORMULAS ─────────────────────────────────────────────── -->
-        <div x-show="lensActiveTab === 'custom'" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Python-safe expressions evaluated against each stock's metrics. Build filters or scoring formulas from any available field.</p>
-            <button @click="openLensForm('custom')" class="shrink-0 self-start text-sm px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition font-medium">+ New Formula</button>
+        <div x-show="lensActiveTab === 'custom'" class="space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-400 max-w-xl leading-relaxed">Python-safe expressions evaluated against each stock's metrics. Build filters or scoring formulas from any available field.</p>
+            <button @click="openLensForm('custom')" class="shrink-0 flex items-center gap-1.5 text-sm px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition font-medium shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Formula
+            </button>
           </div>
-          <div class="grid gap-3">
+          <div class="grid gap-2">
             <template x-for="lens in lensCustom" :key="lens.id">
-              <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-sm p-4">
-                <div class="flex items-start gap-3">
-                  <span class="text-xl leading-none shrink-0" x-text="lens.emoji || '🔧'"></span>
+              <div class="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 group">
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 rounded-xl bg-slate-700/80 flex items-center justify-center text-xl shrink-0 border border-slate-600/50" x-text="lens.emoji || '🔧'"></div>
                   <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-start justify-between gap-2 mb-2">
                       <div class="min-w-0">
-                        <p class="font-semibold text-slate-100 leading-snug" x-text="lens.name"></p>
-                        <p class="text-sm text-slate-400 mt-1 leading-relaxed" x-text="lens.description"></p>
+                        <div class="flex items-center gap-2">
+                          <p class="font-semibold text-slate-100 text-[15px]" x-text="lens.name"></p>
+                          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border"
+                                :class="lens.type === 'score' ? 'text-blue-400 bg-blue-900/30 border-blue-700/40' : 'text-slate-400 bg-slate-700/50 border-slate-600/50'"
+                                x-text="lens.type"></span>
+                        </div>
+                        <p class="text-sm text-slate-400 mt-0.5 leading-snug" x-text="lens.description"></p>
                       </div>
-                      <div class="flex items-center gap-2 shrink-0 text-xs">
-                        <span class="px-2 py-0.5 rounded-md border border-slate-600 text-slate-400 bg-slate-700/50" x-text="lens.type"></span>
-                        <button @click="openLensForm('custom', lens)" class="text-teal-700 hover:text-teal-900 font-medium">Edit</button>
-                        <button @click="deleteLens('custom', lens.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                      <div class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button @click="openLensForm('custom', lens)"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-teal-400 hover:bg-teal-900/30 transition" title="Edit">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </button>
+                        <button @click="deleteLens('custom', lens.id)"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-900/30 transition" title="Delete">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
                       </div>
                     </div>
-                    <div class="mt-3 bg-slate-900 rounded-lg px-3 py-2.5 font-mono text-sm text-emerald-300 overflow-x-auto" x-text="lens.expression"></div>
-                    <p x-show="lens.source" class="text-xs text-slate-400 italic mt-2" x-text="'Source: ' + lens.source"></p>
+                    <div class="bg-slate-900/70 rounded-xl px-4 py-3 font-mono text-sm text-emerald-300 overflow-x-auto border border-slate-700/50" x-text="lens.expression"></div>
+                    <p x-show="lens.source" class="text-xs text-slate-500 italic mt-2" x-text="'Source: ' + lens.source"></p>
                   </div>
                 </div>
               </div>
             </template>
           </div>
           <!-- Available fields reference -->
-          <details class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-sm">
-            <summary class="text-sm font-medium text-slate-300 cursor-pointer select-none">Available fields for expressions (<span x-text="lensCustomFields.length"></span> total)</summary>
-            <div class="mt-3 flex flex-wrap gap-1.5">
+          <details class="rounded-2xl border border-slate-700 bg-slate-800/40 overflow-hidden">
+            <summary class="px-5 py-3.5 text-sm font-medium text-slate-400 cursor-pointer select-none hover:bg-slate-800 transition list-none flex items-center justify-between">
+              <span>Available fields <span class="text-slate-500 font-normal">(<span x-text="lensCustomFields.length"></span> total)</span></span>
+              <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="px-5 pb-4 pt-2 border-t border-slate-700/60 flex flex-wrap gap-1.5">
               <template x-for="f in lensCustomFields" :key="f">
-                <span class="text-xs font-mono px-2 py-0.5 bg-slate-700 text-slate-300 rounded cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 transition"
+                <span class="text-xs font-mono px-2 py-1 bg-slate-700/70 text-slate-300 rounded-lg cursor-pointer hover:bg-teal-800/40 hover:text-teal-300 border border-slate-600/50 transition"
                       @click="lensForm.expression = (lensForm.expression||'') + f" x-text="f"></span>
               </template>
             </div>
           </details>
-          <p x-show="lensCustom.length === 0" class="text-slate-500 text-sm text-center py-12 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl">No custom formulas yet. Examples: <code class="text-teal-700 bg-teal-50 px-1 rounded">roe > 0.20 and debt_to_equity < 0.3</code></p>
+          <p x-show="lensCustom.length === 0" class="text-slate-500 text-sm text-center py-16 bg-slate-800/30 border border-dashed border-slate-700 rounded-2xl">No custom formulas yet. Example: <code class="text-teal-400 bg-slate-700/50 px-1.5 py-0.5 rounded-lg text-xs font-mono">roe > 0.20 and debt_to_equity &lt; 0.3</code></p>
         </div>
 
         <!-- ════ LENS FORM MODAL ════════════════════════════════════════════ -->
