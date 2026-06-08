@@ -5094,7 +5094,7 @@
           (this.allStocksRows || []).forEach(r => { if (r.sector) seen.add(r.sector); });
           return [...seen].sort();
         },
-        onPageChange() {
+        async onPageChange() {
           // Destroy only the Tabulator(s) for the page being left, not all of them.
           // Data stays in memory so switching back is instant (no network call).
           const _pageTabs = {
