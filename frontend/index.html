@@ -2750,6 +2750,11 @@
               <p class="text-sm text-slate-500 mt-0.5">Your current holdings. <span class="text-slate-400">Avg buy price is optional — enables P&L and cost-basis analysis.</span></p>
             </div>
             <div class="flex gap-2 flex-wrap">
+              <button @click="syncPortfolioFromTrades().then(() => { fetchPortfolioData(); fetchPortfolioPrices(); })"
+                      title="Sync holdings from your trade ledger (open positions by AVCO)"
+                      class="px-3 py-1.5 rounded-lg bg-slate-600 text-white text-xs font-medium hover:bg-slate-500 transition flex items-center gap-1.5">
+                ⇄ Sync from Trades
+              </button>
               <button @click="computePortfolioAll(false)" :disabled="computeRunning || !personalIndexInputRows.length"
                       title="Fetch missing/outdated Sharia periods from Yahoo Finance"
                       class="px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-medium hover:bg-teal-700 disabled:opacity-50 transition">
@@ -5145,6 +5150,10 @@
             }
           }
           else if (this.page === 'portfolio') {
+            // Auto-sync holdings from trade positions if nothing manually entered
+            if (!this.personalIndexInputRows.length) {
+              await this.syncPortfolioFromTrades();
+            }
             if (this.portfolioRows.length) {
               // Re-init tables from cached data
               this.$nextTick(() => {
@@ -7352,6 +7361,25 @@
             }
           } catch (_) {}
           finally { this.computeRunning = false; }
+        },
+        async syncPortfolioFromTrades() {
+          // Populate personalIndexInputRows from open trade positions (AVCO units + avg cost)
+          try {
+            const r = await fetch('/api/trades/positions');
+            const d = await r.json();
+            const positions = d.positions || [];
+            if (!positions.length) return;
+            this.personalIndexInputRows = positions.map(pos => ({
+              symbol: pos.symbol,
+              units: pos.units,
+              price: pos.avg_cost ? Math.round(pos.avg_cost * 100) / 100 : '',
+              market: 'IN',
+            }));
+            // Also update the text backing store
+            this.personalIndexHoldingsText = positions
+              .map(pos => `${pos.symbol} ${pos.units} ${pos.avg_cost ? Math.round(pos.avg_cost * 100) / 100 : ''}`)
+              .join('\n');
+          } catch(_) {}
         },
         async fetchPortfolioPrices() {
           // Silently fetch live prices via the analyze endpoint — populates personalIndexHoldingsRows
