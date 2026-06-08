@@ -2938,21 +2938,19 @@
         </section>
 
         <!-- Section: Performance vs benchmarks -->
-        <section x-show="personalIndexInputRows.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+        <section x-show="personalIndexInputRows.length" class="bg-slate-800 rounded-2xl border border-slate-700 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-700 flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <h2 class="text-base font-semibold text-slate-800">Performance vs Benchmarks</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Simple return from avg buy price vs indices, inflation, and USD-real (FX-adjusted). Not XIRR.</p>
+              <h2 class="text-base font-semibold text-slate-100">Performance vs Benchmarks</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Simple return from avg buy price vs indices, inflation, and USD-real (FX-adjusted). Not XIRR.</p>
             </div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <label class="text-xs text-slate-500 font-medium">Invested since</label>
-              <input type="date"
-                     x-model="portfolioInvestedSince"
-                     @change="saveSettings(); fetchPortfolioPerformance()"
-                     class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm focus:ring-2 focus:ring-teal-500" />
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs text-slate-400">
+                Since <span class="font-medium text-slate-200" x-text="portfolioInvestedSince || '—'"></span>
+              </span>
               <button @click="fetchPortfolioPerformance()"
                       :disabled="performanceLoading || !personalIndexInputRows.length"
-                      class="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-medium hover:bg-violet-700 disabled:opacity-50 transition">
+                      class="px-4 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-medium hover:bg-violet-500 disabled:opacity-50 transition">
                 <span x-show="!performanceLoading">Refresh</span>
                 <span x-show="performanceLoading">Computing…</span>
               </button>
@@ -2962,69 +2960,69 @@
           <div x-show="performanceLoading" class="px-6 py-10 text-center text-sm text-slate-400">Fetching benchmark returns…</div>
 
           <div x-show="!performanceLoading && performanceError" class="px-6 py-6">
-            <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3" x-text="performanceError"></p>
+            <p class="text-sm text-amber-400 bg-amber-900/30 border border-amber-700 rounded-lg px-4 py-3" x-text="performanceError"></p>
           </div>
 
           <template x-if="performanceData && !performanceLoading">
             <div class="p-6 space-y-6">
               <!-- Period + portfolio summary -->
               <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Period</p>
-                  <p class="text-sm font-medium text-slate-800 mt-1"
+                <div class="rounded-xl border border-slate-600 bg-slate-700/50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Period</p>
+                  <p class="text-sm font-medium text-slate-100 mt-1"
                      x-text="performanceData.period_days + ' days (' + performanceData.period_years + ' yr)'"></p>
                   <p class="text-[10px] text-slate-400 mt-0.5"
                      x-text="performanceData.anchor_date + ' → ' + performanceData.as_of_date"></p>
                 </div>
-                <div class="rounded-xl border border-teal-200 bg-teal-50/50 p-4">
-                  <p class="text-[10px] uppercase tracking-wider text-teal-700 font-semibold">Your portfolio (INR)</p>
+                <div class="rounded-xl border border-teal-700/60 bg-teal-900/30 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-teal-400 font-semibold">Your portfolio (INR)</p>
                   <p class="text-2xl font-bold mt-1"
-                     :class="(performanceData.portfolio?.return_pct_inr ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                     :class="(performanceData.portfolio?.return_pct_inr ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'"
                      x-text="performanceData.portfolio?.return_pct_inr != null ? (performanceData.portfolio.return_pct_inr >= 0 ? '+' : '') + performanceData.portfolio.return_pct_inr.toFixed(1) + '%' : '—'"></p>
-                  <p class="text-[10px] text-slate-500 mt-0.5"
+                  <p class="text-[10px] text-slate-400 mt-0.5"
                      x-text="'₹' + (performanceData.portfolio?.cost_basis_inr || 0).toLocaleString(undefined,{maximumFractionDigits:0}) + ' → ₹' + (performanceData.portfolio?.current_value_inr || 0).toLocaleString(undefined,{maximumFractionDigits:0})"></p>
                 </div>
-                <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4">
-                  <p class="text-[10px] uppercase tracking-wider text-indigo-700 font-semibold">USD-real return</p>
+                <div class="rounded-xl border border-indigo-700/60 bg-indigo-900/30 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-indigo-400 font-semibold">USD-real return</p>
                   <p class="text-2xl font-bold mt-1"
-                     :class="(performanceData.portfolio?.return_pct_usd ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                     :class="(performanceData.portfolio?.return_pct_usd ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'"
                      x-text="performanceData.portfolio?.return_pct_usd != null ? (performanceData.portfolio.return_pct_usd >= 0 ? '+' : '') + performanceData.portfolio.return_pct_usd.toFixed(1) + '%' : '—'"></p>
-                  <p class="text-[10px] text-slate-500 mt-0.5"
+                  <p class="text-[10px] text-slate-400 mt-0.5"
                      x-text="'$' + (performanceData.portfolio?.cost_basis_usd || 0).toLocaleString(undefined,{maximumFractionDigits:0}) + ' → $' + (performanceData.portfolio?.current_value_usd || 0).toLocaleString(undefined,{maximumFractionDigits:0})"></p>
                 </div>
-                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">USD/INR</p>
-                  <p class="text-sm font-medium text-slate-800 mt-1"
+                <div class="rounded-xl border border-slate-600 bg-slate-700/50 p-4">
+                  <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">USD/INR</p>
+                  <p class="text-sm font-medium text-slate-100 mt-1"
                      x-text="performanceData.fx?.usd_inr_anchor && performanceData.fx?.usd_inr_now ? '₹' + performanceData.fx.usd_inr_anchor.toFixed(2) + ' → ₹' + performanceData.fx.usd_inr_now.toFixed(2) : '—'"></p>
-                  <p class="text-[10px] text-slate-500 mt-0.5"
+                  <p class="text-[10px] text-slate-400 mt-0.5"
                      x-text="performanceData.fx?.rupee_depreciation_pct != null ? 'Rupee ' + (performanceData.fx.rupee_depreciation_pct >= 0 ? 'depreciation' : 'appreciation') + ': ' + Math.abs(performanceData.fx.rupee_depreciation_pct).toFixed(1) + '%' : ''"></p>
                 </div>
               </div>
 
               <!-- Benchmark comparison table -->
-              <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <div class="overflow-x-auto rounded-xl border border-slate-700">
                 <table class="w-full text-sm min-w-[640px]">
                   <thead>
-                    <tr class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <tr class="bg-slate-700/80 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-700">
                       <th class="text-left px-4 py-2.5">Benchmark</th>
                       <th class="text-right px-4 py-2.5">Return</th>
                       <th class="text-right px-4 py-2.5">Alpha vs you</th>
                       <th class="text-left px-4 py-2.5 hidden md:table-cell">Notes</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-100">
+                  <tbody class="divide-y divide-slate-700/60">
                     <template x-for="b in (performanceData.benchmarks || [])" :key="b.id">
-                      <tr class="hover:bg-slate-50/60">
-                        <td class="px-4 py-2.5 font-medium text-slate-800" x-text="b.name"></td>
-                        <td class="px-4 py-2.5 text-right"
-                            :class="(b.return_pct ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
-                            x-text="b.return_pct != null ? (b.return_pct >= 0 ? '+' : '') + b.return_pct.toFixed(1) + '%' : '—'"></td>
+                      <tr class="hover:bg-slate-700/40 transition-colors">
+                        <td class="px-4 py-2.5 font-medium text-slate-200" x-text="b.name"></td>
                         <td class="px-4 py-2.5 text-right font-medium"
-                            :class="(b.alpha_vs_portfolio_inr_pct ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'"
+                            :class="(b.return_pct ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'"
+                            x-text="b.return_pct != null ? (b.return_pct >= 0 ? '+' : '') + b.return_pct.toFixed(1) + '%' : '—'"></td>
+                        <td class="px-4 py-2.5 text-right font-semibold"
+                            :class="(b.alpha_vs_portfolio_inr_pct ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'"
                             x-text="b.alpha_vs_portfolio_inr_pct != null ? (b.alpha_vs_portfolio_inr_pct >= 0 ? '+' : '') + b.alpha_vs_portfolio_inr_pct.toFixed(1) + ' pp' : '—'"></td>
-                        <td class="px-4 py-2.5 text-xs text-slate-400 hidden md:table-cell">
+                        <td class="px-4 py-2.5 text-xs text-slate-500 hidden md:table-cell">
                           <span x-show="b.type === 'inflation'" x-text="'Assumed ' + (b.annual_pct || 6) + '% CPI p.a.'"></span>
-                          <span x-show="b.type === 'index' && b.error" x-text="b.error" class="text-amber-600"></span>
+                          <span x-show="b.type === 'index' && b.error" x-text="b.error" class="text-amber-500"></span>
                           <span x-show="b.type === 'index' && !b.error && b.ticker" x-text="b.ticker"></span>
                         </td>
                       </tr>
@@ -3033,18 +3031,18 @@
                 </table>
               </div>
 
-              <p x-show="performanceData.warnings?.length" class="text-xs text-amber-700">
+              <p x-show="performanceData.warnings?.length" class="text-xs text-amber-400">
                 <template x-for="(w, i) in (performanceData.warnings || [])" :key="i">
                   <span x-text="w"></span><br/>
                 </template>
               </p>
-              <p class="text-[10px] text-slate-400" x-text="performanceData.method_note"></p>
+              <p class="text-[10px] text-slate-500" x-text="performanceData.method_note"></p>
             </div>
           </template>
 
           <div x-show="!performanceLoading && !performanceData && !performanceError && personalIndexInputRows.length"
                class="px-6 py-8 text-center text-sm text-slate-400">
-            Set an <strong>Invested since</strong> date and click Refresh to compare returns.
+            Click <strong class="text-slate-200">Refresh</strong> to compare returns against benchmarks.
           </div>
         </section>
 
@@ -6300,6 +6298,15 @@
             this.performanceData = null;
             this.performanceError = '';
             return;
+          }
+          // Auto-derive anchor date from first trade in ledger if not manually set
+          if (!this.portfolioInvestedSince) {
+            try {
+              const r = await fetch('/api/trades?limit=1000');
+              const d = await r.json();
+              const dates = (d.trades || []).map(t => t.date).filter(Boolean).sort();
+              if (dates.length) this.portfolioInvestedSince = dates[0];
+            } catch(_) {}
           }
           this.performanceLoading = true;
           this.performanceError = '';
