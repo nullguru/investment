@@ -4205,9 +4205,9 @@
           </div>
           <div class="grid gap-2">
             <template x-for="lens in lensCompositeLenses" :key="lens.id">
-              <div class="rounded-2xl border border-slate-700 bg-slate-800/60 backdrop-blur-sm" x-data="{ open: false }">
+              <div class="rounded-2xl border border-slate-700 bg-slate-800/60 backdrop-blur-sm">
                 <!-- Card header: div (not button) so inner buttons are valid HTML -->
-                <div class="flex items-center gap-4 px-5 py-4 cursor-pointer select-none" @click="open = !open">
+                <div class="flex items-center gap-4 px-5 py-4 cursor-pointer select-none" @click="lensOpenMap[lens.id] = !lensOpenMap[lens.id]">
                   <div class="w-10 h-10 rounded-xl bg-slate-700/80 flex items-center justify-center text-xl shrink-0 border border-slate-600/50" x-text="lens.emoji || '📐'"></div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-baseline gap-2">
@@ -4226,11 +4226,11 @@
                             class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-900/30 transition" title="Delete">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
-                    <svg class="w-4 h-4 text-slate-500 transition-transform duration-200 ml-1" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <svg class="w-4 h-4 text-slate-500 transition-transform duration-200 ml-1" :class="lensOpenMap[lens.id] ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </div>
                 </div>
                 <!-- Expandable breakdown -->
-                <div x-show="open"
+                <div x-show="lensOpenMap[lens.id]"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -translate-y-1"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -4329,8 +4329,8 @@
           </div>
           <div class="grid gap-2">
             <template x-for="idea in lensIdeasFiltered()" :key="idea.id">
-              <div class="rounded-2xl border border-slate-700 bg-slate-800/60" x-data="{ open: false }">
-                <div class="flex items-start gap-4 px-5 py-4 cursor-pointer select-none" @click="open = !open">
+              <div class="rounded-2xl border border-slate-700 bg-slate-800/60">
+                <div class="flex items-start gap-4 px-5 py-4 cursor-pointer select-none" @click="lensOpenMap[idea.id] = !lensOpenMap[idea.id]">
                   <div class="flex-1 min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                       <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border"
@@ -4356,10 +4356,10 @@
                             class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-900/30 transition" title="Delete">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
-                    <svg class="w-4 h-4 text-slate-500 transition-transform duration-200 ml-1" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <svg class="w-4 h-4 text-slate-500 transition-transform duration-200 ml-1" :class="lensOpenMap[idea.id] ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </div>
                 </div>
-                <div x-show="open"
+                <div x-show="lensOpenMap[idea.id]"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -translate-y-1"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -4893,6 +4893,7 @@
         lensThematics: [],
         lensIdeas: [],
         lensCustom: [],
+        lensOpenMap: {},              // tracks expanded state per lens/idea id
         lensActiveTab: 'composite',   // composite | thematic | ideas | custom
         lensFormOpen: false,
         lensFormType: null,           // type of form open
