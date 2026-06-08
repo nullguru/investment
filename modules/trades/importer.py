@@ -54,13 +54,15 @@ def _parse_date(raw: str) -> str:
 
 
 def _symbol_with_suffix(symbol: str, exchange: str) -> str:
-    """Add yfinance suffix if missing.  NSE → .NS, BSE → .BO"""
+    """Add yfinance suffix if missing.
+    Always use .NS for Indian stocks regardless of execution exchange —
+    the same security trades on both NSE and BSE; .NS is the canonical
+    yfinance ticker and must be consistent for AVCO position tracking.
+    """
     s = symbol.strip().upper()
     if "." in s:
         return s
-    if exchange.upper() == "BSE":
-        return s + ".BO"
-    return s + ".NS"  # default NSE
+    return s + ".NS"
 
 
 def _build_trade(row: dict) -> dict:
