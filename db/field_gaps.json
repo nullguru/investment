@@ -592,5 +592,41 @@
         "filled_at": null
       }
     }
+  },
+  "INFY.BO": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-08T17:49:57.990523+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-08T17:49:57.990523+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "HCLTECH.BO": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-08T17:49:59.228005+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-08T17:49:59.228005+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
   }
 }

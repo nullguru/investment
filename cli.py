@@ -335,7 +335,9 @@ def cmd_portfolio(args):
         return cmd_portfolio_analyze(args)
     if action == "size":
         return cmd_portfolio_size(args)
-    print_error("Specify a subcommand: analyze or size", fmt=args.format)
+    if action == "performance":
+        return cmd_portfolio_performance(args)
+    print_error("Specify a subcommand: analyze, size, or performance", fmt=args.format)
     return 1
 
 
@@ -352,6 +354,29 @@ def cmd_portfolio_analyze(args):
 
     result = analyze_portfolio(holdings)
     if result.get("error"):
+        print_error(result["error"], fmt=args.format)
+        return 1
+
+    print_output(result, fmt=args.format)
+    return 0
+
+
+def cmd_portfolio_performance(args):
+    """Compare portfolio return vs index and inflation benchmarks."""
+    from modules.portfolio import parse_holdings_arg, compute_portfolio_performance
+    from core.output import print_output, print_error
+
+    holdings = parse_holdings_arg(args.holdings)
+    if not holdings:
+        print_error("Provide holdings like TCS.NS:9:3015,INFY.NS:24:1549", fmt=args.format)
+        return 1
+
+    result = compute_portfolio_performance(
+        holdings=holdings,
+        anchor_date=args.since,
+        benchmark_ids=args.benchmarks.split(",") if args.benchmarks else None,
+    )
+    if result.get("error") and not result.get("portfolio"):
         print_error(result["error"], fmt=args.format)
         return 1
 
@@ -1030,6 +1055,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Current holdings as SYMBOL:units[:price], e.g. TCS.NS:9,INFY.NS:24",
     )
     ps.add_argument("--sip", type=float, default=0.0, help="Fresh capital to deploy (₹)")
+
+    pp_perf = port_sub.add_parser("performance", help="Return vs indices, inflation, USD-real", parents=[common])
+    pp_perf.add_argument(
+        "--holdings", required=True,
+        help="Comma-separated SYMBOL:units:price entries, e.g. TCS.NS:9:3015,INFY.NS:24:1549",
+    )
+    pp_perf.add_argument(
+        "--since",
+        help="Anchor date YYYY-MM-DD (default: 1 year ago)",
+    )
+    pp_perf.add_argument(
+        "--benchmarks",
+        help="Comma-separated benchmark ids (default: all). e.g. nifty50,nifty500,inflation",
+    )
 
     # --- universe-suggest ---
     p = sub.add_parser(

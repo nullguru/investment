@@ -13,6 +13,11 @@ from modules.portfolio.sharia_index import (
 )
 from modules.portfolio.policy import analyze_portfolio
 from modules.portfolio.sizer import compute_position_size
+from modules.portfolio.performance import (
+    compute_portfolio_performance,
+    list_performance_benchmarks,
+    load_performance_indices,
+)
 
 __all__ = [
     "analyze_personal_index",
@@ -22,4 +27,7 @@ __all__ = [
     "parse_holdings_text",
     "analyze_portfolio",
     "compute_position_size",
+    "compute_portfolio_performance",
+    "list_performance_benchmarks",
+    "load_performance_indices",
 ]

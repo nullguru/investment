@@ -95,10 +95,11 @@
   "portfolioSymbolsText": "TCS\nINFY\nHCLTECH",
   "compareSymbolsText": "TCS.NS\nINFY.NS",
   "watchlistText": "",
-  "personalIndexHoldingsText": "INFY.NS 24 1549\nHINDUNILVR.NS 21 2411\nSUNPHARMA.NS 20 1665\nCIPLA.NS 24 1497\nGAIL.NS 226 174\nTATATECH.NS 56 676\nHAVELLS.NS 9 1468\nCUMMINSIND.NS 16 3984\nSAFARI.NS 16 2163\nTCS.NS 9 3015\nHCLTECH.NS 23 1548",
+  "personalIndexHoldingsText": "INFY.NS 24 1549\nHINDUNILVR.NS 21 2411\nSUNPHARMA.NS 20 1665\nCIPLA.NS 24 1497\nGAIL.NS 226 174\nTATATECH.NS 56 676\nHAVELLS.NS 9 1468\nSAFARI.NS 16 2163\nTCS.NS 9 3015\nHCLTECH.NS 23 1548",
   "personalIndexBenchmark": "nifty50",
   "personalIndexSipAmount": 0.0,
   "personalIndexStrictNoSell": true,
+  "portfolioInvestedSince": "2026-04-04",
   "computeN": 50,
   "computeWorkers": 5
 }

@@ -1,0 +1,41 @@
+{
+  "as_of": "2026-06-04",
+  "inflation": {
+    "id": "inflation",
+    "name": "India CPI (assumed)",
+    "annual_pct": 6.0,
+    "note": "Ballpark CPI assumption for purchasing-power comparison; replace with published CPI when available."
+  },
+  "indices": [
+    {
+      "id": "nifty50",
+      "name": "Nifty 50",
+      "ticker": "^NSEI",
+      "market": "india"
+    },
+    {
+      "id": "nifty100",
+      "name": "Nifty 100",
+      "ticker": "^CNX100",
+      "market": "india"
+    },
+    {
+      "id": "nifty500",
+      "name": "Nifty 500",
+      "ticker": "^CRSLDX",
+      "market": "india"
+    },
+    {
+      "id": "sensex",
+      "name": "BSE Sensex",
+      "ticker": "^BSESN",
+      "market": "india"
+    },
+    {
+      "id": "sp500",
+      "name": "S&P 500",
+      "ticker": "^GSPC",
+      "market": "us"
+    }
+  ]
+}
