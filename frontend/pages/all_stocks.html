@@ -1,0 +1,474 @@
+      <div x-show="page === 'all_stocks'" x-cloak class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-semibold text-slate-800">All Stocks</h1>
+          <button x-show="allStocksRows.length" @click="columnModalTable = 'all_stocks'"
+                  class="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition" title="Table columns">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </button>
+        </div>
+        <p x-show="!allStocksRows.length && !loading" class="text-slate-600">No Sharia data yet. Open Compute Sharia data on Home.</p>
+        <div x-show="loading" class="text-slate-500">Loading…</div>
+        <div x-show="allStocksRows.length" class="space-y-3">
+          <!-- Search + filter toolbar -->
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="text" x-model="tableSearchQuery" @input="applyTableSearch()"
+                   placeholder="Search by name, symbol, sector…"
+                   class="flex-1 min-w-[200px] max-w-sm rounded-lg border border-slate-200 px-3 py-2 text-sm placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+            <!-- Filters button -->
+            <button @click="stockFilterPanelOpen = true"
+                    :class="['flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition',
+                      stockFilterActiveCount() > 0 ? 'bg-teal-600 text-white border-teal-600 hover:bg-teal-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50']">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+              Filters
+              <span x-show="stockFilterActiveCount() > 0"
+                    class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold"
+                    :class="stockFilterActiveCount() > 0 ? 'bg-white text-teal-700' : 'bg-teal-100 text-teal-700'"
+                    x-text="stockFilterActiveCount()"></span>
+            </button>
+            <!-- Clear all -->
+            <button x-show="stockFilterActiveCount() > 0" @click="clearAllStockFilters()"
+                    class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 transition">
+              Clear all
+            </button>
+          </div>
+
+          <!-- Active filter chips -->
+          <div x-show="stockFilterActiveCount() > 0" class="flex flex-wrap gap-1.5">
+            <template x-if="shariaFilterOn">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                Sharia compliant
+                <button @click="shariaFilterOn = false; applyTableSearch()" class="hover:text-emerald-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-for="ex in stockFilters.exchange" :key="ex">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span x-text="ex"></span>
+                <button @click="stockFilters.exchange = stockFilters.exchange.filter(e=>e!==ex); applyTableSearch()" class="hover:text-blue-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-for="sec in stockFilters.sector" :key="sec">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                <span x-text="sec"></span>
+                <button @click="stockFilters.sector = stockFilters.sector.filter(s=>s!==sec); applyTableSearch()" class="hover:text-orange-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.marketCapMin || stockFilters.marketCapMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                MCap: <span x-text="(stockFilters.marketCapMin||'0')+'–'+(stockFilters.marketCapMax||'∞')+' Cr'"></span>
+                <button @click="stockFilters.marketCapMin=''; stockFilters.marketCapMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.peMin || stockFilters.peMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                P/E: <span x-text="(stockFilters.peMin||'0')+'–'+(stockFilters.peMax||'∞')"></span>
+                <button @click="stockFilters.peMin=''; stockFilters.peMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.roeMin || stockFilters.roeMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                ROE: <span x-text="(stockFilters.roeMin||'0')+'–'+(stockFilters.roeMax||'∞')+'%'"></span>
+                <button @click="stockFilters.roeMin=''; stockFilters.roeMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.marginMin || stockFilters.marginMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Op.Margin: <span x-text="(stockFilters.marginMin||'0')+'–'+(stockFilters.marginMax||'∞')+'%'"></span>
+                <button @click="stockFilters.marginMin=''; stockFilters.marginMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.debtEquityMin || stockFilters.debtEquityMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                D/E: <span x-text="(stockFilters.debtEquityMin||'0')+'–'+(stockFilters.debtEquityMax||'∞')"></span>
+                <button @click="stockFilters.debtEquityMin=''; stockFilters.debtEquityMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.qualityMin">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-800">
+                Quality ≥ <span x-text="stockFilters.qualityMin"></span>
+                <button @click="stockFilters.qualityMin=''; applyTableSearch()" class="hover:text-violet-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.cashPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Cash/Assets ≤ <span x-text="stockFilters.cashPctMax+'%'"></span>
+                <button @click="stockFilters.cashPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.recPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Rec/Assets ≤ <span x-text="stockFilters.recPctMax+'%'"></span>
+                <button @click="stockFilters.recPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+            <template x-if="stockFilters.otherRevPctMax">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                Other Rev% ≤ <span x-text="stockFilters.otherRevPctMax+'%'"></span>
+                <button @click="stockFilters.otherRevPctMax=''; applyTableSearch()" class="hover:text-slate-600 ml-0.5">✕</button>
+              </span>
+            </template>
+          </div>
+
+          <!-- Filter Modal -->
+          <div x-show="stockFilterPanelOpen" x-cloak
+               @keydown.escape.window="stockFilterPanelOpen = false"
+               class="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+               x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+               x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+               x-data="{ fTab: 'compliance' }">
+            <div @click="stockFilterPanelOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="relative bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-3xl flex flex-col"
+                 style="max-height: min(92vh, 640px)"
+                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+
+              <!-- Drag handle mobile -->
+              <div class="flex justify-center pt-2.5 pb-0.5 sm:hidden shrink-0"><div class="w-8 h-1 rounded-full bg-slate-300"></div></div>
+
+              <!-- Header -->
+              <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-100">Filters</span>
+                  <template x-if="stockFilterActiveCount() > 0">
+                    <span class="px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 text-[11px] font-semibold" x-text="stockFilterActiveCount() + ' active'"></span>
+                  </template>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button x-show="stockFilterActiveCount() > 0" @click="clearAllStockFilters()"
+                    class="text-[11px] font-medium text-rose-500 hover:text-rose-700 transition px-2 py-1 rounded hover:bg-rose-50">Clear all</button>
+                  <button @click="stockFilterPanelOpen = false"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Two-column body -->
+              <div class="flex flex-1 min-h-0">
+
+                <!-- Left nav -->
+                <div class="w-36 sm:w-44 shrink-0 border-r border-slate-100 dark:border-slate-800 overflow-y-auto py-2">
+                  <template x-for="tab in [
+                    {id:'compliance', icon:'☪️', label:'Compliance'},
+                    {id:'market',     icon:'📊', label:'Market'},
+                    {id:'valuation',  icon:'💰', label:'Valuation'},
+                    {id:'profit',     icon:'📈', label:'Profitability'},
+                    {id:'growth',     icon:'🚀', label:'Growth'},
+                    {id:'health',     icon:'🏦', label:'Health'},
+                    {id:'momentum',   icon:'⚡', label:'Momentum'},
+                    {id:'sharia',     icon:'📐', label:'Sharia Ratios'}
+                  ]" :key="tab.id">
+                    <button @click="fTab = tab.id"
+                            :class="fTab === tab.id
+                              ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-r-2 border-teal-500 font-semibold'
+                              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                            class="w-full flex items-center gap-2 px-3 py-2 text-xs transition text-left">
+                      <span x-text="tab.icon" class="text-sm leading-none"></span>
+                      <span x-text="tab.label"></span>
+                    </button>
+                  </template>
+                </div>
+
+                <!-- Right content -->
+                <div class="flex-1 overflow-y-auto px-5 py-4">
+
+                  <!-- Compliance -->
+                  <div x-show="fTab === 'compliance'" class="space-y-4">
+                    <div>
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Sharia</p>
+                      <button @click="shariaFilterOn = !shariaFilterOn; applyTableSearch()"
+                              :class="shariaFilterOn ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-emerald-400'"
+                              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition">
+                        <span>☪</span><span>Compliant only</span>
+                        <span x-show="shariaFilterOn" class="text-emerald-100 text-xs font-bold">✓</span>
+                      </button>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Exchange</p>
+                      <div class="flex gap-2">
+                        <template x-for="ex in ['NSE','BSE']" :key="ex">
+                          <button @click="toggleArrayFilter('exchange', ex); applyTableSearch()"
+                                  :class="stockFilters.exchange.includes(ex) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-slate-800 text-slate-600 border-slate-200 dark:border-slate-600 hover:border-blue-400'"
+                                  class="px-5 py-2 rounded-xl text-sm font-medium border transition" x-text="ex"></button>
+                        </template>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sector</p>
+                        <button x-show="stockFilters.sector.length" @click="stockFilters.sector=[]; applyTableSearch()" class="text-[10px] text-rose-500 hover:underline">Clear</button>
+                      </div>
+                      <div class="flex flex-wrap gap-1.5">
+                        <template x-for="sec in allStocksSectors()" :key="sec">
+                          <button @click="toggleArrayFilter('sector', sec); applyTableSearch()"
+                                  :class="stockFilters.sector.includes(sec) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-orange-400'"
+                                  class="px-2.5 py-1 rounded-full text-[11px] font-medium border transition" x-text="sec"></button>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Market & Size -->
+                  <div x-show="fTab === 'market'" class="space-y-4">
+                    <div>
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Market Cap (₹ Cr)</p>
+                      <div class="flex gap-2 items-center mb-2">
+                        <input type="number" x-model="stockFilters.marketCapMin" @input="applyTableSearch()" placeholder="Min" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-xs shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.marketCapMax" @input="applyTableSearch()" placeholder="Max" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                      <div class="flex gap-2">
+                        <template x-for="p in [{l:'Small Cap',s:'< ₹5K Cr',min:0,max:5000},{l:'Mid Cap',s:'₹5K–20K',min:5000,max:20000},{l:'Large Cap',s:'> ₹20K Cr',min:20000,max:''}]" :key="p.l">
+                          <button @click="stockFilters.marketCapMin=p.min||''; stockFilters.marketCapMax=p.max||''; applyTableSearch()"
+                                  class="flex-1 px-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-teal-400 text-center transition">
+                            <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-300" x-text="p.l"></p>
+                            <p class="text-[10px] text-slate-400" x-text="p.s"></p>
+                          </button>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Valuation -->
+                  <div x-show="fTab === 'valuation'" class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">P/E (Trailing)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.peMin" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.peMax" @input="applyTableSearch()" placeholder="e.g. 30" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">P/E (Forward)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.forwardPeMin" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.forwardPeMax" @input="applyTableSearch()" placeholder="e.g. 25" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">PEG Ratio</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.pegMin" @input="applyTableSearch()" placeholder="e.g. 0" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.pegMax" @input="applyTableSearch()" placeholder="e.g. 2" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">< 1 = undervalued</p>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Price / Book</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.pbMin" @input="applyTableSearch()" placeholder="e.g. 0.5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.pbMax" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">EV / EBITDA</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.evEbitdaMin" @input="applyTableSearch()" placeholder="e.g. 0" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.evEbitdaMax" @input="applyTableSearch()" placeholder="e.g. 20" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Price / Sales</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.psMin" @input="applyTableSearch()" placeholder="e.g. 0" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.psMax" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Dividend Yield %</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.divYieldMin" @input="applyTableSearch()" placeholder="e.g. 1" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.divYieldMax" @input="applyTableSearch()" placeholder="e.g. 8" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Profitability -->
+                  <div x-show="fTab === 'profit'" class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">ROE (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.roeMin" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.roeMax" @input="applyTableSearch()" placeholder="e.g. 50" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">> 15% = good</p>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">ROA (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.roaMin" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.roaMax" @input="applyTableSearch()" placeholder="e.g. 30" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">ROCE (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.roceMin" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.roceMax" @input="applyTableSearch()" placeholder="e.g. 50" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Net Margin (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.netMarginMin" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.netMarginMax" @input="applyTableSearch()" placeholder="e.g. 40" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Operating Margin (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.opMarginMin" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.opMarginMax" @input="applyTableSearch()" placeholder="e.g. 50" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Gross Margin (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.grossMarginMin" @input="applyTableSearch()" placeholder="e.g. 20" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.grossMarginMax" @input="applyTableSearch()" placeholder="e.g. 80" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Growth -->
+                  <div x-show="fTab === 'growth'" class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Revenue Growth YoY (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.revGrowthMin" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.revGrowthMax" @input="applyTableSearch()" placeholder="e.g. 50" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Earnings Growth YoY (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.earnGrowthMin" @input="applyTableSearch()" placeholder="e.g. 10" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.earnGrowthMax" @input="applyTableSearch()" placeholder="e.g. 60" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Health -->
+                  <div x-show="fTab === 'health'" class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Debt / Equity</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.debtEquityMin" @input="applyTableSearch()" placeholder="e.g. 0" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.debtEquityMax" @input="applyTableSearch()" placeholder="e.g. 1" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">Sharia limit: < 0.33</p>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Current Ratio</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.currentRatioMin" @input="applyTableSearch()" placeholder="e.g. 1" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.currentRatioMax" @input="applyTableSearch()" placeholder="e.g. 3" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">Healthy: > 1.5</p>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Quick Ratio</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.quickRatioMin" @input="applyTableSearch()" placeholder="e.g. 0.5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.quickRatioMax" @input="applyTableSearch()" placeholder="e.g. 2" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Interest Coverage</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.intCovMin" @input="applyTableSearch()" placeholder="e.g. 2" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.intCovMax" @input="applyTableSearch()" placeholder="e.g. 20" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">> 3x = comfortable</p>
+                    </div>
+                  </div>
+
+                  <!-- Momentum -->
+                  <div x-show="fTab === 'momentum'" class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Beta</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.betaMin" @input="applyTableSearch()" placeholder="e.g. 0.5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.betaMax" @input="applyTableSearch()" placeholder="e.g. 1.5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div><p class="text-[10px] text-slate-400 mt-1">< 1 = defensive</p>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">vs 200 DMA (%)</p>
+                      <div class="flex gap-1 items-center">
+                        <input type="number" x-model="stockFilters.vs200dmaMin" @input="applyTableSearch()" placeholder="e.g. -20" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                        <span class="text-slate-400 text-[10px] shrink-0">—</span>
+                        <input type="number" x-model="stockFilters.vs200dmaMax" @input="applyTableSearch()" placeholder="e.g. 20" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sharia Ratios -->
+                  <div x-show="fTab === 'sharia'" class="space-y-3">
+                    <p class="text-xs text-slate-400">Maximum allowed values — leave blank to skip.</p>
+                    <div class="grid grid-cols-1 gap-3">
+                      <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                        <div class="flex-1">
+                          <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400">Cash / Assets ≤</p>
+                          <p class="text-[10px] text-emerald-600 mt-0.5">Sharia limit: 33%</p>
+                        </div>
+                        <div class="relative w-32">
+                          <input type="number" x-model="stockFilters.cashPctMax" @input="applyTableSearch()" placeholder="e.g. 33" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400 pr-6 w-full" />
+                          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">%</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                        <div class="flex-1">
+                          <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400">Receivables / Assets ≤</p>
+                          <p class="text-[10px] text-emerald-600 mt-0.5">Sharia limit: 50%</p>
+                        </div>
+                        <div class="relative w-32">
+                          <input type="number" x-model="stockFilters.recPctMax" @input="applyTableSearch()" placeholder="e.g. 50" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400 pr-6 w-full" />
+                          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">%</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                        <div class="flex-1">
+                          <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400">Non-Halal Revenue ≤</p>
+                          <p class="text-[10px] text-emerald-600 mt-0.5">Sharia limit: 5%</p>
+                        </div>
+                        <div class="relative w-32">
+                          <input type="number" x-model="stockFilters.otherRevPctMax" @input="applyTableSearch()" placeholder="e.g. 5" class="w-full rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400 pr-6 w-full" />
+                          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <span class="text-[11px] text-slate-400"
+                      x-text="stockFilterActiveCount() ? stockFilterActiveCount() + ' filter' + (stockFilterActiveCount()>1?'s':'') + ' active' : 'Showing all stocks'"></span>
+                <button @click="stockFilterPanelOpen = false"
+                        class="px-5 py-2 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-700 transition">
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+                    <div id="all-stocks-table" class="rounded-xl border border-slate-200 overflow-x-auto overflow-hidden" style="min-width: 600px;"></div>
+        </div>
+
+      </div>
+
+      <!-- Per Stock Research -->

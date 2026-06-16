@@ -14,6 +14,8 @@ from __future__ import annotations
 from math import floor
 from typing import Optional
 
+import pandas as pd
+
 from modules.market import get_section_data
 from modules.sharia import enrich_cached_sharia, load_cached_sharia
 from modules.universe.cap_tier import get_cap_tier_by_symbol
@@ -111,7 +113,7 @@ def _map_to_policy_sector(industry, sector) -> Optional[str]:
     return None
 
 
-def analyze_portfolio(holdings: list[dict]) -> dict:
+def analyze_portfolio(holdings: list[dict], market: str = "india") -> dict:
     """
     Analyze holdings against the portfolio construction policy.
 
@@ -122,7 +124,7 @@ def analyze_portfolio(holdings: list[dict]) -> dict:
         return {"error": "No holdings provided"}
 
     # Load Sharia cache for sector/industry metadata
-    sharia_df = load_cached_sharia()
+    sharia_df = load_cached_sharia(market=market)
     sharia_df = enrich_cached_sharia(sharia_df) if sharia_df is not None else None
 
     def _sharia_meta(symbol: str) -> dict:
@@ -143,13 +145,19 @@ def analyze_portfolio(holdings: list[dict]) -> dict:
         }
 
     # ── Enrich each holding with live price + metadata ────────────────────────
+    # Fetch all market snapshots in parallel to avoid serial yfinance latency
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    symbols = [h["symbol"] for h in holdings]
+    with ThreadPoolExecutor(max_workers=min(len(symbols), 10)) as pool:
+        snaps = dict(zip(symbols, pool.map(_market_snapshot, symbols)))
+
     enriched = []
     for h in holdings:
         symbol = h["symbol"]
         units = float(h.get("units") or 0)
         price_override = _safe_float(h.get("price"))
 
-        snap = _market_snapshot(symbol)
+        snap = snaps.get(symbol, {})
         price = price_override or snap.get("currentPrice")
         market_cap = snap.get("marketCap")
         meta = _sharia_meta(symbol)
@@ -341,11 +349,138 @@ def analyze_portfolio(holdings: list[dict]) -> dict:
         "cap_allocation": cap_allocation,
         "sector_weights": sector_weights,
         "stock_weights": [
-            {"symbol": h["symbol"], "weight": round(h["weight"], 4), "cap_tier": h["cap_tier"],
-             "policy_sector": h["policy_sector"], "value": round(h["value"], 2) if h["value"] else None}
+            {
+                "symbol": h["symbol"],
+                "weight": round(h["weight"], 4),
+                "cap_tier": h["cap_tier"],
+                "policy_sector": h["policy_sector"],
+                "value": round(h["value"], 2) if h["value"] else None,
+                "price": h["price"],
+                "sharia": h["sharia"],
+            }
             for h in sorted(enriched, key=lambda x: -(x["weight"] or 0))
         ],
         "concentration_flags": concentration_flags,
         "gaps": gaps,
         "action_items": action_items,
     }
+
+
+def find_gap_candidates(
+    gaps: list[dict],
+    existing_symbols: set[str],
+    market: str = "india",
+    top_n: int = 5,
+) -> list[dict]:
+    """
+    For each gap, search the full Sharia universe for candidates.
+
+    Returns one entry per gap with up to `top_n` options per Sharia status.
+    Fetches live vs200DMA only for the top-3 Sharia-compliant options (to keep it fast).
+    """
+    from modules.sharia import load_cached_sharia, enrich_cached_sharia
+    from modules.universe.cap_tier import load_mcap_rankings, _strip_suffix
+
+    df = load_cached_sharia(market=market)
+    if df is None or df.empty:
+        return []
+
+    df = enrich_cached_sharia(df)
+
+    # Latest row per symbol, deduplicated
+    latest = (
+        df.sort_values("report_period", ascending=False)
+        .drop_duplicates(subset="symbol", keep="first")
+        .copy()
+    )
+    latest["market_cap"] = pd.to_numeric(latest["market_cap"], errors="coerce").fillna(0)
+
+    # Attach cap tier from rankings
+    rankings = load_mcap_rankings(market=market)
+    rank_map = {}
+    if not rankings.empty:
+        rank_map = dict(zip(rankings["symbol"], rankings["cap_tier"]))
+
+    existing_base = {_strip_suffix(s) for s in existing_symbols}
+
+    result = []
+    for gap in gaps:
+        if gap.get("status") == "at_ceiling":
+            continue
+        sector_name = gap["sector"]
+        gap_cap_tier = gap.get("cap_tier")  # "large" | "mid" | "small" | "any" | None
+
+        # Filter to this policy sector
+        def _matches_sector(row):
+            ind = row.get("industry") or ""
+            sec = row.get("sector") or ""
+            return _map_to_policy_sector(ind, sec) == sector_name
+
+        mask = latest.apply(_matches_sector, axis=1)
+        pool = latest[mask].copy()
+
+        if pool.empty:
+            result.append({
+                "sector_gap": sector_name,
+                "gap_status": gap["status"],
+                "priority": gap.get("priority", "normal"),
+                "current_weight_pct": round(gap["current_weight"] * 100, 1),
+                "target_min_pct": round(gap["target_min"] * 100, 1),
+                "target_max_pct": round(gap["target_max"] * 100, 1),
+                "options": [],
+            })
+            continue
+
+        # Attach cap tier and filter if gap specifies a tier
+        pool["_cap_tier"] = pool["symbol"].map(rank_map).fillna("micro")
+        if gap_cap_tier and gap_cap_tier not in ("any", None):
+            tier_pool = pool[pool["_cap_tier"] == gap_cap_tier]
+            if tier_pool.empty:
+                tier_pool = pool  # widen if nothing matches
+            pool = tier_pool
+
+        # Sort by market cap descending within each Sharia group
+        pool = pool.sort_values("market_cap", ascending=False)
+
+        # Exclude already-held symbols
+        pool = pool[~pool["symbol"].apply(lambda s: _strip_suffix(s) in existing_base)]
+
+        # Build options list, grouped by Sharia status (Yes first, then Unknown, then No)
+        options = []
+        for sharia_val in ("Yes", "Unknown", "No"):
+            subset = pool[pool["Sharia"] == sharia_val].head(top_n)
+            for _, row in subset.iterrows():
+                options.append({
+                    "symbol": row["symbol"],
+                    "name": row.get("name") or row["symbol"],
+                    "policy_sector": sector_name,
+                    "sector": row.get("sector") or "",
+                    "industry": row.get("industry") or "",
+                    "cap_tier": row["_cap_tier"],
+                    "market_cap": float(row["market_cap"]) if row["market_cap"] else None,
+                    "sharia_status": sharia_val,
+                    "vs200DMA": None,  # populated below for compliant top picks
+                })
+
+        # Fetch live vs200DMA for top-3 compliant candidates in parallel
+        compliant_options = [o for o in options if o["sharia_status"] == "Yes"]
+        top3 = compliant_options[:3]
+        if top3:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=len(top3)) as pool:
+                top3_snaps = list(pool.map(lambda o: _market_snapshot(o["symbol"]), top3))
+            for opt, snap in zip(top3, top3_snaps):
+                opt["vs200DMA"] = snap.get("vs200DMA")
+                opt["current_price"] = snap.get("currentPrice")
+
+        result.append({
+            "sector_gap": sector_name,
+            "gap_status": gap["status"],
+            "priority": gap.get("priority", "normal"),
+            "current_weight_pct": round(gap["current_weight"] * 100, 1),
+            "target_min_pct": round(gap["target_min"] * 100, 1),
+            "target_max_pct": round(gap["target_max"] * 100, 1),
+            "options": options,
+        })
+
+    return result

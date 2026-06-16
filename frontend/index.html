@@ -59,13 +59,10 @@
     html.dark .hover\:bg-slate-100:hover { background-color: #334155 !important; }
     html.dark .hover\:bg-slate-200:hover { background-color: #475569 !important; }
     html.dark .hover\:text-slate-700:hover { color: #cbd5e1 !important; }
-    /* FX rate pill dark mode */
     html.dark .bg-white.border-slate-200.rounded-xl { background-color: #1e293b !important; border-color: #334155 !important; }
-    /* Market toggle switches in dark mode */
     html.dark .border-slate-200 { border-color: #334155 !important; }
     html.dark .bg-white.text-slate-500 { background-color: #1e293b !important; color: #94a3b8 !important; }
     html.dark .bg-white.text-slate-500:hover { background-color: #253447 !important; }
-    /* Portfolio table dark-mode hover — covers opacity variants like /60 */
     html.dark tbody tr:hover { background-color: #253447 !important; }
     html.dark tbody tr:hover td { color: #e2e8f0 !important; }
     html.dark thead tr { background-color: #0f172a !important; }
@@ -157,8 +154,7 @@
         <button @click="cacheStatusDismissed = true" class="text-amber-400 hover:text-amber-600 text-lg leading-none">&times;</button>
       </div>
 
-      <!-- Home -->
-      <div x-show="page === 'home'" x-cloak class="max-w-4xl mx-auto">
+            <div x-show="page === 'home'" x-cloak class="max-w-4xl mx-auto">
         <!-- Centered search bar -->
         <div class="flex justify-center mb-10">
           <div class="w-full max-w-xl">
@@ -268,6 +264,7 @@
       </div>
 
       <!-- All Stocks -->
+
       <div x-show="page === 'all_stocks'" x-cloak class="space-y-4">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold text-slate-800">All Stocks</h1>
@@ -742,6 +739,7 @@
       </div>
 
       <!-- Per Stock Research -->
+
       <div x-show="page === 'per_stock'" x-cloak class="space-y-4">
         <div class="flex flex-col gap-4">
           <div class="flex gap-3 items-end flex-wrap">
@@ -2498,80 +2496,56 @@
       </div>
 
       <!-- Stock Comparison -->
+
       <div x-show="page === 'comparison'" x-cloak class="space-y-6">
 
-        <!-- Dual stock pickers -->
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Stock A -->
-          <div class="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Stock A</p>
-            <div class="relative" x-data x-on:click.outside="symbolPickerState.compareA.open = false">
+        <!-- Stock picker (up to 5) -->
+        <div class="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3">Compare Stocks <span class="text-slate-600 font-normal normal-case">up to 5</span></p>
+          <!-- Selected chips -->
+          <div class="flex flex-wrap gap-2 mb-3" x-show="compareSymbols.length">
+            <template x-for="(sym, idx) in compareSymbols" :key="sym">
+              <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border"
+                    :style="'border-color:' + ['#2dd4bf','#a78bfa','#fbbf24','#fb923c','#ec4899'][idx] + '60; color:' + ['#2dd4bf','#a78bfa','#fbbf24','#fb923c','#ec4899'][idx]">
+                <span x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                <button @click="removeCompareStock(sym)" class="opacity-60 hover:opacity-100 text-xs leading-none">×</button>
+              </span>
+            </template>
+          </div>
+          <!-- Add input -->
+          <template x-if="compareSymbols.length < 5">
+            <div class="relative" x-data x-on:click.outside="symbolPickerState.compareAdd.open = false">
               <input type="text"
-                     x-model="symbolPickerState.compareA.query"
-                     @focus="symbolPickerState.compareA.open = true"
-                     @keydown.enter.prevent="comparePickerCommit('A')"
-                     @keydown.escape="symbolPickerState.compareA.open = false"
-                     @input="symbolPickerState.compareA.open = true"
-                     placeholder="Search symbol or company..."
+                     x-model="symbolPickerState.compareAdd.query"
+                     @focus="symbolPickerState.compareAdd.open = true"
+                     @keydown.enter.prevent="(() => { const m = symbolPickerMatches('compareAdd'); if (m.length) addCompareStock(m[0]); symbolPickerState.compareAdd.query = ''; symbolPickerState.compareAdd.open = false; })()"
+                     @keydown.escape="symbolPickerState.compareAdd.open = false"
+                     @input="symbolPickerState.compareAdd.open = true"
+                     :placeholder="compareSymbols.length === 0 ? 'Search and add stocks…' : 'Add another stock…'"
                      class="w-full rounded-xl bg-slate-900 border border-slate-600 text-slate-100 px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" />
-              <div x-show="symbolPickerState.compareA.open && symbolPickerState.compareA.query.length >= 1"
+              <div x-show="symbolPickerState.compareAdd.open && symbolPickerState.compareAdd.query.length >= 1"
                    x-transition class="absolute z-30 mt-1 w-full rounded-xl border border-slate-600 bg-slate-800 shadow-xl max-h-52 overflow-y-auto">
-                <template x-for="sym in symbolPickerMatches('compareA').slice(0, 10)" :key="sym">
-                  <button type="button" @click="comparePickerCommit('A', sym)"
-                    class="w-full text-left px-3 py-2.5 text-sm hover:bg-slate-700 flex justify-between items-center gap-2">
+                <template x-for="sym in symbolPickerMatches('compareAdd').slice(0, 10)" :key="sym">
+                  <button type="button"
+                          @click="addCompareStock(sym); symbolPickerState.compareAdd.query = ''; symbolPickerState.compareAdd.open = false"
+                          :disabled="compareSymbols.some(s => s.toUpperCase() === sym.toUpperCase())"
+                          class="w-full text-left px-3 py-2.5 text-sm hover:bg-slate-700 flex justify-between items-center gap-2 disabled:opacity-40">
                     <span class="font-medium text-slate-100" x-text="sym"></span>
                     <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
                   </button>
                 </template>
-                <p x-show="symbolPickerMatches('compareA').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches</p>
+                <p x-show="symbolPickerMatches('compareAdd').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches</p>
               </div>
             </div>
-            <template x-if="compareSymA">
-              <div class="mt-2 flex items-center justify-between">
-                <span class="text-sm font-semibold text-teal-400" x-text="compareSymA.replace('.NS','').replace('.BO','')"></span>
-                <button @click="compareSymA = ''; compareRows = []" class="text-slate-500 hover:text-slate-300 text-xs">✕ clear</button>
-              </div>
-            </template>
-          </div>
-
-          <!-- Stock B -->
-          <div class="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Stock B</p>
-            <div class="relative" x-data x-on:click.outside="symbolPickerState.compareB.open = false">
-              <input type="text"
-                     x-model="symbolPickerState.compareB.query"
-                     @focus="symbolPickerState.compareB.open = true"
-                     @keydown.enter.prevent="comparePickerCommit('B')"
-                     @keydown.escape="symbolPickerState.compareB.open = false"
-                     @input="symbolPickerState.compareB.open = true"
-                     placeholder="Search symbol or company..."
-                     class="w-full rounded-xl bg-slate-900 border border-slate-600 text-slate-100 px-3 py-2.5 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" />
-              <div x-show="symbolPickerState.compareB.open && symbolPickerState.compareB.query.length >= 1"
-                   x-transition class="absolute z-30 mt-1 w-full rounded-xl border border-slate-600 bg-slate-800 shadow-xl max-h-52 overflow-y-auto">
-                <template x-for="sym in symbolPickerMatches('compareB').slice(0, 10)" :key="sym">
-                  <button type="button" @click="comparePickerCommit('B', sym)"
-                    class="w-full text-left px-3 py-2.5 text-sm hover:bg-slate-700 flex justify-between items-center gap-2">
-                    <span class="font-medium text-slate-100" x-text="sym"></span>
-                    <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
-                  </button>
-                </template>
-                <p x-show="symbolPickerMatches('compareB').length === 0" class="px-3 py-2 text-sm text-slate-500">No matches</p>
-              </div>
-            </div>
-            <template x-if="compareSymB">
-              <div class="mt-2 flex items-center justify-between">
-                <span class="text-sm font-semibold text-violet-400" x-text="compareSymB.replace('.NS','').replace('.BO','')"></span>
-                <button @click="compareSymB = ''; compareRows = []" class="text-slate-500 hover:text-slate-300 text-xs">✕ clear</button>
-              </div>
-            </template>
-          </div>
+          </template>
+          <p x-show="compareSymbols.length >= 5" class="text-xs text-slate-500 mt-1">Maximum 5 stocks. Remove one to add another.</p>
         </div>
 
         <!-- Loading -->
         <div x-show="loading" class="text-center py-8 text-slate-400 text-sm">Loading comparison data…</div>
 
-        <!-- Head-to-head comparison -->
-        <template x-if="!loading && compareRows.length === 2">
+        <!-- Comparison results (2–5 stocks) -->
+        <template x-if="!loading && compareRows.length >= 2">
           <div class="space-y-4" x-data="{ cmpView: 'charts' }">
 
             <!-- View toggle -->
@@ -2580,24 +2554,20 @@
               <button @click="cmpView = 'table'" :class="cmpView === 'table' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'" class="px-4 py-1.5 rounded-lg text-sm font-medium transition">⇄ Head-to-Head</button>
             </div>
 
-            <!-- Identity header -->
-            <div class="grid grid-cols-[1fr_80px_1fr] gap-0 rounded-2xl border border-slate-700 overflow-hidden">
-              <!-- A header -->
-              <div class="bg-teal-900/40 px-5 py-4 border-r border-slate-700">
-                <p class="text-lg font-bold text-teal-300" x-text="(compareRows[0].symbol||'').replace('.NS','').replace('.BO','')"></p>
-                <p class="text-xs text-slate-400 mt-0.5 truncate" x-text="compareRows[0].name || '—'"></p>
-                <p class="text-xs text-slate-500 mt-1 truncate" x-text="compareRows[0].sector || compareRows[0].industry || '—'"></p>
-              </div>
-              <!-- VS badge -->
-              <div class="bg-slate-800 flex items-center justify-center border-r border-slate-700">
-                <span class="text-xs font-bold text-slate-500 tracking-widest">VS</span>
-              </div>
-              <!-- B header -->
-              <div class="bg-violet-900/40 px-5 py-4">
-                <p class="text-lg font-bold text-violet-300" x-text="(compareRows[1].symbol||'').replace('.NS','').replace('.BO','')"></p>
-                <p class="text-xs text-slate-400 mt-0.5 truncate" x-text="compareRows[1].name || '—'"></p>
-                <p class="text-xs text-slate-500 mt-1 truncate" x-text="compareRows[1].sector || compareRows[1].industry || '—'"></p>
-              </div>
+            <!-- Identity header — dynamic grid based on stock count -->
+            <div class="grid rounded-2xl border border-slate-700 overflow-hidden"
+                 :style="'grid-template-columns: repeat(' + compareRows.length + ', 1fr)'">
+              <template x-for="(row, idx) in compareRows" :key="row.symbol">
+                <div class="px-5 py-4"
+                     :class="idx < compareRows.length - 1 ? 'border-r border-slate-700' : ''"
+                     :style="'background: ' + ['rgba(45,212,191,0.08)','rgba(167,139,250,0.08)','rgba(251,191,36,0.08)','rgba(249,115,22,0.08)','rgba(236,72,153,0.08)'][idx]">
+                  <p class="text-lg font-bold"
+                     :style="'color: ' + ['#2dd4bf','#a78bfa','#fbbf24','#fb923c','#ec4899'][idx]"
+                     x-text="(row.symbol||'').replace('.NS','').replace('.BO','')"></p>
+                  <p class="text-xs text-slate-400 mt-0.5 truncate" x-text="row.name || '—'"></p>
+                  <p class="text-xs text-slate-500 mt-1 truncate" x-text="row.sector || row.industry || '—'"></p>
+                </div>
+              </template>
             </div>
 
             <!-- ── CHARTS VIEW ─────────────────────────────────────── -->
@@ -2634,87 +2604,86 @@
             <!-- ── TABLE / HEAD-TO-HEAD VIEW ───────────────────────── -->
             <div x-show="cmpView === 'table'" class="space-y-4">
 
-            <!-- Metric groups -->
-            <template x-for="group in compareMetricGroups()" :key="group.label">
-              <div class="rounded-2xl border border-slate-700 overflow-hidden">
-                <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-700">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400" x-text="group.label"></span>
+              <!-- Metric groups — metric label col + one col per stock -->
+              <template x-for="group in compareMetricGroups()" :key="group.label">
+                <div class="rounded-2xl border border-slate-700 overflow-hidden">
+                  <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-700">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400" x-text="group.label"></span>
+                  </div>
+                  <template x-for="metric in group.metrics" :key="metric.key">
+                    <div class="grid border-b border-slate-800 last:border-0"
+                         :style="'grid-template-columns: 180px repeat(' + compareRows.length + ', 1fr)'">
+                      <!-- metric label -->
+                      <div class="px-4 py-3 bg-slate-900/40 flex items-center border-r border-slate-700">
+                        <span class="text-[11px] text-slate-400" x-text="metric.label"></span>
+                      </div>
+                      <!-- one column per stock -->
+                      <template x-for="(row, idx) in compareRows" :key="row.symbol">
+                        <div class="px-4 py-3 flex items-center"
+                             :class="[
+                               idx < compareRows.length - 1 ? 'border-r border-slate-800' : '',
+                               compareWinnerIdx(metric, compareRows) === idx ? 'bg-emerald-950/40' : 'bg-slate-800/40'
+                             ]">
+                          <span class="text-sm font-semibold"
+                                :class="compareWinnerIdx(metric, compareRows) === idx ? 'text-emerald-400' : 'text-slate-300'"
+                                x-text="compareFormatVal(metric, row)"></span>
+                          <span x-show="compareWinnerIdx(metric, compareRows) === idx" class="ml-1.5 text-emerald-500 text-xs">▲</span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
                 </div>
-                <template x-for="metric in group.metrics" :key="metric.key">
-                  <div class="grid grid-cols-[1fr_100px_1fr] border-b border-slate-800 last:border-0"
-                       :class="compareWinner(metric, compareRows[0], compareRows[1]) === 'tie' ? '' : ''">
-                    <!-- A value -->
-                    <div class="px-5 py-3 flex items-center"
-                         :class="compareWinner(metric, compareRows[0], compareRows[1]) === 'a' ? 'bg-emerald-950/40' : 'bg-slate-800/50'">
-                      <span class="text-sm font-semibold"
-                            :class="compareWinner(metric, compareRows[0], compareRows[1]) === 'a' ? 'text-emerald-400' : 'text-slate-300'"
-                            x-text="compareFormatVal(metric, compareRows[0])"></span>
-                      <span x-show="compareWinner(metric, compareRows[0], compareRows[1]) === 'a'" class="ml-1.5 text-emerald-500 text-xs">▲</span>
-                    </div>
-                    <!-- Metric label (centre) -->
-                    <div class="px-2 py-3 bg-slate-900/40 flex items-center justify-center border-x border-slate-700">
-                      <span class="text-[11px] text-slate-400 text-center leading-tight" x-text="metric.label"></span>
-                    </div>
-                    <!-- B value -->
-                    <div class="px-5 py-3 flex items-center justify-end"
-                         :class="compareWinner(metric, compareRows[0], compareRows[1]) === 'b' ? 'bg-emerald-950/40' : 'bg-slate-800/50'">
-                      <span x-show="compareWinner(metric, compareRows[0], compareRows[1]) === 'b'" class="mr-1.5 text-emerald-500 text-xs">▲</span>
-                      <span class="text-sm font-semibold"
-                            :class="compareWinner(metric, compareRows[0], compareRows[1]) === 'b' ? 'text-emerald-400' : 'text-slate-300'"
-                            x-text="compareFormatVal(metric, compareRows[1])"></span>
+              </template>
+
+              <!-- Sharia compliance — dynamic grid -->
+              <div class="grid gap-4"
+                   :style="'grid-template-columns: repeat(' + compareRows.length + ', 1fr)'">
+                <template x-for="(row, idx) in compareRows" :key="row.symbol">
+                  <div class="rounded-2xl border overflow-hidden"
+                       :class="row.Sharia === 'Yes' ? 'border-emerald-700 bg-emerald-950/30' : 'border-rose-800 bg-rose-950/20'">
+                    <div class="px-5 py-4">
+                      <p class="text-[10px] font-bold uppercase tracking-wider mb-1"
+                         :class="row.Sharia === 'Yes' ? 'text-emerald-500' : 'text-rose-500'">Sharia Status</p>
+                      <p class="text-xl font-bold"
+                         :class="row.Sharia === 'Yes' ? 'text-emerald-400' : 'text-rose-400'"
+                         x-text="row.Sharia === 'Yes' ? '✓ Compliant' : (row.Sharia === 'No' ? '✗ Non-Compliant' : '— Unknown')"></p>
+                      <div class="mt-3 space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                          <span class="text-slate-400">Debt/Equity</span>
+                          <span :class="(row.debt_to_equity_ratio||999) <= 0.33 ? 'text-emerald-400' : 'text-rose-400'"
+                                x-text="row.debt_to_equity_ratio != null ? row.debt_to_equity_ratio.toFixed(2) : '—'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="text-slate-400">Cash/Assets %</span>
+                          <span :class="(row.cash_to_assets_pct||999) <= 33 ? 'text-emerald-400' : 'text-rose-400'"
+                                x-text="row.cash_to_assets_pct != null ? row.cash_to_assets_pct.toFixed(1)+'%' : '—'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="text-slate-400">Non-Halal Rev %</span>
+                          <span :class="(row.other_revenue_to_revenue_pct||999) <= 5 ? 'text-emerald-400' : 'text-rose-400'"
+                                x-text="row.other_revenue_to_revenue_pct != null ? row.other_revenue_to_revenue_pct.toFixed(2)+'%' : '—'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span class="text-slate-400">Receivables/Assets %</span>
+                          <span :class="(row.receivables_to_assets_pct||999) <= 50 ? 'text-emerald-400' : 'text-rose-400'"
+                                x-text="row.receivables_to_assets_pct != null ? row.receivables_to_assets_pct.toFixed(1)+'%' : '—'"></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </template>
               </div>
-            </template>
-
-            <!-- Sharia compliance row -->
-            <div class="grid grid-cols-2 gap-4">
-              <template x-for="(row, idx) in compareRows" :key="row.symbol">
-                <div class="rounded-2xl border overflow-hidden"
-                     :class="row.Sharia === 'Yes' ? 'border-emerald-700 bg-emerald-950/30' : 'border-rose-800 bg-rose-950/20'">
-                  <div class="px-5 py-4">
-                    <p class="text-[10px] font-bold uppercase tracking-wider mb-1"
-                       :class="row.Sharia === 'Yes' ? 'text-emerald-500' : 'text-rose-500'">Sharia Status</p>
-                    <p class="text-xl font-bold"
-                       :class="row.Sharia === 'Yes' ? 'text-emerald-400' : 'text-rose-400'"
-                       x-text="row.Sharia === 'Yes' ? '✓ Compliant' : (row.Sharia === 'No' ? '✗ Non-Compliant' : '— Unknown')"></p>
-                    <div class="mt-3 space-y-1.5 text-xs">
-                      <div class="flex justify-between">
-                        <span class="text-slate-400">Debt/Equity</span>
-                        <span :class="(row.debt_to_equity_ratio||999) <= 0.33 ? 'text-emerald-400' : 'text-rose-400'"
-                              x-text="row.debt_to_equity_ratio != null ? row.debt_to_equity_ratio.toFixed(2) : '—'"></span>
-                      </div>
-                      <div class="flex justify-between">
-                        <span class="text-slate-400">Cash/Assets %</span>
-                        <span :class="(row.cash_to_assets_pct||999) <= 33 ? 'text-emerald-400' : 'text-rose-400'"
-                              x-text="row.cash_to_assets_pct != null ? row.cash_to_assets_pct.toFixed(1)+'%' : '—'"></span>
-                      </div>
-                      <div class="flex justify-between">
-                        <span class="text-slate-400">Non-Halal Rev %</span>
-                        <span :class="(row.other_revenue_to_revenue_pct||999) <= 5 ? 'text-emerald-400' : 'text-rose-400'"
-                              x-text="row.other_revenue_to_revenue_pct != null ? row.other_revenue_to_revenue_pct.toFixed(2)+'%' : '—'"></span>
-                      </div>
-                      <div class="flex justify-between">
-                        <span class="text-slate-400">Receivables/Assets %</span>
-                        <span :class="(row.receivables_to_assets_pct||999) <= 50 ? 'text-emerald-400' : 'text-rose-400'"
-                              x-text="row.receivables_to_assets_pct != null ? row.receivables_to_assets_pct.toFixed(1)+'%' : '—'"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </div>
 
             </div><!-- /cmpView table -->
 
           </div>
         </template>
 
-        <p x-show="!loading && !compareRows.length" class="text-slate-500 text-sm text-center py-8">Select two stocks above to compare them head-to-head.</p>
+        <p x-show="!loading && compareRows.length < 2" class="text-slate-500 text-sm text-center py-8">Select 2–5 stocks above to compare them.</p>
       </div>
 
       <!-- Portfolio -->
+
       <div x-show="page === 'portfolio'" x-cloak class="space-y-6" x-init="fetchUsdInrRate(); fetchPortfolioPerformance()">
         <div class="flex items-center justify-between flex-wrap gap-3">
           <h1 class="text-xl font-semibold text-slate-800">Portfolio</h1>
@@ -3058,103 +3027,6 @@
           </div>
         </section>
 
-        <!-- Section 3: Portfolio Breakdown -->
-        <section x-show="personalIndexInputRows.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-base font-semibold text-slate-800">Portfolio Breakdown</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Allocation by market cap tier, sector, and Sharia compliance</p>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <!-- Cap Tier -->
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Market Cap Tier</h3>
-              <div class="space-y-2">
-                <template x-for="tier in capTierBreakdown()" :key="tier.label">
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="font-medium text-slate-700" x-text="tier.label"></span>
-                      <span class="text-slate-500" x-text="tier.pct + '% (' + tier.count + ')'"></span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div class="h-full rounded-full transition-all"
-                           :class="{'bg-blue-500': tier.label==='Large Cap','bg-teal-500': tier.label==='Mid Cap','bg-amber-400': tier.label==='Small Cap','bg-slate-300': tier.label==='Unknown'}"
-                           :style="'width:' + tier.pct + '%'"></div>
-                    </div>
-                  </div>
-                </template>
-              </div>
-              <p class="text-[10px] text-slate-400 mt-2">Large >₹20,000 Cr · Mid ₹5,000–20,000 Cr · Small &lt;₹5,000 Cr</p>
-            </div>
-
-            <!-- Sharia Split -->
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Sharia Compliance</h3>
-              <div class="space-y-2">
-                <template x-for="s in shariaBreakdown()" :key="s.label">
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="font-medium text-slate-700" x-text="s.label"></span>
-                      <span class="text-slate-500" x-text="s.pct + '% (' + s.count + ')'"></span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div class="h-full rounded-full transition-all"
-                           :class="{'bg-emerald-500': s.label==='Compliant','bg-rose-500': s.label==='Non-Compliant','bg-slate-300': s.label==='Unknown'}"
-                           :style="'width:' + s.pct + '%'"></div>
-                    </div>
-                  </div>
-                </template>
-              </div>
-              <!-- Diversification score -->
-              <div class="mt-4 bg-slate-50 rounded-lg p-3">
-                <p class="text-xs text-slate-500">Diversification Score</p>
-                <p class="text-xl font-bold mt-0.5"
-                   :class="diversificationScore() >= 7 ? 'text-emerald-600' : diversificationScore() >= 4 ? 'text-amber-600' : 'text-rose-600'"
-                   x-text="diversificationScore() + ' / 10'"></p>
-                <p class="text-[10px] text-slate-400 mt-0.5" x-text="diversificationLabel()"></p>
-              </div>
-            </div>
-
-            <!-- Sector -->
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Sector Allocation</h3>
-              <div class="space-y-1.5">
-                <template x-for="s in sectorBreakdown().slice(0,7)" :key="s.sector">
-                  <div>
-                    <div class="flex justify-between text-xs mb-0.5">
-                      <span class="text-slate-700 truncate max-w-[140px]" x-text="s.sector"></span>
-                      <span class="text-slate-500 ml-2 shrink-0" x-text="s.pct + '%'"></span>
-                    </div>
-                    <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div class="h-full rounded-full bg-violet-400 transition-all" :style="'width:' + s.pct + '%'"></div>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </div>
-
-          <!-- Concentration risk -->
-          <div class="border-t border-slate-100 pt-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Concentration Risk — Top Holdings</h3>
-            <div class="flex flex-wrap gap-2">
-              <template x-for="h in topHoldingsByWeight()" :key="h.symbol">
-                <div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 text-xs">
-                  <span class="font-semibold text-slate-800" x-text="h.symbol.replace('.NS','').replace('.BO','')"></span>
-                  <div class="h-1.5 w-16 rounded-full bg-slate-200 overflow-hidden">
-                    <div class="h-full rounded-full bg-teal-500" :style="'width:' + Math.min(h.weight*5, 100) + '%'"></div>
-                  </div>
-                  <span class="text-slate-500" x-text="h.weight + '%'"></span>
-                </div>
-              </template>
-            </div>
-            <p x-show="portfolioConcentrationWarning()" class="mt-2 text-xs text-amber-600 font-medium"
-               x-text="portfolioConcentrationWarning()"></p>
-          </div>
-        </section>
-
         <!-- Section 4: Non-Sharia Replacements -->
         <section x-show="nonShariaHoldings().length" class="bg-white rounded-2xl border border-rose-200 shadow-sm p-6 space-y-4">
           <div>
@@ -3227,9 +3099,13 @@
           </template>
         </section>
 
-        <!-- Section 5: Portfolio Theory -->
+        <!-- ① BLUEPRINT — Portfolio Construction Rules -->
         <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-          <h2 class="text-base font-semibold text-slate-800 mb-4">Portfolio Theory — How to Diversify</h2>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">① Blueprint</span>
+            <h2 class="text-base font-semibold text-slate-800">Portfolio Theory — How We Build</h2>
+          </div>
+
           <div class="grid md:grid-cols-2 gap-6 text-sm">
             <div class="space-y-4">
               <div>
@@ -3237,30 +3113,31 @@
                 <p class="text-slate-600 text-xs">Harry Markowitz (1952): combine assets that don't move together to get the same return at lower risk. The "efficient frontier" is the set of portfolios with the best risk/return trade-off. <span class="font-medium text-slate-700">Key insight:</span> diversification is the only free lunch in investing.</p>
               </div>
               <div>
-                <h3 class="font-semibold text-teal-700 mb-1">The 55 / 30 / 15 Rule (Your Policy)</h3>
-                <p class="text-slate-600 text-xs">55% Large Cap · 30% Mid Cap · 15% Small Cap. Large caps provide stability and liquidity. Mid caps offer growth with moderate risk. Small caps add return potential but increase volatility — keep them capped.</p>
+                <h3 class="font-semibold text-teal-700 mb-1">Stock Concentration</h3>
+                <p class="text-slate-600 text-xs">Maximum 8% in any single stock. With 15–18 stocks you get ~90% of the diversification benefit of an index. Beyond 20–25 stocks, incremental diversification is minimal.</p>
               </div>
               <div>
-                <h3 class="font-semibold text-teal-700 mb-1">Sector Diversification</h3>
-                <p class="text-slate-600 text-xs">No single sector >15% of portfolio. Sectors move in different phases of the economic cycle. Technology/financials often lead; utilities/healthcare are defensive. Indian equity benefits from overweighting domestic consumption (FMCG, Pharma) over pure cyclicals.</p>
+                <h3 class="font-semibold text-violet-700 mb-1">Sharia Constraints</h3>
+                <p class="text-slate-600 text-xs">Sharia screening excludes financials (~30% of Nifty) and some cyclicals, creating a natural tilt toward IT, healthcare, industrials, and consumer goods — a tilt that has historically outperformed in high-growth markets. The policy targets below account for this.</p>
               </div>
             </div>
             <div class="space-y-4">
               <div>
-                <h3 class="font-semibold text-violet-700 mb-1">Stock Concentration</h3>
-                <p class="text-slate-600 text-xs">Maximum 8% in any single stock. With 15–18 stocks you get ~90% of the diversification benefit of an index. Beyond 20-25 stocks, incremental diversification is minimal — you're just tracking the index at higher cost and complexity.</p>
+                <h3 class="font-semibold text-teal-700 mb-1">The 55 / 30 / 15 Cap Mix</h3>
+                <p class="text-slate-600 text-xs">55% Large Cap · 30% Mid Cap · 15% Small Cap. Large caps provide stability; mid caps offer growth at moderate risk; small caps add return potential but must be capped to control volatility.</p>
               </div>
               <div>
-                <h3 class="font-semibold text-violet-700 mb-1">Sharia Constraints</h3>
-                <p class="text-slate-600 text-xs">Sharia screening naturally excludes financials (banks, insurance) and some cyclicals — this creates a tilt toward tech, healthcare, industrials, and consumer goods. This tilt has historically outperformed in high-growth markets. The main gap: financials are ~30% of Indian indices, so a Sharia portfolio will look very different from Nifty.</p>
+                <h3 class="font-semibold text-violet-700 mb-1">Sector Diversification</h3>
+                <p class="text-slate-600 text-xs">No single sector above 15% of portfolio. Each target sector below has a weight band — staying within it prevents overexposure to any one economic cycle.</p>
               </div>
               <div>
-                <h3 class="font-semibold text-violet-700 mb-1">Rebalancing Trigger</h3>
-                <p class="text-slate-600 text-xs">Rebalance when any stock hits 12%+ of portfolio or any sector hits 20%+. Do it by deploying new money first (add to underweight) before selling — minimises churn and tax events. Review quarterly.</p>
+                <h3 class="font-semibold text-violet-700 mb-1">Rebalancing Rule</h3>
+                <p class="text-slate-600 text-xs">Rebalance by deploying new money first (add to underweight) before selling — minimises churn and tax events. Sell only when a stock exceeds 12% or a sector exceeds 20%.</p>
               </div>
             </div>
           </div>
-          <!-- Rule of thumb cards -->
+
+          <!-- Quick-reference rule cards -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-100">
             <div class="bg-teal-50 rounded-xl p-3 text-center">
               <p class="text-2xl font-bold text-teal-700">15–18</p>
@@ -3280,86 +3157,466 @@
             </div>
           </div>
 
-          <!-- Before / After rebalancing table -->
-          <template x-if="personalIndexInputRows.length">
-            <div class="mt-6 pt-5 border-t border-slate-100">
-              <h3 class="text-sm font-semibold text-slate-800 mb-1">Your Portfolio — Before vs Recommended</h3>
-              <p class="text-xs text-slate-500 mb-3">Based on your current holdings, Sharia status, weight, and sector rules.</p>
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs">
-                  <thead>
-                    <tr class="text-left text-[10px] text-slate-500 uppercase border-b border-slate-200 bg-slate-50">
-                      <th class="px-3 py-2">Symbol</th>
-                      <th class="px-3 py-2">Sector</th>
-                      <th class="px-3 py-2 text-right">Current Weight</th>
-                      <th class="px-3 py-2 text-right">Cap Tier</th>
-                      <th class="px-3 py-2 text-center">Sharia</th>
-                      <th class="px-3 py-2 text-center">Status</th>
-                      <th class="px-3 py-2">Recommendation</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    <template x-for="row in beforeAfterRows()" :key="row.symbol">
-                      <tr :class="row.action === 'Replace' ? 'bg-rose-50' : row.action === 'Trim' ? 'bg-amber-50' : row.action === 'Hold' ? '' : 'bg-emerald-50/40'">
-                        <td class="px-3 py-2 font-semibold text-slate-800" x-text="row.symbol.replace('.NS','').replace('.BO','')"></td>
-                        <td class="px-3 py-2 text-slate-500 max-w-[110px] truncate" x-text="row.sector || '—'"></td>
-                        <td class="px-3 py-2 text-right font-mono"
-                            :class="row.weight > 8 ? 'text-rose-600 font-bold' : 'text-slate-700'"
-                            x-text="row.weight + '%'"></td>
-                        <td class="px-3 py-2 text-right">
-                          <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold"
-                                :class="row.capTier==='Large Cap' ? 'bg-blue-100 text-blue-700' : row.capTier==='Mid Cap' ? 'bg-teal-100 text-teal-700' : row.capTier==='Small Cap' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'"
-                                x-text="row.capTier"></span>
-                        </td>
-                        <td class="px-3 py-2 text-center">
-                          <span :class="row.sharia==='Yes' ? 'text-emerald-600' : row.sharia==='No' ? 'text-rose-600' : 'text-slate-400'"
-                                x-text="row.sharia==='Yes' ? '✓' : row.sharia==='No' ? '✗' : '?'"></span>
-                        </td>
-                        <td class="px-3 py-2 text-center">
-                          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                                :class="{
-                                  'bg-rose-100 text-rose-700': row.action==='Replace',
-                                  'bg-amber-100 text-amber-700': row.action==='Trim',
-                                  'bg-emerald-100 text-emerald-700': row.action==='Hold',
-                                  'bg-blue-100 text-blue-700': row.action==='Add'
-                                }"
-                                x-text="row.action"></span>
-                        </td>
-                        <td class="px-3 py-2 text-slate-600 max-w-[220px]" x-text="row.recommendation"></td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+          <!-- Sector target reference table -->
+          <div class="mt-5 pt-4 border-t border-slate-100">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Sector Targets — Your Policy</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-left text-[10px] text-slate-500 uppercase border-b border-slate-200 bg-slate-50">
+                    <th class="px-3 py-2">Sector</th>
+                    <th class="px-3 py-2 text-right">Target Range</th>
+                    <th class="px-3 py-2 text-center">Priority</th>
+                    <th class="px-3 py-2 text-right hidden sm:table-cell">Max Stocks</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">IT / Software</td><td class="px-3 py-1.5 text-right text-slate-600">12–15%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">3</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Pharma / Healthcare</td><td class="px-3 py-1.5 text-right text-slate-600">10–12%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Industrial / Capital Goods</td><td class="px-3 py-1.5 text-right text-slate-600">10–12%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">FMCG / Consumer Staples</td><td class="px-3 py-1.5 text-right text-slate-600">8–10%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Auto / Auto Ancillary</td><td class="px-3 py-1.5 text-right text-slate-600">8–10%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px]">high</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Consumer Discretionary</td><td class="px-3 py-1.5 text-right text-slate-600">8–10%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Energy</td><td class="px-3 py-1.5 text-right text-slate-600">7–10%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Specialty Chemicals</td><td class="px-3 py-1.5 text-right text-slate-600">5–8%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px]">high</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                  <tr class="hover:bg-slate-50"><td class="px-3 py-1.5 font-medium text-slate-700">Healthcare Devices / Diagnostics</td><td class="px-3 py-1.5 text-right text-slate-600">5–8%</td><td class="px-3 py-1.5 text-center"><span class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px]">normal</span></td><td class="px-3 py-1.5 text-right text-slate-500 hidden sm:table-cell">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ② DIAGNOSIS — How Your Portfolio Measures Up -->
+        <section x-show="personalIndexInputRows.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-bold uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">② Diagnosis</span>
+              <h2 class="text-base font-semibold text-slate-800">Your Portfolio — Health Check</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <span x-show="policyAnalysisLoading" class="text-xs text-slate-400 animate-pulse">Analysing…</span>
+              <span x-show="policyAnalysisError && !policyAnalysisLoading" class="text-xs text-rose-500" x-text="policyAnalysisError"></span>
+              <span x-show="policyAnalysis && !policyAnalysisLoading"
+                    :class="policyAnalysis?.summary?.policy_met ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                    class="text-xs font-semibold px-2.5 py-1 rounded-full"
+                    x-text="policyAnalysis?.summary?.policy_met ? '✓ Policy met' : '⚠ Gaps found'"></span>
+            </div>
+          </div>
+
+          <!-- Health scorecard chips -->
+          <template x-if="policyAnalysis">
+            <div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <!-- Stock count -->
+                <div class="rounded-xl border p-3"
+                     :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold"
+                     :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-600' : 'text-amber-600'">Stock Count</p>
+                  <p class="text-2xl font-bold mt-0.5"
+                     :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-700' : 'text-amber-700'"
+                     x-text="policyAnalysis.summary.stock_count"></p>
+                  <p class="text-[10px] mt-0.5"
+                     :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-600' : 'text-amber-600'"
+                     x-text="policyAnalysis.summary.stock_count < 15 ? 'Target 15–18, need ' + (15 - policyAnalysis.summary.stock_count) + ' more' : policyAnalysis.summary.stock_count > 18 ? 'Over ideal range' : 'Ideal range ✓'"></p>
+                </div>
+                <!-- Sectors covered -->
+                <div class="rounded-xl border p-3"
+                     :class="policyAnalysis.summary.sector_count >= 8 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold"
+                     :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-600' : 'text-amber-600'">Sectors</p>
+                  <p class="text-2xl font-bold mt-0.5"
+                     :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-700' : 'text-amber-700'"
+                     x-text="policyAnalysis.summary.sector_count"></p>
+                  <p class="text-[10px] mt-0.5"
+                     :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-600' : 'text-amber-600'"
+                     x-text="policyAnalysis.summary.sector_count >= 8 ? 'Min 8 met ✓' : 'Need ' + (8 - policyAnalysis.summary.sector_count) + ' more'"></p>
+                </div>
+                <!-- Gap count -->
+                <div class="rounded-xl border p-3"
+                     :class="policyAnalysis.gaps.length === 0 ? 'border-emerald-200 bg-emerald-50' : policyAnalysis.gaps.length <= 3 ? 'border-amber-200 bg-amber-50' : 'border-rose-200 bg-rose-50'">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold"
+                     :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-600' : policyAnalysis.gaps.length <= 3 ? 'text-amber-600' : 'text-rose-600'">Sector Gaps</p>
+                  <p class="text-2xl font-bold mt-0.5"
+                     :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-700' : policyAnalysis.gaps.length <= 3 ? 'text-amber-700' : 'text-rose-700'"
+                     x-text="policyAnalysis.gaps.length"></p>
+                  <p class="text-[10px] mt-0.5"
+                     :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-600' : policyAnalysis.gaps.length <= 3 ? 'text-amber-600' : 'text-rose-600'"
+                     x-text="policyAnalysis.gaps.length === 0 ? 'No gaps ✓' : policyAnalysis.gaps.filter(g=>g.status==='missing').length + ' missing, ' + policyAnalysis.gaps.filter(g=>g.status==='underweight').length + ' underweight'"></p>
+                </div>
+                <!-- Concentration flags -->
+                <div class="rounded-xl border p-3"
+                     :class="policyAnalysis.concentration_flags.length === 0 ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold"
+                     :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-600' : 'text-rose-600'">Concentration</p>
+                  <p class="text-2xl font-bold mt-0.5"
+                     :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-700' : 'text-rose-700'"
+                     x-text="policyAnalysis.concentration_flags.length === 0 ? 'OK' : policyAnalysis.concentration_flags.length + ' flags'"></p>
+                  <p class="text-[10px] mt-0.5"
+                     :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-600' : 'text-rose-600'"
+                     x-text="policyAnalysis.concentration_flags.length === 0 ? 'All within limits ✓' : 'Over cap limits'"></p>
+                </div>
               </div>
-              <!-- Summary flags -->
-              <div class="flex flex-wrap gap-3 mt-3">
-                <span class="text-xs text-slate-500">
-                  Sectors covered: <span class="font-semibold text-slate-700" x-text="sectorBreakdown().length"></span>
-                  <span :class="sectorBreakdown().length >= 8 ? 'text-emerald-600' : 'text-amber-600'"
-                        x-text="sectorBreakdown().length >= 8 ? ' ✓ Target met' : ' ✗ Need ' + (8 - sectorBreakdown().length) + ' more'"></span>
-                </span>
-                <span class="text-xs text-slate-500">
-                  Holdings: <span class="font-semibold text-slate-700" x-text="personalIndexInputRows.length"></span>
-                  <span :class="personalIndexInputRows.length >= 15 && personalIndexInputRows.length <= 18 ? 'text-emerald-600' : 'text-amber-600'"
-                        x-text="personalIndexInputRows.length >= 15 && personalIndexInputRows.length <= 18 ? ' ✓ Ideal range' : personalIndexInputRows.length < 15 ? ' ↑ Add ' + (15 - personalIndexInputRows.length) + ' more' : ' ↓ Consider trimming'"></span>
-                </span>
-                <span class="text-xs text-slate-500">
-                  Diversification: <span :class="diversificationScore() >= 7 ? 'text-emerald-600 font-semibold' : diversificationScore() >= 4 ? 'text-amber-600 font-semibold' : 'text-rose-600 font-semibold'"
-                        x-text="diversificationScore() + '/10 — ' + diversificationLabel()"></span>
-                </span>
+
+              <!-- Concentration flag details -->
+              <template x-if="policyAnalysis.concentration_flags.length">
+                <div class="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200">
+                  <p class="text-xs font-semibold text-rose-700 mb-1.5">⚠ Concentration Flags</p>
+                  <div class="flex flex-wrap gap-2">
+                    <template x-for="flag in policyAnalysis.concentration_flags" :key="flag">
+                      <span class="text-[10px] px-2 py-1 rounded-full bg-rose-100 text-rose-700" x-text="flag"></span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Cap mix: actual vs target bars -->
+              <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Cap Tier Mix — Actual vs Target (55 / 30 / 15)</h3>
+                  <div class="space-y-3">
+                    <template x-for="[tier, data] in Object.entries(policyAnalysis.cap_allocation)" :key="tier">
+                      <div>
+                        <div class="flex justify-between text-xs mb-1">
+                          <span class="font-medium text-slate-700 capitalize" x-text="tier + ' Cap'"></span>
+                          <span class="text-slate-500">
+                            <span :class="data.status === 'overweight' ? 'text-amber-600 font-semibold' : data.status === 'underweight' ? 'text-rose-600 font-semibold' : 'text-emerald-600 font-semibold'"
+                                  x-text="Math.round(data.actual * 100) + '%'"></span>
+                            <span class="text-slate-400"> / target </span>
+                            <span x-text="Math.round(data.target * 100) + '%'"></span>
+                          </span>
+                        </div>
+                        <div class="relative h-3 rounded-full bg-slate-100 overflow-visible">
+                          <!-- Actual bar -->
+                          <div class="h-full rounded-full transition-all"
+                               :class="data.status === 'overweight' ? 'bg-amber-400' : data.status === 'underweight' ? 'bg-rose-400' : 'bg-emerald-500'"
+                               :style="'width:' + Math.min(Math.round(data.actual * 100), 100) + '%'"></div>
+                          <!-- Target marker -->
+                          <div class="absolute top-0 h-full w-0.5 bg-slate-400"
+                               :style="'left:' + Math.round(data.target * 100) + '%'"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-0.5"
+                           x-text="data.status === 'on_target' ? '✓ On target' : data.status === 'overweight' ? '↑ ' + Math.round(data.gap * -100) + 'pp overweight' : '↓ ' + Math.round(data.gap * 100) + 'pp underweight'"></p>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Sector weights -->
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Sector Weights</h3>
+                  <div class="space-y-2">
+                    <template x-for="s in policyAnalysis.sector_weights" :key="s.sector">
+                      <div>
+                        <div class="flex justify-between text-xs mb-0.5">
+                          <span class="text-slate-700 truncate max-w-[160px]" x-text="s.sector"></span>
+                          <span class="ml-2 shrink-0 flex items-center gap-1">
+                            <span :class="s.flags.includes('overweight') ? 'text-amber-600 font-semibold' : 'text-slate-500'"
+                                  x-text="Math.round(s.weight * 100) + '%'"></span>
+                            <span x-show="s.flags.includes('overweight')" class="text-amber-500 text-[10px]">↑</span>
+                            <span x-show="s.flags.includes('at_ceiling')" class="text-slate-400 text-[10px]">max</span>
+                          </span>
+                        </div>
+                        <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                          <div class="h-full rounded-full transition-all"
+                               :class="s.flags.includes('overweight') ? 'bg-amber-400' : 'bg-violet-400'"
+                               :style="'width:' + Math.min(Math.round(s.weight * 100 / 0.15), 100) + '%'"></div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <p class="text-[10px] text-slate-400 mt-2">Bar = % of 15% sector cap</p>
+                </div>
+              </div>
+
+              <!-- Sector gaps table -->
+              <template x-if="policyAnalysis.gaps.length">
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Sector Gaps</h3>
+                  <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-xs">
+                      <thead>
+                        <tr class="bg-slate-50 text-[10px] text-slate-500 uppercase border-b border-slate-200">
+                          <th class="px-3 py-2 text-left">Sector</th>
+                          <th class="px-3 py-2 text-center">Status</th>
+                          <th class="px-3 py-2 text-right">Current</th>
+                          <th class="px-3 py-2 text-right">Target</th>
+                          <th class="px-3 py-2 text-center">Priority</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        <template x-for="g in policyAnalysis.gaps" :key="g.sector">
+                          <tr :class="g.priority === 'high' ? 'bg-amber-50/50' : ''">
+                            <td class="px-3 py-2 font-medium text-slate-700" x-text="g.sector"></td>
+                            <td class="px-3 py-2 text-center">
+                              <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
+                                    :class="g.status === 'missing' ? 'bg-rose-100 text-rose-700' : g.status === 'underweight' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'"
+                                    x-text="g.status"></span>
+                            </td>
+                            <td class="px-3 py-2 text-right text-slate-600"
+                                x-text="g.status === 'missing' ? '0%' : Math.round(g.current_weight * 100) + '%'"></td>
+                            <td class="px-3 py-2 text-right text-slate-500"
+                                x-text="Math.round(g.target_min * 100) + '–' + Math.round(g.target_max * 100) + '%'"></td>
+                            <td class="px-3 py-2 text-center">
+                              <span x-show="g.priority === 'high'" class="text-amber-600 font-bold text-[10px]">HIGH</span>
+                              <span x-show="g.priority !== 'high'" class="text-slate-400 text-[10px]">normal</span>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Holdings detail with policy alignment -->
+              <div class="mt-5 pt-4 border-t border-slate-100">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Holdings — Policy Alignment</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr class="text-left text-[10px] text-slate-500 uppercase border-b border-slate-200 bg-slate-50">
+                        <th class="px-3 py-2">Symbol</th>
+                        <th class="px-3 py-2">Sector</th>
+                        <th class="px-3 py-2 text-right">Weight</th>
+                        <th class="px-3 py-2 text-right">Cap Tier</th>
+                        <th class="px-3 py-2 text-center">Sharia</th>
+                        <th class="px-3 py-2 text-center">Status</th>
+                        <th class="px-3 py-2">Recommendation</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      <template x-for="row in beforeAfterRows()" :key="row.symbol">
+                        <tr :class="row.action === 'Replace' ? 'bg-rose-50' : row.action === 'Trim' ? 'bg-amber-50' : row.action === 'Hold' ? '' : 'bg-emerald-50/40'">
+                          <td class="px-3 py-2 font-semibold text-slate-800" x-text="row.symbol.replace('.NS','').replace('.BO','')"></td>
+                          <td class="px-3 py-2 text-slate-500 max-w-[110px] truncate" x-text="row.sector || '—'"></td>
+                          <td class="px-3 py-2 text-right font-mono"
+                              :class="row.weight > 8 ? 'text-rose-600 font-bold' : 'text-slate-700'"
+                              x-text="row.weight + '%'"></td>
+                          <td class="px-3 py-2 text-right">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold"
+                                  :class="row.capTier==='Large Cap' ? 'bg-blue-100 text-blue-700' : row.capTier==='Mid Cap' ? 'bg-teal-100 text-teal-700' : row.capTier==='Small Cap' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'"
+                                  x-text="row.capTier"></span>
+                          </td>
+                          <td class="px-3 py-2 text-center">
+                            <span :class="row.sharia==='Yes' ? 'text-emerald-600' : row.sharia==='No' ? 'text-rose-600' : 'text-slate-400'"
+                                  x-text="row.sharia==='Yes' ? '✓' : row.sharia==='No' ? '✗' : '?'"></span>
+                          </td>
+                          <td class="px-3 py-2 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                  :class="{
+                                    'bg-rose-100 text-rose-700': row.action==='Replace',
+                                    'bg-amber-100 text-amber-700': row.action==='Trim',
+                                    'bg-emerald-100 text-emerald-700': row.action==='Hold',
+                                    'bg-blue-100 text-blue-700': row.action==='Add'
+                                  }"
+                                  x-text="row.action"></span>
+                          </td>
+                          <td class="px-3 py-2 text-slate-600 max-w-[220px]" x-text="row.recommendation"></td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </template>
 
-          <!-- Deployment scenario cards -->
+          <!-- No data state -->
+          <div x-show="!policyAnalysis && !policyAnalysisLoading && !policyAnalysisError && personalIndexInputRows.length"
+               class="py-8 text-center text-sm text-slate-400">
+            Diagnosis will appear after prices load.
+          </div>
+        </section>
+
+        <!-- ③ PRESCRIPTION — Where to Deploy New Money -->
+        <section x-show="personalIndexInputRows.length" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-xs font-bold uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">③ Prescription</span>
+            <h2 class="text-base font-semibold text-slate-800">Where to Deploy New Money</h2>
+          </div>
+
+          <!-- Gap candidates from universe -->
+          <template x-if="policyAnalysis && policyAnalysis.candidates && policyAnalysis.candidates.length">
+            <div class="space-y-3 mb-6">
+              <p class="text-xs text-slate-500">Candidates from the full NSE universe, ranked by market cap within Sharia status. Select stocks to compare them side-by-side.</p>
+              <template x-for="cand in policyAnalysis.candidates" :key="cand.sector_gap">
+                <div class="rounded-xl border overflow-hidden"
+                     :class="cand.priority === 'high' ? 'border-amber-500/40' : 'border-slate-600/40'">
+                  <!-- Gap header — click to expand -->
+                  <button class="w-full text-left px-4 py-3 flex items-center justify-between gap-3 transition"
+                          style="background-color:#2d3748"
+                          @mouseenter="$el.style.backgroundColor='#374151'"
+                          @mouseleave="$el.style.backgroundColor='#2d3748'"
+                          @click="policyGapExpanded[cand.sector_gap] = !policyGapExpanded[cand.sector_gap]">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-semibold text-sm" style="color:#f8fafc" x-text="cand.sector_gap"></span>
+                      <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
+                            :class="cand.gap_status === 'missing' ? 'bg-rose-900 text-rose-300 border border-rose-700' : 'bg-amber-900 text-amber-300 border border-amber-700'"
+                            x-text="cand.gap_status"></span>
+                      <span x-show="cand.priority === 'high'" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-900 text-amber-300 border border-amber-600">HIGH PRIORITY</span>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0 text-xs" style="color:#94a3b8">
+                      <span x-text="'Current: ' + cand.current_weight_pct + '%'"></span>
+                      <span>Target: <span style="color:#cbd5e1" x-text="cand.target_min_pct + '–' + cand.target_max_pct + '%'"></span></span>
+                      <span x-text="(cand.options.filter(o=>o.sharia_status==='Yes').length) + ' compliant'"></span>
+                      <svg class="w-4 h-4 transition-transform" style="color:#94a3b8"
+                           :class="policyGapExpanded[cand.sector_gap] ? 'rotate-180' : ''"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </div>
+                  </button>
+
+                  <!-- Expanded candidate list -->
+                  <div x-show="policyGapExpanded[cand.sector_gap]" x-collapse class="border-t border-slate-700">
+                    <template x-if="cand.options.length === 0">
+                      <p class="px-4 py-4 text-xs text-slate-400">No candidates found in this sector from the universe cache.</p>
+                    </template>
+                    <template x-if="cand.options.length > 0">
+                      <div class="bg-slate-900 text-slate-100">
+                        <!-- Column headers -->
+                        <div class="px-4 py-1.5 grid gap-x-3 border-b border-slate-700 bg-slate-950/60"
+                             style="grid-template-columns: 20px 1fr 80px 110px 100px 70px">
+                          <span></span>
+                          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Stock</span>
+                          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-center">Cap Tier</span>
+                          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-right">Mkt Cap</span>
+                          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-center">Sharia</span>
+                          <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-right">Price</span>
+                        </div>
+
+                        <!-- Compliant -->
+                        <template x-if="cand.options.filter(o=>o.sharia_status==='Yes').length">
+                          <div>
+                            <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400">Sharia Compliant</p>
+                            <div class="divide-y divide-slate-800/60">
+                              <template x-for="opt in cand.options.filter(o=>o.sharia_status==='Yes')" :key="opt.symbol">
+                                <div class="px-4 py-2 grid items-center gap-x-3 hover:bg-slate-800 transition cursor-pointer"
+                                     style="grid-template-columns: 20px 1fr 80px 110px 100px 70px"
+                                     @click="togglePrescriptionSelect(opt.symbol)">
+                                  <input type="checkbox" class="w-3.5 h-3.5 rounded accent-teal-500 cursor-pointer"
+                                         :checked="prescriptionSelected.includes(opt.symbol)"
+                                         @click.stop="togglePrescriptionSelect(opt.symbol)">
+                                  <div class="min-w-0">
+                                    <p class="font-semibold text-slate-100 text-xs truncate" x-text="opt.symbol.replace('.NS','').replace('.BO','')"></p>
+                                    <p class="text-[10px] text-slate-400 truncate" x-text="opt.name"></p>
+                                  </div>
+                                  <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-200 text-center"
+                                        x-text="(opt.cap_tier || 'unknown') + ' cap'"></span>
+                                  <span class="text-[10px] text-slate-400 text-right"
+                                        x-text="opt.market_cap ? '₹' + Math.round(opt.market_cap / 1e7).toLocaleString() + ' Cr' : '—'"></span>
+                                  <span class="px-1.5 py-0.5 rounded-full bg-emerald-900 text-emerald-300 text-[10px] font-semibold border border-emerald-700 text-center">✓ Compliant</span>
+                                  <span class="text-[10px] text-slate-300 font-mono text-right"
+                                        x-text="opt.current_price ? '₹' + opt.current_price.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'"></span>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                        </template>
+                        <!-- Unknown -->
+                        <template x-if="cand.options.filter(o=>o.sharia_status==='Unknown').length">
+                          <div>
+                            <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">Unknown — Data Incomplete</p>
+                            <div class="divide-y divide-slate-800/60">
+                              <template x-for="opt in cand.options.filter(o=>o.sharia_status==='Unknown')" :key="opt.symbol">
+                                <div class="px-4 py-2 grid items-center gap-x-3 hover:bg-slate-800 transition"
+                                     style="grid-template-columns: 20px 1fr 80px 110px 100px 70px">
+                                  <span></span>
+                                  <div class="min-w-0">
+                                    <p class="font-semibold text-slate-200 text-xs truncate" x-text="opt.symbol.replace('.NS','').replace('.BO','')"></p>
+                                    <p class="text-[10px] text-slate-500 truncate" x-text="opt.name"></p>
+                                  </div>
+                                  <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-700 text-slate-300 text-center"
+                                        x-text="(opt.cap_tier || 'unknown') + ' cap'"></span>
+                                  <span class="text-[10px] text-slate-400 text-right"
+                                        x-text="opt.market_cap ? '₹' + Math.round(opt.market_cap / 1e7).toLocaleString() + ' Cr' : '—'"></span>
+                                  <span class="px-1.5 py-0.5 rounded-full bg-amber-900 text-amber-300 text-[10px] font-semibold border border-amber-700 text-center">? Unknown</span>
+                                  <span class="text-[10px] text-slate-600 text-right">—</span>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                        </template>
+                        <!-- Non-compliant -->
+                        <template x-if="cand.options.filter(o=>o.sharia_status==='No').length">
+                          <div>
+                            <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-rose-400">Non-Compliant — Avoid</p>
+                            <div class="divide-y divide-slate-800/60">
+                              <template x-for="opt in cand.options.filter(o=>o.sharia_status==='No')" :key="opt.symbol">
+                                <div class="px-4 py-2 grid items-center gap-x-3 opacity-50 hover:opacity-70 transition"
+                                     style="grid-template-columns: 20px 1fr 80px 110px 100px 70px">
+                                  <span></span>
+                                  <div class="min-w-0">
+                                    <p class="font-medium text-slate-400 text-xs line-through truncate" x-text="opt.symbol.replace('.NS','').replace('.BO','')"></p>
+                                    <p class="text-[10px] text-slate-600 truncate" x-text="opt.name"></p>
+                                  </div>
+                                  <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-700 text-slate-400 text-center"
+                                        x-text="(opt.cap_tier || 'unknown') + ' cap'"></span>
+                                  <span class="text-[10px] text-slate-500 text-right"
+                                        x-text="opt.market_cap ? '₹' + Math.round(opt.market_cap / 1e7).toLocaleString() + ' Cr' : '—'"></span>
+                                  <span class="px-1.5 py-0.5 rounded-full bg-rose-900 text-rose-400 text-[10px] font-semibold border border-rose-800 text-center">✗ Avoid</span>
+                                  <span class="text-[10px] text-slate-600 text-right">—</span>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <!-- Sticky compare bar — appears when ≥1 stocks selected -->
+          <div x-show="prescriptionSelected.length > 0"
+               x-cloak
+               class="sticky bottom-4 z-10 mx-auto max-w-2xl mt-3">
+            <div class="rounded-2xl border border-teal-600/50 bg-slate-900/95 backdrop-blur shadow-xl px-4 py-3 flex items-center gap-3">
+              <div class="flex-1 flex items-center gap-2 flex-wrap min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-400 shrink-0">Compare:</span>
+                <template x-for="sym in prescriptionSelected" :key="sym">
+                  <span class="flex items-center gap-1 bg-slate-700 rounded-full px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                    <span x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                    <button @click.stop="prescriptionSelected.splice(prescriptionSelected.indexOf(sym), 1)"
+                            class="text-slate-400 hover:text-slate-100 leading-none ml-0.5">×</button>
+                  </span>
+                </template>
+                <span class="text-[10px] text-slate-500" x-show="prescriptionSelected.length < 2">· select 1 more to compare</span>
+              </div>
+              <button @click="goCompareSelected()"
+                      :disabled="prescriptionSelected.length < 2"
+                      :class="prescriptionSelected.length < 2 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-teal-500'"
+                      class="shrink-0 px-4 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold transition">
+                Compare →
+              </button>
+              <button @click="prescriptionSelected = []"
+                      class="shrink-0 text-slate-500 hover:text-slate-300 text-sm transition">✕</button>
+            </div>
+          </div>
+
+          <!-- Loading state for candidates -->
+          <div x-show="policyAnalysisLoading" class="py-6 text-center text-sm text-slate-400 animate-pulse">Finding candidates across the universe…</div>
+
+          <!-- No gaps = nothing to prescribe -->
+          <template x-if="policyAnalysis && policyAnalysis.candidates && policyAnalysis.candidates.length === 0 && !policyAnalysisLoading">
+            <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 text-center">
+              ✓ No sector gaps — portfolio meets all policy targets. Deploy new money to existing underweight positions.
+            </div>
+          </template>
+
+          <!-- Deployment scenarios (money amounts) -->
           <template x-if="personalIndexInputRows.length">
-            <div class="mt-6 pt-5 border-t border-slate-100">
-              <h3 class="text-sm font-semibold text-slate-800 mb-1">If I Deploy New Money — What Should I Buy?</h3>
+            <div class="pt-4 border-t border-slate-100">
+              <h3 class="text-sm font-semibold text-slate-800 mb-1">Deployment Scenarios</h3>
               <p class="text-xs text-slate-500 mb-4">Assumes non-Sharia holdings are sold first. Proceeds + new money are redeployed following the 55/30/15 and 8% rules.</p>
+              <template x-if="deploymentScenariosLoading">
+                <p class="text-xs text-slate-400 animate-pulse">Computing scenarios…</p>
+              </template>
               <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <template x-for="scenario in deploymentScenarios()" :key="scenario.label">
+                <template x-for="scenario in deploymentScenariosData" :key="scenario.label">
                   <div class="rounded-2xl border border-slate-700 overflow-hidden shadow-sm flex flex-col bg-slate-800">
-                    <!-- Card header -->
                     <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between"
                          :class="{'bg-teal-900/60': scenario.idx===0, 'bg-violet-900/60': scenario.idx===1, 'bg-amber-900/60': scenario.idx===2, 'bg-rose-900/60': scenario.idx===3}">
                       <div>
@@ -3373,8 +3630,6 @@
                         <p class="text-sm font-bold text-slate-200" x-text="'₹' + scenario.newTotal.toLocaleString(undefined,{maximumFractionDigits:0})"></p>
                       </div>
                     </div>
-
-                    <!-- Sell section -->
                     <template x-if="scenario.sells.length">
                       <div class="px-4 py-2 border-b border-rose-900/50 bg-rose-950/30">
                         <p class="text-[10px] font-bold uppercase text-rose-400 mb-1">Sell — Non-Sharia exits</p>
@@ -3394,8 +3649,6 @@
                         </div>
                       </div>
                     </template>
-
-                    <!-- Buy section -->
                     <div class="px-4 py-2 flex-1">
                       <p class="text-[10px] font-bold uppercase text-emerald-400 mb-1">Buy — Deploy here</p>
                       <div class="space-y-1">
@@ -3417,8 +3670,6 @@
                         </template>
                       </div>
                     </div>
-
-                    <!-- Card footer -->
                     <div class="px-4 py-2 bg-slate-900/50 border-t border-slate-700 text-[10px] text-slate-400 flex justify-between">
                       <span x-text="scenario.buys.length + ' buy action' + (scenario.buys.length !== 1 ? 's' : '')"></span>
                       <span x-text="scenario.sells.length + ' sell action' + (scenario.sells.length !== 1 ? 's' : '')"></span>
@@ -3584,6 +3835,7 @@
       <!-- ═══════════════════════════════════════════════════════════════════
            TRADE JOURNAL
            ═══════════════════════════════════════════════════════════════════ -->
+
       <div x-show="page === 'trades'" x-cloak class="space-y-6">
 
         <!-- Header row -->
@@ -4172,8 +4424,140 @@
       </div><!-- /trades -->
 
       <!-- ════════════════════════════════════════════════════════════════
+           MF HOLDINGS
+           ════════════════════════════════════════════════════════════════ -->
+
+      <div x-show="page === 'mf'" x-cloak class="space-y-6">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-100">Mutual Fund Holdings</h1>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Snapshot imported from Groww.
+              <span x-show="mfAsOfDate" x-text="'Holdings as on ' + mfAsOfDate" class="text-slate-500"></span>
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button @click="reimportMf()" :disabled="mfImportRunning"
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-lg transition border border-slate-600 disabled:opacity-50">
+              <span x-show="!mfImportRunning">↻ Re-import</span>
+              <span x-show="mfImportRunning">Importing…</span>
+            </button>
+            <label class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-lg transition border border-slate-600 cursor-pointer">
+              📂 Upload File
+              <input type="file" accept=".xlsx,.xls" class="hidden" @change="handleMfUpload($event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div x-show="mfError" class="px-4 py-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm" x-text="mfError"></div>
+
+        <!-- Loading -->
+        <div x-show="mfLoading" class="flex items-center justify-center py-16 text-slate-400 text-sm">
+          <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+          Loading holdings…
+        </div>
+
+        <!-- Summary cards -->
+        <div x-show="!mfLoading && mfSummary.total_invested" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4">
+            <p class="text-xs text-slate-400 mb-1">Total Invested</p>
+            <p class="text-lg font-semibold text-slate-100" x-text="'₹' + (mfSummary.total_invested||0).toLocaleString('en-IN', {maximumFractionDigits:0})"></p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4">
+            <p class="text-xs text-slate-400 mb-1">Current Value</p>
+            <p class="text-lg font-semibold text-slate-100" x-text="'₹' + (mfSummary.current_value||0).toLocaleString('en-IN', {maximumFractionDigits:0})"></p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4">
+            <p class="text-xs text-slate-400 mb-1">P&amp;L</p>
+            <p class="text-lg font-semibold" :class="(mfSummary.profit_loss||0) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+               x-text="((mfSummary.profit_loss||0) >= 0 ? '+' : '') + '₹' + Math.abs(mfSummary.profit_loss||0).toLocaleString('en-IN', {maximumFractionDigits:0})"></p>
+            <p class="text-xs mt-0.5" :class="(mfSummary.profit_loss_pct||0) >= 0 ? 'text-emerald-500' : 'text-red-500'"
+               x-text="((mfSummary.profit_loss_pct||0) >= 0 ? '+' : '') + (mfSummary.profit_loss_pct||0).toFixed(2) + '%'"></p>
+          </div>
+          <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4">
+            <p class="text-xs text-slate-400 mb-1">XIRR</p>
+            <p class="text-lg font-semibold" :class="(mfSummary.xirr_pct||0) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+               x-text="((mfSummary.xirr_pct||0) >= 0 ? '+' : '') + (mfSummary.xirr_pct||0).toFixed(2) + '%'"></p>
+          </div>
+        </div>
+
+        <!-- Holdings table -->
+        <div x-show="!mfLoading && mfHoldings.length > 0" class="bg-slate-800/40 border border-slate-700 rounded-xl overflow-hidden">
+          <div class="px-5 py-3 border-b border-slate-700">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Holdings</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+              <thead class="bg-slate-800">
+                <tr class="text-slate-400 text-left">
+                  <th class="px-4 py-2.5 font-medium">Scheme</th>
+                  <th class="px-4 py-2.5 font-medium">AMC</th>
+                  <th class="px-4 py-2.5 font-medium">Category</th>
+                  <th class="px-4 py-2.5 font-medium">Folio</th>
+                  <th class="px-4 py-2.5 font-medium text-right">Units</th>
+                  <th class="px-4 py-2.5 font-medium text-right">Invested</th>
+                  <th class="px-4 py-2.5 font-medium text-right">Current</th>
+                  <th class="px-4 py-2.5 font-medium text-right">Returns</th>
+                  <th class="px-4 py-2.5 font-medium text-right">XIRR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="h in mfHoldings" :key="h.folio_no">
+                  <tr class="border-t border-slate-800 hover:bg-slate-800/50 transition-colors">
+                    <td class="px-4 py-2.5 text-slate-200 max-w-[200px]">
+                      <span x-text="h.scheme_name" class="block truncate" :title="h.scheme_name"></span>
+                    </td>
+                    <td class="px-4 py-2.5 text-slate-400" x-text="h.amc"></td>
+                    <td class="px-4 py-2.5">
+                      <span class="inline-flex items-center gap-1">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-violet-900/50 text-violet-300" x-text="h.category"></span>
+                        <span class="text-slate-500" x-text="h.sub_category"></span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-2.5 text-slate-500 font-mono" x-text="h.folio_no"></td>
+                    <td class="px-4 py-2.5 text-slate-300 text-right font-mono" x-text="h.units.toFixed(3)"></td>
+                    <td class="px-4 py-2.5 text-slate-300 text-right" x-text="'₹' + h.invested_value.toLocaleString('en-IN', {maximumFractionDigits:0})"></td>
+                    <td class="px-4 py-2.5 text-right font-medium" x-text="'₹' + h.current_value.toLocaleString('en-IN', {maximumFractionDigits:0})"></td>
+                    <td class="px-4 py-2.5 text-right font-medium" :class="h.returns >= 0 ? 'text-emerald-400' : 'text-red-400'"
+                        x-text="(h.returns >= 0 ? '+' : '') + '₹' + Math.abs(h.returns).toLocaleString('en-IN', {maximumFractionDigits:0})"></td>
+                    <td class="px-4 py-2.5 text-right font-medium" :class="h.xirr_pct >= 0 ? 'text-emerald-400' : 'text-red-400'"
+                        x-text="(h.xirr_pct >= 0 ? '+' : '') + h.xirr_pct.toFixed(2) + '%'"></td>
+                  </tr>
+                </template>
+              </tbody>
+              <!-- Totals row -->
+              <tfoot class="border-t-2 border-slate-600 bg-slate-800/80">
+                <tr class="text-slate-300 font-semibold text-xs">
+                  <td class="px-4 py-2.5" colspan="4">Total</td>
+                  <td class="px-4 py-2.5 text-right font-mono" x-text="mfHoldings.reduce((s,h)=>s+h.units,0).toFixed(3)"></td>
+                  <td class="px-4 py-2.5 text-right" x-text="'₹' + mfHoldings.reduce((s,h)=>s+h.invested_value,0).toLocaleString('en-IN',{maximumFractionDigits:0})"></td>
+                  <td class="px-4 py-2.5 text-right" x-text="'₹' + mfHoldings.reduce((s,h)=>s+h.current_value,0).toLocaleString('en-IN',{maximumFractionDigits:0})"></td>
+                  <td class="px-4 py-2.5 text-right" :class="mfHoldings.reduce((s,h)=>s+h.returns,0) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+                      x-text="(mfHoldings.reduce((s,h)=>s+h.returns,0) >= 0 ? '+' : '') + '₹' + Math.abs(mfHoldings.reduce((s,h)=>s+h.returns,0)).toLocaleString('en-IN',{maximumFractionDigits:0})"></td>
+                  <td class="px-4 py-2.5"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div x-show="!mfLoading && mfHoldings.length === 0 && !mfError"
+             class="flex flex-col items-center justify-center py-16 text-slate-500">
+          <p class="text-4xl mb-3">📊</p>
+          <p class="font-medium text-slate-400">No MF holdings yet</p>
+          <p class="text-sm mt-1">Click Re-import or upload a Groww Mutual Funds export</p>
+        </div>
+
+      </div><!-- /mf -->
+
+      <!-- ════════════════════════════════════════════════════════════════
            LENS LIBRARY
            ════════════════════════════════════════════════════════════════ -->
+
       <div x-show="page === 'lenses'" x-cloak class="max-w-4xl mx-auto space-y-6">
 
         <!-- Header -->
@@ -4560,6 +4944,7 @@
       </div><!-- /lenses -->
 
       <!-- Watchlist -->
+
       <div x-show="page === 'watchlist'" x-cloak class="space-y-4">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold text-slate-800">Watchlist</h1>
@@ -4718,8 +5103,12 @@
 
   </div>
 
+
+    </main>
+  </div>
+
   <script>
-    const API = '/api';
+      const API = '/api';
 
     function app() {
       return {
@@ -4730,7 +5119,7 @@
         reportPeriods: ['All periods', '31st March 2025'],
         counts: {},
         tickers: [],
-        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', lenses: 'Lens Library', watchlist: 'Watchlist' },
+        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', mf: 'MF Holdings', lenses: 'Lens Library', watchlist: 'Watchlist' },
         tabulators: {},
         loading: false,
         allStocksRows: [],
@@ -4811,8 +5200,7 @@
         compareSymbolsText: '',
         compareSymbolsList: [],
         compareRows: [],
-        compareSymA: '',
-        compareSymB: '',
+        compareSymbols: [],
         portfolioPivot: [],
         portfolioRows: [],
         portfolioRowsBySymbol: {},
@@ -4824,6 +5212,7 @@
           comparison: { query: '', open: false },
           compareA: { query: '', open: false },
           compareB: { query: '', open: false },
+          compareAdd: { query: '', open: false },
           portfolio: { query: '', open: false },
           personal_index: { query: '', open: false }
         },
@@ -4868,6 +5257,15 @@
         tradeCheckRunning: false,
         tradeCheckResult: null,
         tradeCheckError: '',
+        // MF Holdings state
+        mfHoldings: [],
+        mfSummary: {},
+        mfAsOfDate: '',
+        mfImportedAt: '',
+        mfLoading: false,
+        mfImportRunning: false,
+        mfUploadRunning: false,
+        mfError: '',
         // Broker import state
         importModalOpen: false,
         importLoading: false,
@@ -4903,6 +5301,28 @@
                 usdInrRate: null,
         usdInrUpdated: '',
         personalIndexHoldingsRows: [],
+        policyAnalysis: null,
+        policyAnalysisLoading: false,
+        policyAnalysisError: '',
+        deploymentScenariosData: [],
+        deploymentScenariosLoading: false,
+        policyGapExpanded: {},
+        prescriptionSelected: [],
+        togglePrescriptionSelect(sym) {
+          const idx = this.prescriptionSelected.indexOf(sym);
+          if (idx === -1) {
+            if (this.prescriptionSelected.length < 5) this.prescriptionSelected = [...this.prescriptionSelected, sym];
+          } else {
+            this.prescriptionSelected = this.prescriptionSelected.filter(s => s !== sym);
+          }
+        },
+        goCompareSelected() {
+          if (this.prescriptionSelected.length < 2) return;
+          this.compareSymbols = [...this.prescriptionSelected];
+          this.prescriptionSelected = [];
+          this.fetchCompare();
+          this.go('comparison');
+        },
         watchlistText: '',
         watchlistRows: [],
         tableColumns: {},
@@ -5199,20 +5619,23 @@
           }
           else if (this.page === 'comparison') {
             // Restore from session if not already set
-            if (!this.compareSymA) { this.compareSymA = this.sessionGet('compareSymA') || ''; if (this.compareSymA) this.symbolPickerState.compareA.query = this.compareSymA.replace('.NS','').replace('.BO',''); }
-            if (!this.compareSymB) { this.compareSymB = this.sessionGet('compareSymB') || ''; if (this.compareSymB) this.symbolPickerState.compareB.query = this.compareSymB.replace('.NS','').replace('.BO',''); }
+            if (!this.compareSymbols.length) {
+              // migrate legacy session keys
+              const a = this.sessionGet('compareSymA') || '';
+              const b = this.sessionGet('compareSymB') || '';
+              if (a && b) this.compareSymbols = [a, b];
+              else if (a) this.compareSymbols = [a];
+            }
             // Only fetch if no results yet; otherwise re-render charts from cache
-            if (!this.compareRows || !this.compareRows.length) {
+            if (this.compareSymbols.length >= 2 && (!this.compareRows || !this.compareRows.length)) {
               this.fetchCompare();
-            } else {
+            } else if (this.compareRows && this.compareRows.length >= 2) {
               setTimeout(() => this.renderCmpCharts(), 200);
             }
           }
           else if (this.page === 'portfolio') {
-            // Auto-sync holdings from trade positions if nothing manually entered
-            if (!this.personalIndexInputRows.length) {
-              await this.syncPortfolioFromTrades();
-            }
+            // Always sync holdings from trade positions on page load
+            await this.syncPortfolioFromTrades();
             if (this.portfolioRows.length) {
               // Re-init tables from cached data
               this.$nextTick(() => {
@@ -5241,9 +5664,60 @@
             this.fetchTrades();
             if (!this.tradePositions.length) this.fetchTradePositions();
           }
+          else if (this.page === 'mf') {
+            if (!this.mfHoldings.length) this.fetchMfHoldings();
+          }
           else if (this.page === 'lenses') {
             this.fetchLensLibrary();
           }
+        },
+
+        // ── MF Holdings ──────────────────────────────────────────────────────
+        async fetchMfHoldings() {
+          this.mfLoading = true; this.mfError = '';
+          try {
+            const d = await fetch(API + '/mf/holdings').then(r => r.json());
+            this.mfHoldings = d.holdings || [];
+            this.mfSummary = d.summary || {};
+            this.mfAsOfDate = d.as_of_date || '';
+            this.mfImportedAt = d.imported_at || '';
+          } catch(e) { this.mfError = e.message; }
+          finally { this.mfLoading = false; }
+        },
+        async reimportMf() {
+          this.mfImportRunning = true; this.mfError = '';
+          try {
+            const r = await fetch(API + '/mf/import', { method: 'POST' }).then(r => r.json());
+            if (r.error) { this.mfError = r.error; return; }
+            await this.fetchMfHoldings();
+          } catch(e) { this.mfError = e.message; }
+          finally { this.mfImportRunning = false; }
+        },
+        async handleMfUpload(evt) {
+          const file = evt.target.files[0]; if (!file) return;
+          this.mfUploadRunning = true; this.mfError = '';
+          try {
+            const fd = new FormData(); fd.append('file', file);
+            const r = await fetch(API + '/mf/upload', { method: 'POST', body: fd }).then(r => r.json());
+            if (r.error) { this.mfError = r.error; return; }
+            await this.fetchMfHoldings();
+          } catch(e) { this.mfError = e.message; }
+          finally { this.mfUploadRunning = false; evt.target.value = ''; }
+        },
+        mfGroupedHoldings() {
+          const groups = {};
+          for (const h of this.mfHoldings) {
+            const key = h.scheme_name;
+            if (!groups[key]) groups[key] = { scheme_name: h.scheme_name, amc: h.amc, category: h.category, sub_category: h.sub_category, folios: [] };
+            groups[key].folios.push(h);
+          }
+          return Object.values(groups).map(g => ({
+            ...g,
+            total_units: g.folios.reduce((s, f) => s + f.units, 0),
+            total_invested: g.folios.reduce((s, f) => s + f.invested_value, 0),
+            total_current: g.folios.reduce((s, f) => s + f.current_value, 0),
+            total_returns: g.folios.reduce((s, f) => s + f.returns, 0),
+          }));
         },
 
         // ── Lens Library ─────────────────────────────────────────────────────
@@ -6082,9 +6556,25 @@
             }
           }
 
+          // Top compliant pick per gap from prescription (HIGH PRIORITY first)
+          const gapCandidates = [];
+          const candidatePriceMap = {}; // symbol → unit price
+          if (this.policyAnalysis && this.policyAnalysis.candidates) {
+            const sorted = [...this.policyAnalysis.candidates].sort((a, b) =>
+              (a.priority === 'high' ? 0 : 1) - (b.priority === 'high' ? 0 : 1)
+            );
+            for (const gap of sorted) {
+              const best = (gap.options || []).find(o => o.sharia_status === 'Yes');
+              if (best) {
+                gapCandidates.push({ symbol: best.symbol, sector: gap.sector_gap, priority: gap.priority });
+                if (best.current_price) candidatePriceMap[best.symbol] = best.current_price;
+              }
+            }
+          }
+
           return amounts.map((newAmount, idx) => {
             const deployable = newAmount + saleProceeds;
-            const newTotal   = currentTotal + newAmount; // total after sell+buy nets to same + new cash
+            const newTotal   = currentTotal + newAmount;
             let remaining    = deployable;
             const buys = [];
 
@@ -6097,6 +6587,8 @@
               const currentVal = repRow ? (this.holdingCurrentValue(repRow) || 0) : 0;
               const currentW = Math.round(currentVal / newTotal * 1000) / 10;
               const buyAmt = Math.min(sale.amount, remaining, newTotal * 0.08 - currentVal);
+              const repUnitPrice = this.holdingCurrentPrice(rep.symbol);
+              if (repUnitPrice && buyAmt < repUnitPrice) continue;
               if (buyAmt > 500) {
                 const newW = Math.round((currentVal + buyAmt) / newTotal * 1000) / 10;
                 buys.push({ symbol: rep.symbol, amount: Math.round(buyAmt), reason: `↔ Replace ${sale.symbol.replace('.NS','')}`, currentWeight: currentW, newWeight: newW });
@@ -6104,7 +6596,30 @@
               }
             }
 
-            // 2. Top up underweight compliant holdings (sorted by current weight asc)
+            // 2. Fill sector gaps using prescription candidates (HIGH PRIORITY first)
+            if (remaining > 500) {
+              for (const cand of gapCandidates) {
+                if (remaining < 500) break;
+                if (buys.find(b => b.symbol === cand.symbol)) continue;
+                const existingRow = (this.personalIndexInputRows || []).find(r => r.symbol === cand.symbol);
+                const currentVal = existingRow ? (this.holdingCurrentValue(existingRow) || 0) : 0;
+                const currentW = Math.round(currentVal / newTotal * 1000) / 10;
+                if (currentW >= 8) continue; // already at cap
+                // Allocate proportional slice — gap fills split remaining equally
+                const sliceAmt = Math.round(Math.min(remaining / Math.max(gapCandidates.length, 1), newTotal * 0.08 - currentVal, remaining));
+                // Skip if we can't afford even one unit
+                const unitPrice = candidatePriceMap[cand.symbol] || this.holdingCurrentPrice(cand.symbol);
+                if (unitPrice && sliceAmt < unitPrice) continue;
+                if (sliceAmt > 500) {
+                  const newW = Math.round((currentVal + sliceAmt) / newTotal * 1000) / 10;
+                  const label = cand.priority === 'high' ? `🎯 Gap fill — ${cand.sector}` : `↗ Gap fill — ${cand.sector}`;
+                  buys.push({ symbol: cand.symbol.replace('.NS','').replace('.BO',''), amount: sliceAmt, reason: label, currentWeight: currentW, newWeight: newW });
+                  remaining -= sliceAmt;
+                }
+              }
+            }
+
+            // 3. Top up underweight compliant existing holdings
             if (remaining > 500) {
               const compliant = (this.personalIndexInputRows || [])
                 .filter(row => (meta[row.symbol] || {}).Sharia === 'Yes')
@@ -6112,7 +6627,7 @@
                   const val = this.holdingCurrentValue(row) || 0;
                   return { symbol: row.symbol, currentVal: val, currentWeight: Math.round(val / newTotal * 1000) / 10 };
                 })
-                .filter(h => !buys.find(b => b.symbol === h.symbol)) // skip already targeted
+                .filter(h => !buys.find(b => b.symbol === h.symbol))
                 .sort((a, b) => a.currentWeight - b.currentWeight);
 
               for (const h of compliant) {
@@ -6120,6 +6635,8 @@
                 if (h.currentWeight >= targetWeightPct) continue;
                 const deficit = (targetWeightPct - h.currentWeight) / 100 * newTotal;
                 const buyAmt = Math.round(Math.min(deficit, remaining, newTotal * 0.08 - h.currentVal));
+                const hUnitPrice = this.holdingCurrentPrice(h.symbol);
+                if (hUnitPrice && buyAmt < hUnitPrice) continue;
                 if (buyAmt > 500) {
                   const newW = Math.round((h.currentVal + buyAmt) / newTotal * 1000) / 10;
                   buys.push({ symbol: h.symbol, amount: buyAmt, reason: `↑ Underweight (${h.currentWeight}%)`, currentWeight: h.currentWeight, newWeight: newW });
@@ -6128,7 +6645,7 @@
               }
             }
 
-            // 3. Any leftover: go into the most underweight compliant holding
+            // 4. Any leftover: most underweight compliant existing holding
             if (remaining > 500) {
               const compliant = (this.personalIndexInputRows || [])
                 .filter(row => (meta[row.symbol] || {}).Sharia === 'Yes' && !buys.find(b => b.symbol === row.symbol))
@@ -6422,6 +6939,7 @@
           await this.fetchCounts();
           await this.fetchSymbolsMissing();
           this.onPageChange();
+          this.fetchPolicyAnalysis();
         },
         async fetchReportPeriods() { const r = await fetch(API + '/report-periods').then(r => r.json()); this.reportPeriods = r && r.length ? r : ['All periods', '31st March 2025']; if (!this.reportPeriods.includes(this.period)) this.period = this.reportPeriods[0]; },
         async fetchUniverse() { const r = await fetch(API + '/universe?market=' + encodeURIComponent(this.market)).then(r => r.json()); this.tickers = r.tickers || []; },
@@ -6919,10 +7437,13 @@
           this.perStockSectionLoading = { ...this.perStockSectionLoading, [section]: true };
           try {
             let url;
+            const symMarket = (this.holdingMarkets || {})[sym] === 'US' ? 'us' : 'india';
             if (isResearch) {
               url = API + '/symbol/' + encodeURIComponent(sym) + '/research/' + section;
             } else {
-              url = API + '/symbol/' + encodeURIComponent(sym) + '/section/' + section + (force ? '?force=true' : '');
+              const params = new URLSearchParams({ market: symMarket });
+              if (force) params.set('force', 'true');
+              url = API + '/symbol/' + encodeURIComponent(sym) + '/section/' + section + '?' + params.toString();
             }
             const r = await fetch(url).then(x => x.json());
             if (!this.perStockSectionData[sym]) this.perStockSectionData[sym] = {};
@@ -7152,13 +7673,13 @@
           }
         },
         async fetchCompare() {
-          if (!this.compareSymA || !this.compareSymB) { this.compareRows = []; return; }
-          const syms = [this.compareSymA, this.compareSymB];
+          if (this.compareSymbols.length < 2) { this.compareRows = []; return; }
+          const syms = this.compareSymbols;
           this.loading = true;
           try {
             const r = await fetch(API + '/compare?symbols=' + encodeURIComponent(syms.join(',')) + '&market=' + encodeURIComponent(this.market)).then(r => r.json());
             this.compareRows = r.rows || [];
-            if (this.compareRows.length === 2) {
+            if (this.compareRows.length >= 2) {
               const tryRender = (attempts) => {
                 const el = document.getElementById('cmp-radar');
                 if (el && el.offsetParent !== null) {
@@ -7172,24 +7693,44 @@
           } finally { this.loading = false; }
         },
         comparePickerCommit(side, explicitSym) {
+          // legacy method kept for any remaining references
           const key = side === 'A' ? 'compareA' : 'compareB';
           const query = (explicitSym || this.symbolPickerMatches(key)[0] || this.symbolPickerState[key].query || '').trim();
           if (!query) return;
-          if (side === 'A') { this.compareSymA = query; this.sessionSet('compareSymA', query); }
-          else { this.compareSymB = query; this.sessionSet('compareSymB', query); }
+          this.addCompareStock(query);
           this.symbolPickerState[key].query = query.replace('.NS','').replace('.BO','');
           this.symbolPickerState[key].open = false;
-          if (this.compareSymA && this.compareSymB) this.fetchCompare();
+        },
+        addCompareStock(sym) {
+          const s = (sym || '').trim().toUpperCase();
+          if (!s || this.compareSymbols.some(x => x.toUpperCase() === s)) return;
+          if (this.compareSymbols.length >= 5) return;
+          this.compareSymbols = [...this.compareSymbols, sym.trim()];
+          this.fetchCompare();
+        },
+        removeCompareStock(sym) {
+          this.compareSymbols = this.compareSymbols.filter(x => x.toUpperCase() !== sym.toUpperCase());
+          this.fetchCompare();
         },
         _cmpCharts: {},
         renderCmpCharts() {
           if (this.compareRows.length < 2) return;
-          const a = this.compareRows[0], b = this.compareRows[1];
-          const symA = (a.symbol||'').replace('.NS','').replace('.BO','');
-          const symB = (b.symbol||'').replace('.NS','').replace('.BO','');
-          const colA = 'rgba(45,212,191,0.85)';   // teal
-          const colB = 'rgba(167,139,250,0.85)';   // violet
-          const colAB = [colA, colB];
+          const rows = this.compareRows;
+          const COLORS = [
+            'rgba(45,212,191,0.85)',
+            'rgba(167,139,250,0.85)',
+            'rgba(251,191,36,0.85)',
+            'rgba(249,115,22,0.85)',
+            'rgba(236,72,153,0.85)',
+          ];
+          const COLORS_BG = [
+            'rgba(45,212,191,0.15)',
+            'rgba(167,139,250,0.15)',
+            'rgba(251,191,36,0.15)',
+            'rgba(249,115,22,0.15)',
+            'rgba(236,72,153,0.15)',
+          ];
+          const sym = row => (row.symbol||'').replace('.NS','').replace('.BO','');
           const grid = { color: 'rgba(148,163,184,0.12)' };
           const tick = { color: '#94a3b8', font: { size: 11 } };
           const legend = { labels: { color: '#cbd5e1', font: { size: 12 }, boxWidth: 12 } };
@@ -7207,20 +7748,14 @@
           };
           destroyAll();
 
-          const mkBar = (id, labels, dataA, dataB, opts = {}) => {
+          const mkBar = (id, labels, datasets, opts = {}) => {
             const el = document.getElementById(id);
             if (!el) return;
             const ctx = el.getContext('2d');
             if (!ctx) return;
             return new Chart(ctx, {
               type: 'bar',
-              data: {
-                labels,
-                datasets: [
-                  { label: symA, data: dataA, backgroundColor: colA, borderRadius: 4 },
-                  { label: symB, data: dataB, backgroundColor: colB, borderRadius: 4 },
-                ]
-              },
+              data: { labels, datasets },
               options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { ...legend, position: 'top' }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + (opts.suffix||'') } } },
@@ -7237,31 +7772,24 @@
           if (radarEl && radarEl.getContext('2d')) {
             const norm = (v, lo, hi) => v == null ? 0 : Math.min(10, Math.max(0, (v - lo) / (hi - lo) * 10));
             const dims = ['Profitability', 'Valuation', 'Growth', 'Health', 'Momentum', 'Quality'];
-            const scoreA = [
-              norm(pctVal(a.roe), 0, 30),
-              norm(30 - (a.trailing_pe||30), 0, 30),
-              norm(pctVal(a.revenue_growth), -10, 30),
-              norm(a.current_ratio, 0, 3),
-              norm(a['52w_change_pct']||0, -30, 50),
-              norm(a.total_score||0, 0, 100),
-            ];
-            const scoreB = [
-              norm(pctVal(b.roe), 0, 30),
-              norm(30 - (b.trailing_pe||30), 0, 30),
-              norm(pctVal(b.revenue_growth), -10, 30),
-              norm(b.current_ratio, 0, 3),
-              norm(b['52w_change_pct']||0, -30, 50),
-              norm(b.total_score||0, 0, 100),
-            ];
+            const radarDatasets = rows.map((row, i) => ({
+              label: sym(row),
+              data: [
+                norm(pctVal(row.roe), 0, 30),
+                norm(30 - (row.trailing_pe||30), 0, 30),
+                norm(pctVal(row.revenue_growth), -10, 30),
+                norm(row.current_ratio, 0, 3),
+                norm(row['52w_change_pct']||0, -30, 50),
+                norm(row.total_score||0, 0, 100),
+              ],
+              backgroundColor: COLORS_BG[i],
+              borderColor: COLORS[i],
+              borderWidth: 2,
+              pointBackgroundColor: COLORS[i],
+            }));
             this._cmpCharts['radar'] = new Chart(radarEl.getContext('2d'), {
               type: 'radar',
-              data: {
-                labels: dims,
-                datasets: [
-                  { label: symA, data: scoreA, backgroundColor: 'rgba(45,212,191,0.15)', borderColor: colA, borderWidth: 2, pointBackgroundColor: colA },
-                  { label: symB, data: scoreB, backgroundColor: 'rgba(167,139,250,0.15)', borderColor: colB, borderWidth: 2, pointBackgroundColor: colB },
-                ]
-              },
+              data: { labels: dims, datasets: radarDatasets },
               options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend },
@@ -7273,16 +7801,22 @@
           // 2. Valuation multiples
           this._cmpCharts['val'] = mkBar('cmp-valuation',
             ['P/E TTM', 'P/E Fwd', 'EV/EBITDA', 'P/B', 'P/S'],
-            [a.trailing_pe, a.forward_pe, a.ev_to_ebitda, a.price_to_book, a.price_to_sales].map(v => v != null ? +v.toFixed(1) : 0),
-            [b.trailing_pe, b.forward_pe, b.ev_to_ebitda, b.price_to_book, b.price_to_sales].map(v => v != null ? +v.toFixed(1) : 0),
+            rows.map((row, i) => ({
+              label: sym(row),
+              data: [row.trailing_pe, row.forward_pe, row.ev_to_ebitda, row.price_to_book, row.price_to_sales].map(v => v != null ? +v.toFixed(1) : 0),
+              backgroundColor: COLORS[i], borderRadius: 4,
+            })),
             { suffix: 'x' }
           );
 
           // 3. Profitability
           this._cmpCharts['prof'] = mkBar('cmp-profit',
             ['Gross Margin', 'EBIT Margin', 'Net Margin', 'ROE', 'ROA'],
-            [a.gross_margin, a.operating_margin, a.profit_margin||a.net_margin, a.roe, a.roa].map(pctVal),
-            [b.gross_margin, b.operating_margin, b.profit_margin||b.net_margin, b.roe, b.roa].map(pctVal),
+            rows.map((row, i) => ({
+              label: sym(row),
+              data: [row.gross_margin, row.operating_margin, row.profit_margin||row.net_margin, row.roe, row.roa].map(pctVal),
+              backgroundColor: COLORS[i], borderRadius: 4,
+            })),
             { suffix: '%' }
           );
 
@@ -7290,8 +7824,11 @@
           const growthVal = (v, alreadyPct) => v == null ? 0 : alreadyPct ? +Number(v).toFixed(1) : +(v*100).toFixed(1);
           this._cmpCharts['growth'] = mkBar('cmp-growth',
             ['Revenue Growth', 'Earnings Growth', 'Dividend Yield', '52W Return'],
-            [growthVal(a.revenue_growth,false), growthVal(a.earnings_growth,false), growthVal(a.dividend_yield,true), growthVal(a['52w_change_pct'],false)],
-            [growthVal(b.revenue_growth,false), growthVal(b.earnings_growth,false), growthVal(b.dividend_yield,true), growthVal(b['52w_change_pct'],false)],
+            rows.map((row, i) => ({
+              label: sym(row),
+              data: [growthVal(row.revenue_growth,false), growthVal(row.earnings_growth,false), growthVal(row.dividend_yield,true), growthVal(row['52w_change_pct'],false)],
+              backgroundColor: COLORS[i], borderRadius: 4,
+            })),
             { suffix: '%', beginAtZero: false }
           );
 
@@ -7299,14 +7836,13 @@
           const healthEl = document.getElementById('cmp-health');
           if (healthEl && healthEl.getContext('2d')) {
             const labels = ['Current Ratio', 'Quick Ratio', 'Interest Coverage', 'Beta', 'D/E Ratio'];
-            const va = [a.current_ratio, a.quick_ratio, a.interest_coverage, a.beta, a.debt_to_equity||a.debt_to_equity_live].map(v => v != null ? +Number(v).toFixed(2) : 0);
-            const vb = [b.current_ratio, b.quick_ratio, b.interest_coverage, b.beta, b.debt_to_equity||b.debt_to_equity_live].map(v => v != null ? +Number(v).toFixed(2) : 0);
             this._cmpCharts['health'] = new Chart(healthEl.getContext('2d'), {
               type: 'bar',
-              data: { labels, datasets: [
-                { label: symA, data: va, backgroundColor: colA, borderRadius: 4 },
-                { label: symB, data: vb, backgroundColor: colB, borderRadius: 4 },
-              ]},
+              data: { labels, datasets: rows.map((row, i) => ({
+                label: sym(row),
+                data: [row.current_ratio, row.quick_ratio, row.interest_coverage, row.beta, row.debt_to_equity||row.debt_to_equity_live].map(v => v != null ? +Number(v).toFixed(2) : 0),
+                backgroundColor: COLORS[i], borderRadius: 4,
+              }))},
               options: {
                 indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { ...legend, position: 'top' } },
@@ -7342,6 +7878,18 @@
               { key: 'current_ratio', label: 'Current Ratio', fmt: 'x2', dir: 'higher' },
             ]},
           ];
+        },
+        compareWinnerIdx(metric, rows) {
+          if (!metric.better && metric.dir === 'none') return -1;
+          const dir = metric.better || metric.dir;
+          if (dir === 'none') return -1;
+          if (!rows || rows.length < 2) return -1;
+          const vals = rows.map(r => r[metric.key]);
+          if (vals.every(v => v == null)) return -1;
+          const defined = vals.filter(v => v != null);
+          const best = dir === 'higher' ? Math.max(...defined) : Math.min(...defined);
+          const winnerIdxs = vals.reduce((acc, v, i) => v === best ? [...acc, i] : acc, []);
+          return winnerIdxs.length === 1 ? winnerIdxs[0] : -1; // -1 = tie or multiple equal
         },
         compareWinner(metric, a, b) {
           if (metric.dir === 'none') return 'tie';
@@ -7441,7 +7989,7 @@
               symbol: pos.symbol,
               units: pos.units,
               price: pos.avg_cost ? Math.round(pos.avg_cost * 100) / 100 : '',
-              market: 'IN',
+              market: (this.holdingMarkets || {})[pos.symbol] || 'IN',
             }));
             // Also update the text backing store
             this.personalIndexHoldingsText = positions
@@ -7461,11 +8009,76 @@
             });
             if (res.ok) {
               const data = await res.json();
-              this.personalIndexHoldingsRows = data.holdings || [];
+              const rows = data.holdings || [];
+              // Fetch prices for US symbols not handled by the India-only analyze endpoint
+              const usSymbols = (this.personalIndexInputRows || [])
+                .filter(r => (this.holdingMarkets || {})[r.symbol] === 'US')
+                .map(r => r.symbol);
+              if (usSymbols.length) {
+                const priceResults = await Promise.allSettled(
+                  usSymbols.map(sym =>
+                    fetch(`${API}/symbol/${encodeURIComponent(sym)}/section/market?market=us`)
+                      .then(r => r.json())
+                      .then(d => ({ symbol: sym, current_price: d.currentPrice ?? null }))
+                      .catch(() => ({ symbol: sym, current_price: null }))
+                  )
+                );
+                for (const result of priceResults) {
+                  if (result.status === 'fulfilled' && result.value.current_price != null) {
+                    const existing = rows.find(r => r.symbol === result.value.symbol);
+                    if (existing) {
+                      existing.current_price = result.value.current_price;
+                    } else {
+                      const inputRow = (this.personalIndexInputRows || []).find(r => r.symbol === result.value.symbol);
+                      rows.push({ symbol: result.value.symbol, current_price: result.value.current_price, units: inputRow?.units ?? 0 });
+                    }
+                  }
+                }
+              }
+              this.personalIndexHoldingsRows = rows;
               // Auto-load replacements for non-Sharia holdings
               this.$nextTick(() => this.autoLoadReplacements());
             }
           } catch (_) {}
+          // Run policy gap analysis in parallel — powers Diagnosis + Prescription sections
+          this.fetchPolicyAnalysis();
+        },
+        async fetchPolicyAnalysis() {
+          const holdings = (this.personalIndexInputRows || [])
+            .filter(r => r.symbol)
+            .map(r => ({ symbol: r.symbol, units: parseFloat(r.units) || 0, price: parseFloat(r.price) || null }));
+          if (!holdings.length) return;
+          this.policyAnalysisLoading = true;
+          this.policyAnalysisError = '';
+          try {
+            const res = await fetch(API + '/portfolio/policy-analysis', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ holdings, market: this.market || 'india' })
+            });
+            const data = await res.json();
+            if (data.error) { this.policyAnalysisError = data.error; return; }
+            this.policyAnalysis = data;
+            this.fetchDeploymentScenarios();
+          } catch(e) { this.policyAnalysisError = e.message; }
+          finally { this.policyAnalysisLoading = false; }
+        },
+        async fetchDeploymentScenarios() {
+          const holdings = (this.personalIndexInputRows || [])
+            .filter(r => r.symbol)
+            .map(r => ({ symbol: r.symbol, units: parseFloat(r.units) || 0, price: parseFloat(r.price) || null }));
+          if (!holdings.length) return;
+          this.deploymentScenariosLoading = true;
+          try {
+            const res = await fetch(API + '/portfolio/deployment-scenarios', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ holdings, market: this.market || 'india' })
+            });
+            const data = await res.json();
+            if (!data.error) this.deploymentScenariosData = data.scenarios || [];
+          } catch(_) {}
+          finally { this.deploymentScenariosLoading = false; }
         },
         async autoLoadReplacements() {
           const nonSharia = this.nonShariaHoldings();
@@ -7531,6 +8144,8 @@
         }
       };
     }
+  </script>
+
   </script>
 </body>
 </html>

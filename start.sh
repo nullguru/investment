@@ -8,9 +8,17 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-if [ ! -d ".venv" ]; then
-  echo "Creating .venv..."
-  python3 -m venv .venv
+# Prefer mise-managed Python 3.13 if available, fall back to system python3
+MISE_PYTHON="$HOME/.local/share/mise/installs/python/3.13.7/bin/python3.13"
+if [ -x "$MISE_PYTHON" ]; then
+  PYTHON="$MISE_PYTHON"
+else
+  PYTHON="python3"
+fi
+
+if [ ! -d ".venv" ] || [ ! -x ".venv/bin/python" ]; then
+  echo "Creating .venv with $PYTHON..."
+  "$PYTHON" -m venv .venv
 fi
 
 echo "Installing dependencies..."

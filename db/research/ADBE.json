@@ -1,0 +1,1072 @@
+{
+  "thesis": {
+    "current": {
+      "section": "thesis",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe Inc. (ADBE): A Bull Case Theory - Insider Monkey",
+          "url": "https://www.insidermonkey.com/blog/adobe-inc-adbe-a-bull-case-theory-11-1670587/"
+        },
+        {
+          "title": "Adobe (ADBE) - The Bull & Bear Case - FinanceCharts",
+          "url": "https://www.financecharts.com/stocks/ADBE/bulls-bears"
+        }
+      ],
+      "data": {
+        "summary": "Adobe is a dominant franchise in creative and marketing software, trading at compressed multiples as investors debate whether generative AI is a threat or opportunity. With $19.7B backlog, ~90% gross margins, and Firefly AI gaining traction (AI-first ARR >$500M in Q2 FY2026, tripled YoY), the bull case is that AI expands TAM rather than disrupts it. The bear case centres on slowing growth and risk of commoditisation from low-cost alternatives.",
+        "bull_case": {
+          "target": "$380",
+          "probability": 40,
+          "drivers": [
+            "Firefly AI monetisation accelerating — AI-first ARR tripled YoY to >$500M in Q2 FY2026",
+            "Firefly Foundry enterprise custom-model platform deepens switching costs",
+            "Aggressive $25B buyback programme (9% share count reduction since Mar 2024)",
+            "$19.7B revenue backlog provides high earnings visibility",
+            "Trading at ~16x trailing FCF vs historical 21% FCF growth — low expectations"
+          ],
+          "narrative": "Adobe is an AI beneficiary, not a victim. Its commercially-safe Firefly models (trained on Adobe Stock / public domain) solve IP provenance issues enterprises care about. AI-influenced ARR has surpassed $5B. With gross margins near 90%, ROE >50%, and a massive buyback, the stock offers quality at a reasonable price."
+        },
+        "base_case": {
+          "target": "$295",
+          "probability": 40,
+          "drivers": [
+            "11% revenue CAGR sustained through FY2026 guidance of $26.5-26.6B",
+            "Digital Media and Digital Experience grow in line with market",
+            "AI monetisation adds incremental ARR but not transformative near-term"
+          ],
+          "narrative": "Adobe maintains its dominant position and grows steadily but re-rates to a lower multiple as growth moderates and competitive intensity rises from Canva, Figma, and AI-native tools."
+        },
+        "bear_case": {
+          "target": "$170",
+          "probability": 20,
+          "drivers": [
+            "Generative AI commoditises creative work, reducing professional tool demand",
+            "Canva, Affinity, and AI-first startups erode SMB and prosumer segments",
+            "Enterprise marketing budgets compressed; Digital Experience growth stalls",
+            "CFO departure (Daniel Durn leaving for Marvell) signals leadership instability"
+          ],
+          "narrative": "AI lowers the barrier to content creation, shrinking the addressable market for premium tools. Competitors offer free or near-free alternatives. Adobe faces a permanent step-down in growth expectations."
+        },
+        "key_drivers": [
+          "Firefly AI monetisation velocity (AI-first ARR trajectory)",
+          "Digital Experience segment growth (marketing tech spend environment)",
+          "Competitive response from Canva, Figma, AI-native tools",
+          "Share buyback execution under $25B authorisation",
+          "CFO succession following Daniel Durn departure"
+        ],
+        "key_risks": [
+          "AI commoditisation of creative software",
+          "Slower-than-expected enterprise adoption of Firefly Foundry",
+          "Regulatory risk (failed Figma acquisition set precedent)",
+          "CFO transition uncertainty",
+          "Valuation compression if growth slows below 10%"
+        ],
+        "verdict": "Hold"
+      }
+    },
+    "versions": []
+  },
+  "industry": {
+    "current": {
+      "section": "industry",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 8-K Q4",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000135/adbeex991q425.htm"
+        },
+        {
+          "title": "Adobe FY2025 Form 10-Q Q2",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000073/adbe-20250530.htm"
+        }
+      ],
+      "data": {
+        "industry_name": "Creative & Marketing Software / Digital Experience Platforms",
+        "market_size": "~$200B+ TAM (Creative Tools + DXP + Generative AI combined)",
+        "growth_rate": "~12% CAGR (software); AI creative tools growing >30% CAGR",
+        "trends": [
+          {
+            "title": "Generative AI Integration",
+            "description": "Every major creative and marketing platform is embedding gen-AI. Adobe leads with Firefly, commercially safe and trained on licensed content. AI-influenced ARR >$5B."
+          },
+          {
+            "title": "Shift to Subscription & ARR",
+            "description": "Industry has fully transitioned to SaaS ARR models. Adobe reported AI-first ARR tripling YoY to >$500M in Q2 FY2026."
+          },
+          {
+            "title": "Enterprise Personalisation at Scale",
+            "description": "Marketing teams demand AI-powered content supply chains. Adobe Experience Platform + GenStudio addresses this end-to-end."
+          },
+          {
+            "title": "Creator Economy Expansion",
+            "description": "Business professionals and consumers growing 15% YoY — largest growth segment, driven by Express and Acrobat AI."
+          }
+        ],
+        "competitive_landscape": [
+          {
+            "company": "Adobe",
+            "market_share": "~65%+ (creative pro tools)",
+            "notes": "Dominant in creative pro segment; Firefly AI differentiator"
+          },
+          {
+            "company": "Canva",
+            "market_share": "~20% (SMB/consumer)",
+            "notes": "Fast-growing, $26B valuation, attacking prosumer segment"
+          },
+          {
+            "company": "Figma",
+            "market_share": "~40% (UI/UX design)",
+            "notes": "Adobe failed acquisition attempt; strong in product design"
+          },
+          {
+            "company": "Salesforce / Salesforce Marketing Cloud",
+            "market_share": "~15% DXP",
+            "notes": "Competes with Adobe Experience Cloud in enterprise marketing"
+          },
+          {
+            "company": "OpenAI / DALL-E / Sora",
+            "market_share": "Emerging",
+            "notes": "Threatens lower tiers of creative content generation"
+          }
+        ],
+        "barriers_to_entry": [
+          "Deep workflow integration — Creative Cloud is the standard across agencies and studios",
+          "IP-safe training data moat (Adobe Stock) for Firefly",
+          "Enterprise integration depth with Experience Platform",
+          "25+ year brand trust with creative professionals",
+          "High switching costs — file formats, plugins, muscle memory"
+        ],
+        "regulatory_environment": "US antitrust regulator blocked Adobe-Figma merger (Dec 2023) at $20B. Heightened scrutiny on big tech M&A. Otherwise low direct regulation on software."
+      }
+    },
+    "versions": []
+  },
+  "business": {
+    "current": {
+      "section": "business",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 8-K Q4",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000135/adbeex991q425.htm"
+        },
+        {
+          "title": "Adobe FY2025 Form 8-K Q2",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000064/adbeex991q225.htm"
+        }
+      ],
+      "data": {
+        "model_summary": "Adobe operates a subscription-first SaaS model with three segments: Digital Media (Creative Cloud + Document Cloud), Digital Experience (marketing/analytics platform), and Publishing & Advertising. Revenue is highly recurring and predictable, recognised ratably. FY2025 revenue was $23.77B, growing 11% YoY. Operating cash flows exceeded $10B in FY2025.",
+        "revenue_streams": [
+          {
+            "name": "Digital Media — Creative Cloud",
+            "pct_of_revenue": 56,
+            "description": "Photoshop, Illustrator, Premiere Pro, After Effects, Firefly. Subscription to creative professionals, students, SMBs.",
+            "growth": "~10-11% YoY"
+          },
+          {
+            "name": "Digital Media — Document Cloud",
+            "pct_of_revenue": 18,
+            "description": "Acrobat, PDF tools, e-signatures. Growing with AI features (AI Assistant for PDFs). Business Professionals +15% YoY.",
+            "growth": "~14-15% YoY"
+          },
+          {
+            "name": "Digital Experience",
+            "pct_of_revenue": 25,
+            "description": "Adobe Experience Platform, Analytics, Marketo, Campaign, GenStudio. Enterprise marketing tech stack.",
+            "growth": "~10% YoY"
+          },
+          {
+            "name": "Publishing & Advertising",
+            "pct_of_revenue": 1,
+            "description": "Legacy print/publishing products. Declining.",
+            "growth": "Declining"
+          }
+        ],
+        "moat_type": "Switching",
+        "moat_description": "Adobe benefits from extraordinarily deep switching costs: creative professionals spend years mastering its tools, studios and agencies standardise on its file formats (PSD, AI, PDF, INDD), and enterprise customers embed Experience Platform into core marketing operations. Firefly adds a data moat — Adobe Stock provides commercially licensed training data no competitor can replicate at scale.",
+        "competitive_advantages": [
+          "Industry-standard file formats (PDF, PSD, AI) create ecosystem lock-in",
+          "Largest commercially licensed creative content library (Adobe Stock) for AI training",
+          "End-to-end content supply chain from creation to delivery to analytics",
+          "Firefly Foundry: enterprise custom AI model platform on proprietary brand assets",
+          "~90% gross margins with 35%+ operating margins — exceptional unit economics"
+        ],
+        "customer_concentration": "Highly diversified — millions of individual and enterprise subscribers globally. No single customer material.",
+        "pricing_power": "High"
+      }
+    },
+    "versions": []
+  },
+  "management": {
+    "current": {
+      "section": "management",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe Executive Compensation 2026 - Panabee",
+          "url": "https://www.panabee.com/news/adobe-executive-compensation-2026"
+        },
+        {
+          "title": "Adobe CFO exit leaves leadership gap - CFO Dive",
+          "url": "https://www.cfodive.com/news/adobe-cfo-leadership-gap-marvell-amid-ceo-search-ai/822849/"
+        },
+        {
+          "title": "Shantanu Narayen salary - Salary.com",
+          "url": "https://www.salary.com/research/executive-compensation/shantanu-narayen-executive-member-of-adobe-inc"
+        }
+      ],
+      "data": {
+        "ceo": {
+          "name": "Shantanu Narayen",
+          "since": "2007",
+          "background": "Joined Adobe 1998, became CEO 2007. Led transformation from perpetual licences to Creative Cloud SaaS (2013), acquired Marketo ($4.75B, 2018) and Magento. Widely credited as one of techs best capital allocators. Board Chair since 2017.",
+          "compensation": "$51.2M total FY2025 ($1.5M base + $45.4M stock awards + $3.1M non-equity incentive)"
+        },
+        "cfo": {
+          "name": "Daniel Durn (departing)",
+          "since": "2021",
+          "background": "Served as CFO for 4 years. Departing effective June 15, 2026 to become CFO at Marvell Technology. Successor not yet announced — key near-term risk.",
+          "compensation": "$16.3M total FY2025 ($900K base + $14.4M stock awards)"
+        },
+        "other_key_executives": [
+          {
+            "name": "Abhay Parasnis",
+            "title": "President & CPO",
+            "since": "2024",
+            "background": "Chief Product Officer overseeing AI product strategy including Firefly. Former Microsoft Azure AI."
+          },
+          {
+            "name": "Ann Lewnes",
+            "title": "CMO & EVP Corporate Strategy",
+            "since": "2006",
+            "background": "Long-tenured CMO. Adobes strongest brand-building executive."
+          },
+          {
+            "name": "Gloria Chen",
+            "title": "CPO (People & Places)",
+            "since": "2019",
+            "background": "Chief People Officer overseeing talent strategy during AI transformation."
+          }
+        ],
+        "board_independence_pct": 89,
+        "insider_ownership_pct": 0.3,
+        "track_record": "Exceptional. Narayens transition to SaaS is one of techs best-executed pivots. 13% revenue CAGR over 5 years. $14B+ buybacks since March 2024. Failed Figma acquisition ($20B) was costly but showed discipline in walking away when blocked by regulators.",
+        "red_flags": [
+          "CFO Daniel Durn departing June 15, 2026 — successor not announced, creates near-term uncertainty",
+          "Very low insider ownership (~0.3%) — limited executive skin in the game beyond stock awards",
+          "CEO compensation of $51.2M in FY2025 is on the high side relative to peers"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "esg": {
+    "current": {
+      "section": "esg",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe Inc. (ADBE) ESG Rating 2026 (MSCI: AAA) - KnowESG",
+          "url": "https://knowesg.com/esg-ratings/adobe-inc"
+        },
+        {
+          "title": "Evaluating a company impact (case of Adobe) - Green Digest",
+          "url": "https://www.greendigest.co/p/evaluating-a-company-s-impact-the-case-of-adobe"
+        },
+        {
+          "title": "Adobe ESG Risk Ratings - Sustainalytics",
+          "url": "https://www.sustainalytics.com/esg-rating/adobe-inc/1007902567"
+        }
+      ],
+      "data": {
+        "overall_rating": "AAA",
+        "rating_provider": "MSCI",
+        "environmental": {
+          "score": "Leader",
+          "highlights": [
+            "Net Zero target for 2050 with validated SBTi (Science Based Targets) status as of November 2025",
+            "100% renewable electricity in operations",
+            "Software-only business model has inherently low direct carbon footprint"
+          ],
+          "controversies": []
+        },
+        "social": {
+          "score": "Strong",
+          "highlights": [
+            "Adobe Fund for Design supports underrepresented creators",
+            "Diversity & inclusion programmes — significant female and minority representation in leadership",
+            "Strong employee satisfaction scores; consistently named top employer"
+          ],
+          "controversies": []
+        },
+        "governance": {
+          "score": "Strong",
+          "highlights": [
+            "89% independent board",
+            "CEO share ownership requirement: 20x base salary",
+            "Transparent executive compensation disclosure",
+            "Refinitiv governance score: 77/100"
+          ],
+          "controversies": [
+            "Failed Figma acquisition ($20B terminated Dec 2023) raised questions about M&A governance and capital allocation process"
+          ]
+        },
+        "notable_initiatives": [
+          "Adobe Firefly trained only on licensed/public domain content — responsible AI leadership",
+          "Content Authenticity Initiative (CAI) — industry coalition to combat AI-generated misinformation via content provenance",
+          "SBTi Net Zero 2050 commitment validated November 2025",
+          "Net impact ratio of 34.4% (Upright Project) — overall positive societal impact"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "estimates": {
+    "current": {
+      "section": "estimates",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe Stock Forecast & Analyst Ratings 2026 - StockAnalysis",
+          "url": "https://stockanalysis.com/stocks/adbe/forecast/"
+        },
+        {
+          "title": "Adobe 2026 Outlook - TIKR.com",
+          "url": "https://www.tikr.com/blog/adobe-stock-2026-outlook-q2-earnings-on-june-11-and-a-25-billion-buyback-in-place"
+        },
+        {
+          "title": "Adobe Q2 FY2026 Earnings - MarketScreener",
+          "url": "https://www.marketscreener.com/news/earnings-flash-adbe-adobe-inc-reports-q2-revenue-6-62b-vs-factset-est-of-6-45b-ce7f5cd8dc8cf32d"
+        }
+      ],
+      "data": {
+        "consensus_rating": "Hold",
+        "analyst_count": 39,
+        "price_target": {
+          "low": 170,
+          "mean": 288,
+          "high": 420,
+          "currency": "USD"
+        },
+        "eps_estimates": [
+          {
+            "period": "FY2026",
+            "consensus": 24.02,
+            "low": 22.8,
+            "high": 26.02
+          },
+          {
+            "period": "FY2026 (mgmt guidance non-GAAP)",
+            "consensus": 23.4,
+            "low": 23.3,
+            "high": 23.5
+          },
+          {
+            "period": "FY2026 (mgmt guidance GAAP)",
+            "consensus": 17.95,
+            "low": 17.9,
+            "high": 18.0
+          }
+        ],
+        "revenue_estimates": [
+          {
+            "period": "FY2026",
+            "consensus": "$26.55B",
+            "low": "$25.8B",
+            "high": "$27.2B"
+          },
+          {
+            "period": "Q2 FY2026 (actual)",
+            "consensus": "$6.62B (beat $6.45B est)",
+            "low": "",
+            "high": ""
+          }
+        ],
+        "estimate_revisions": {
+          "direction": "up",
+          "detail": "Adobe raised full-year FY2026 revenue and non-GAAP EPS guidance after beating Q2 FY2026 estimates ($6.62B revenue vs $6.45B consensus). AI-first ARR tripled YoY to >$500M — positive revision catalyst."
+        }
+      }
+    },
+    "versions": []
+  },
+  "revenue": {
+    "current": {
+      "section": "revenue",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 8-K Q4",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000135/adbeex991q425.htm"
+        },
+        {
+          "title": "Adobe Revenue Breakdown By Segment - Bullfincher",
+          "url": "https://bullfincher.io/companies/adobe/revenue-by-segment"
+        },
+        {
+          "title": "Adobe FY2026 Q2 Form 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000109/adbeex991q226.htm"
+        }
+      ],
+      "data": {
+        "total_revenue": "USD $23.77B (FY2025); $6.62B (Q2 FY2026, record)",
+        "by_segment": [
+          {
+            "name": "Digital Media — Creative Cloud",
+            "revenue": "$13.3B",
+            "pct": 56,
+            "yoy_growth": "10%"
+          },
+          {
+            "name": "Digital Media — Document Cloud (Acrobat/PDF)",
+            "revenue": "$4.3B",
+            "pct": 18,
+            "yoy_growth": "15%"
+          },
+          {
+            "name": "Digital Experience (Experience Platform, Analytics, Marketo)",
+            "revenue": "$5.9B",
+            "pct": 25,
+            "yoy_growth": "10%"
+          },
+          {
+            "name": "Publishing & Advertising",
+            "revenue": "$0.26B",
+            "pct": 1,
+            "yoy_growth": "-5%"
+          }
+        ],
+        "by_geography": [
+          {
+            "region": "Americas",
+            "revenue": "~$12.4B",
+            "pct": 52,
+            "yoy_growth": "~11%"
+          },
+          {
+            "region": "Europe",
+            "revenue": "~$6.9B",
+            "pct": 29,
+            "yoy_growth": "~10%"
+          },
+          {
+            "region": "Asia Pacific",
+            "revenue": "~$4.5B",
+            "pct": 19,
+            "yoy_growth": "~12%"
+          }
+        ],
+        "revenue_quality": "Extremely high — >95% subscription / recurring. Predictable ratable recognition. $19.7B remaining performance obligations (backlog) as of Q2 FY2025.",
+        "recurring_pct": 96
+      }
+    },
+    "versions": []
+  },
+  "catalysts": {
+    "current": {
+      "section": "catalysts",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2026 Q2 Form 8-K (Jun 2026)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000109/adbeex991q226.htm"
+        },
+        {
+          "title": "Adobe ADBE Deep Dive: Can Firefly AI Monetisation Save the Legacy King?",
+          "url": "https://www.financialcontent.com/article/finterra-2026-3-12-adobe-adbe-deep-dive-can-firefly-ai-monetisation-save-the-legacy-king"
+        }
+      ],
+      "data": {
+        "upcoming": [
+          {
+            "date": "2026-09-10",
+            "event": "Q3 FY2026 Earnings",
+            "impact": "High",
+            "description": "Next quarterly earnings. Mgmt guided Q3 adj EPS $6.05-$6.10. AI-first ARR trajectory will be the key metric to watch."
+          },
+          {
+            "date": "2026-12-10",
+            "event": "Q4 FY2026 Earnings & Full Year Results",
+            "impact": "High",
+            "description": "Full-year FY2026 guidance: revenue $26.5-26.6B, GAAP EPS $17.90-18.00. Beat/miss will drive re-rating."
+          },
+          {
+            "date": "2026-Q3",
+            "event": "CFO Succession Announcement",
+            "impact": "Medium",
+            "description": "Daniel Durn departed June 15, 2026 for Marvell. New CFO appointment will clarify financial strategy continuity."
+          },
+          {
+            "date": "2026-H2",
+            "event": "Adobe MAX Creative Conference",
+            "impact": "Medium",
+            "description": "Annual product showcase — historically a catalyst for new Firefly features, pricing changes, and enterprise announcements."
+          }
+        ],
+        "recent": [
+          {
+            "date": "2026-06-11",
+            "event": "Q2 FY2026 Earnings Beat",
+            "impact": "High",
+            "description": "Revenue $6.62B vs $6.45B estimate (+2.6% beat). Raised FY2026 guidance. AI-first ARR tripled YoY to >$500M. Stock reacted positively."
+          },
+          {
+            "date": "2026-03-12",
+            "event": "$25B Share Buyback Authorisation",
+            "impact": "High",
+            "description": "Board approved $25B buyback programme, following $14B already repurchased since March 2024. Signals management confidence and shareholder return focus."
+          },
+          {
+            "date": "2025-12-10",
+            "event": "Record FY2025 Results",
+            "impact": "High",
+            "description": "FY2025 revenue $23.77B (+11% YoY), operating cash flow >$10B record. AI-first ARR exceeded $250M year-end target."
+          },
+          {
+            "date": "2025-03-18",
+            "event": "Adobe Summit Investor Day",
+            "impact": "Medium",
+            "description": "Laid out AI monetisation roadmap at Adobe Summit Las Vegas. Firefly Foundry enterprise positioning unveiled."
+          }
+        ],
+        "long_term": [
+          {
+            "catalyst": "Firefly Foundry Enterprise Rollout",
+            "timeframe": "12-24 months",
+            "description": "Custom AI model platform for enterprises to train on their own brand assets. Potential to significantly expand per-seat revenue in large accounts."
+          },
+          {
+            "catalyst": "AI Content Supply Chain Leadership",
+            "timeframe": "18-36 months",
+            "description": "GenStudio + Experience Platform creates end-to-end AI-powered marketing content pipeline. Positions Adobe as essential infrastructure for enterprise marketers."
+          },
+          {
+            "catalyst": "Document Cloud / Acrobat AI Expansion",
+            "timeframe": "12-18 months",
+            "description": "AI Assistant for PDFs is the fastest-growing segment (+15% YoY). Potential to disrupt legal, finance, and HR document workflows."
+          },
+          {
+            "catalyst": "Firefly Video Model Monetisation",
+            "timeframe": "12-24 months",
+            "description": "Commercially safe video generation (competing with Sora) targeting studio and marketing use cases. Early beta — monetisation not yet reflected in revenue."
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "cyclical": {
+    "current": {
+      "section": "cyclical",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000003/adbeex211fy25.htm"
+        }
+      ],
+      "data": {
+        "cyclicality": "Low — secular growth, not cyclical",
+        "economic_sensitivity": "Moderate. Adobe is primarily a subscription SaaS business with high recurring revenue (>96%), which provides significant revenue stability. However, enterprise Digital Experience budgets are tied to marketing spend, which can be cut during recessions.",
+        "recession_behaviour": "Creative Cloud individual subscriptions are sticky (professional dependency, high switching costs). Enterprise Digital Experience is more exposed — marketing budgets are discretionary and cut early in downturns. In FY2020 (COVID), Adobe still grew 15% YoY, demonstrating resilience.",
+        "revenue_drivers_vs_cycle": [
+          "Subscription renewal rates — largely acyclical",
+          "New seat additions — mildly cyclical (hiring-linked)",
+          "Enterprise DXP deal closures — moderately cyclical",
+          "AI-first ARR — currently growing through any cycle"
+        ],
+        "historical_performance_in_downturns": "FY2020 (COVID): +15% YoY revenue growth. FY2022 (rate shock / macro slowdown): +12% YoY. FY2023 (further slowdown): +10% YoY. Consistent growth through every cycle since SaaS transition in 2013.",
+        "macro_sensitivities": [
+          "USD strength reduces reported international revenue (~48% non-US)",
+          "Enterprise IT budget freezes slow Digital Experience deal velocity",
+          "Consumer/SMB spending cuts affect Creative Cloud individual plans",
+          "Interest rate environment affects DCF valuation multiple"
+        ],
+        "verdict": "Defensive SaaS — resilient but not immune. Enterprise segment is the swing factor in a downturn."
+      }
+    },
+    "versions": []
+  },
+  "ma": {
+    "current": {
+      "section": "ma",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe-Figma termination - Gibson Dunn",
+          "url": "https://www.gibsondunn.com/termination-of-adobe-figma-merger/"
+        },
+        {
+          "title": "List of Adobe acquisitions - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/List_of_acquisitions_by_Adobe"
+        },
+        {
+          "title": "Adobe acquires SEMrush Nov 2025 - Tracxn",
+          "url": "https://tracxn.com/d/acquisitions/acquisitions-by-adobe/__9Huk6yfRGtipbm0NvhqJcW6DSvL2pyawoDn8ejZAn_4"
+        }
+      ],
+      "data": {
+        "strategy_summary": "Adobe historically acquires to fill product gaps and expand TAM — particularly in areas adjacent to its creative and marketing platform. Strategy shifted post-Figma to smaller, bolt-on acquisitions that avoid antitrust scrutiny.",
+        "recent_deals": [
+          {
+            "name": "SEMrush",
+            "year": 2025,
+            "value": "$1.9B",
+            "rationale": "Online visibility management and SEO/content marketing SaaS. Expands Digital Experience into organic search and content strategy workflows.",
+            "outcome": "Completed Nov 2025. Integrates into Experience Cloud."
+          },
+          {
+            "name": "Figma (terminated)",
+            "year": "2022–2023",
+            "value": "$20B (terminated)",
+            "rationale": "UI/UX design collaboration leader — would have made Adobe dominant in product design. Blocked by UK CMA and EU regulators on competition grounds.",
+            "outcome": "Terminated Dec 2023. Adobe paid $1B break fee. Cost: ~$38B+ in lost opportunity vs Figma valuation growth."
+          },
+          {
+            "name": "Workfront",
+            "year": 2020,
+            "value": "$1.5B",
+            "rationale": "Work management platform for marketing teams. Fills the workflow/project management gap in Adobe Experience Cloud.",
+            "outcome": "Successfully integrated. Core to GenStudio content supply chain offering."
+          },
+          {
+            "name": "Marketo",
+            "year": 2018,
+            "value": "$4.75B",
+            "rationale": "B2B marketing automation — significantly expanded Digital Experience segment revenue and enterprise sales.",
+            "outcome": "Core to Adobe Experience Cloud. Strong performer."
+          }
+        ],
+        "ma_appetite": "Moderate bolt-on (sub $3B). Post-Figma, management signalled preference for organic growth and buybacks over transformative M&A. $25B buyback authorisation signals capital return priority.",
+        "antitrust_risk": "Elevated. Adobe-Figma blocked by CMA and EU regulators set precedent. Any large acquisition of a design/creative/marketing tool will face heavy scrutiny. Adobe must stay below $5–10B deals to avoid multi-year regulatory battles.",
+        "integration_track_record": "Good. Marketo, Workfront successfully integrated. Failed Figma was regulatory, not operational.",
+        "key_risks": [
+          "Overpaying for acquisitions to chase AI capabilities",
+          "Regulatory blocking of strategic deals",
+          "SEMrush integration execution risk"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "value": {
+    "current": {
+      "section": "value",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe intrinsic value DCF - GuruFocus",
+          "url": "https://www.gurufocus.com/term/intrinsic-value-dcf-fcf-based/ADBE"
+        },
+        {
+          "title": "Adobe fair value DCF calculator - FinanceCharts",
+          "url": "https://www.financecharts.com/stocks/ADBE/dcf-calculator"
+        },
+        {
+          "title": "Adobe ADBE valuation - StockAnalysis",
+          "url": "https://stockanalysis.com/stocks/adbe/forecast/"
+        }
+      ],
+      "data": {
+        "current_price": 206.36,
+        "currency": "USD",
+        "valuation_summary": "ADBE trades at historically compressed multiples following the Figma failure, AI disruption fears, and CFO departure. At ~9x FCF (vs 30–40x peak in 2021), the stock prices in meaningful growth deceleration. Most DCF models put fair value in $290–$690 range depending on growth assumptions.",
+        "key_multiples": {
+          "trailing_pe": 11.8,
+          "forward_pe": 7.5,
+          "ev_ebitda": 8.8,
+          "price_to_fcf": 9.1,
+          "price_to_sales": 3.3,
+          "peg_ratio": 0.58
+        },
+        "dcf_analysis": {
+          "base_case_iv": "~$290–$350",
+          "assumptions": "FCF ~$9B FY2025, 10% CAGR 5yr, 8% WACC, 3% terminal growth",
+          "bull_case_iv": "~$550–$690",
+          "bull_assumptions": "FCF grows 15% CAGR driven by AI monetisation, 7.5% WACC",
+          "bear_case_iv": "~$170–$200",
+          "bear_assumptions": "FCF growth slows to 5% as AI disruption caps pricing power, 9% WACC"
+        },
+        "vs_peers": "Adobe trades at discount to peer SaaS (Salesforce ~22x FCF, ServiceNow ~45x FCF). Discount reflects genuine AI disruption risk premium and slower growth vs high-growth SaaS. But at 9x FCF for a near-monopoly with 90% gross margins and $25B buyback, it screens as deep value.",
+        "margin_of_safety": "At $206, stock trades ~28% below consensus PT of $288. Meaningful margin of safety exists if 10%+ FCF growth continues.",
+        "verdict": "Undervalued at current price assuming flat-to-modest FCF growth continues. Deep value if AI monetisation accelerates above 12% CAGR."
+      }
+    },
+    "versions": []
+  },
+  "credit": {
+    "current": {
+      "section": "credit",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe Form 424B2 FY2025",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000119312525007129/d889067d424b2.htm"
+        },
+        {
+          "title": "Adobe Form 424B5 FY2025",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000119312525005830/d889067d424b5.htm"
+        }
+      ],
+      "data": {
+        "credit_rating": {
+          "moodys": "A1",
+          "sp": "A+",
+          "outlook": "Stable"
+        },
+        "debt_summary": {
+          "total_debt": "$7.1B (as of Q2 FY2026)",
+          "senior_notes_outstanding": "$5.63B",
+          "revolving_credit_facility": "$3.0B (undrawn as of Jan 2025)",
+          "commercial_paper_program": "$3.0B (unused)",
+          "net_debt": "~$1.5B (debt minus $5.6B cash)"
+        },
+        "leverage_metrics": {
+          "debt_to_ebitda": "~0.7x (FY2025 EBITDA $9.8B)",
+          "interest_coverage": "~34x (EBIT $9.0B / interest $263M)",
+          "debt_to_equity": "0.58x"
+        },
+        "cash_position": "$5.6B cash + short-term investments (Q2 FY2026)",
+        "fcf_generation": "$9.0B+ FY2025 operating cash flow (record). Comfortably services all debt and funds $25B buyback.",
+        "financial_strength_assessment": "Extremely strong. Investment grade A+ / A1 ratings. Near-zero net leverage. $10B+ annual operating cash flow. Debt is low-cost, long-duration. Adobe has no meaningful financial distress risk.",
+        "key_risks": [
+          "Rising interest rates increase cost of any new debt issuance",
+          "$25B buyback at current depressed price is capital efficient but increases leverage slightly",
+          "Any large M&A would require significant debt funding given buyback commitments"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "geofx": {
+    "current": {
+      "section": "geofx",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 10-Q Q2",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000073/adbe-20250530.htm"
+        },
+        {
+          "title": "Adobe FY2025 Form 10-Q Q1",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000059/adbe-20250228.htm"
+        }
+      ],
+      "data": {
+        "revenue_by_geography": [
+          {
+            "region": "Americas",
+            "revenue": "~$14.2B",
+            "pct": 60,
+            "yoy_growth": "~11%",
+            "notes": "Primarily USA. Home market dominance — Creative Cloud + DXP strongest here."
+          },
+          {
+            "region": "EMEA",
+            "revenue": "~$6.2B",
+            "pct": 26,
+            "yoy_growth": "~10%",
+            "notes": "Europe main market. EUR/GBP exposure. Strong in UK, Germany, France. FX headwind when USD strengthens."
+          },
+          {
+            "region": "APAC",
+            "revenue": "~$3.3B",
+            "pct": 14,
+            "yoy_growth": "~12%",
+            "notes": "Japan, ANZ, SE Asia, India. Fastest growing region. JPY and AUD exposure."
+          }
+        ],
+        "fx_exposure": {
+          "primary_currencies": [
+            "EUR",
+            "GBP",
+            "JPY",
+            "AUD",
+            "CAD",
+            "INR"
+          ],
+          "usd_revenue_pct": 60,
+          "fx_hedging": "Adobe maintains a foreign currency hedging programme. In H1 FY2025, USD strength vs APAC currencies and EUR resulted in ~$98M revenue headwind. Hedging gains offset ~$39M of this.",
+          "net_fx_impact_h1_fy2025": "-$59M net (after hedging gains of $39M vs gross headwind of $98M)"
+        },
+        "geopolitical_risks": [
+          "EU digital markets regulation (DMA) could affect bundling of Creative Cloud with other Adobe products",
+          "China market is small but growing; US-China tech restrictions are an emerging risk for enterprise sales",
+          "UK post-Brexit regulatory environment led to Figma acquisition block — ongoing scrutiny risk for future M&A"
+        ],
+        "international_growth_opportunity": "APAC (especially India, SE Asia) and emerging markets represent significant long-term TAM expansion as digital creative industries grow. Currently only 14% of revenue."
+      }
+    },
+    "versions": []
+  },
+  "faq": {
+    "current": {
+      "section": "faq",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Is Adobe still a buy amid AI disruption",
+          "url": "https://www.ainvest.com/news/adobe-adbe-buy-ai-disruption-rising-competition-2509/"
+        },
+        {
+          "title": "Adobe faces AI disruption questions",
+          "url": "https://finance.yahoo.com/news/adobe-faces-ai-disruption-questions-151208596.html"
+        }
+      ],
+      "data": {
+        "questions": [
+          {
+            "q": "Will AI kill Adobe?",
+            "a": "Unlikely. Adobe is actively embedding AI (Firefly) into its tools. AI-first ARR tripled YoY to >M in Q2 FY2026. Risk is AI lowering barriers for competitors (Canva, ChatGPT), but Adobe IP-safe Firefly training data and enterprise file format standards create durable moats."
+          },
+          {
+            "q": "Why is the stock down from its  peak?",
+            "a": "Three factors: (1) Failed Figma acquisition 2023 destroyed confidence. (2) AI disruption fears. (3) Growth deceleration from 20%+ to ~11% YoY. At  it trades at 9x FCF — market pricing near-zero growth."
+          },
+          {
+            "q": "Is Adobe Sharia-compliant?",
+            "a": "No. Adobe fails Sharia screening due to interest income/expense and debt exceeding typical thresholds. As a US stock with conventional debt financing it does not meet standard Sharia criteria."
+          },
+          {
+            "q": "What is the biggest near-term risk?",
+            "a": "CFO transition. Daniel Durn departed June 15 2026 for Marvell. Uncertainty about capital allocation and investor communication during AI transformation. Successor not announced."
+          },
+          {
+            "q": "How does Adobe monetise AI?",
+            "a": "Three channels: (1) AI-first subscription add-ons (Firefly generative credits in Creative Cloud). (2) Firefly Foundry enterprise custom model platform. (3) AI-enhanced Acrobat/Document Cloud. AI-influenced ARR >B; AI-first ARR >M and tripling YoY."
+          },
+          {
+            "q": "What happened to the Figma acquisition?",
+            "a": "Adobe announced B acquisition Sept 2022. UK CMA and EU regulators blocked it on antitrust grounds. Terminated Dec 2023. Adobe paid B break fee. Stock fell ~25% and has not recovered."
+          },
+          {
+            "q": "Does Adobe pay a dividend?",
+            "a": "No. Returns capital exclusively via share buybacks. B buyback authorised April 2026 through 2030 is the primary shareholder return mechanism."
+          }
+        ]
+      }
+    },
+    "versions": []
+  },
+  "capital": {
+    "current": {
+      "section": "capital",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe B buyback announcement - GuruFocus",
+          "url": "https://www.gurufocus.com/news/8807115/adobe-adbe-announces-25-billion-share-repurchase-plan"
+        },
+        {
+          "title": "Adobe FY2026 Q2 Form 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000109/adbeex991q226.htm"
+        }
+      ],
+      "data": {
+        "philosophy": "Adobe prioritises reinvestment in organic R&D and AI innovation, then uses excess FCF entirely for share buybacks. No dividends. Strategy: grow ARR organically, return surplus to shareholders, selective bolt-on M&A.",
+        "buybacks": {
+          "current_authorisation": "B approved April 21 2026 through April 30 2030",
+          "recent_activity": "B+ repurchased since March 2024; reduced share count ~9%",
+          "shares_outstanding": "~397.5M (down from ~440M+ at peak)",
+          "assessment": "Highly capital-efficient at current depressed valuation (~9x FCF). Buybacks at -250 range are accretive for remaining shareholders."
+        },
+        "dividends": {
+          "paid": false,
+          "yield": null,
+          "policy": "No dividends — all surplus returned via buybacks"
+        },
+        "rd_spend": {
+          "fy2025_rd": ".29B (18% of revenue)",
+          "focus_areas": [
+            "Firefly generative AI models (Imaging, Vector, Design, Video)",
+            "Firefly Foundry enterprise platform",
+            "Adobe Experience Platform real-time CDP",
+            "Acrobat AI Assistant",
+            "Adobe GenStudio content supply chain"
+          ],
+          "assessment": "Heavy R&D investment at 18% of revenue reflects AI transformation phase. High but justified given the competitive environment."
+        },
+        "capex": "Light — primarily software company. Capex ~-600M/yr (cloud infrastructure, data centres). FCF conversion ~95%+.",
+        "ma_strategy": "Shifted to bolt-on post-Figma. Recent: SEMrush .9B (2025). Target range sub-B to avoid antitrust scrutiny.",
+        "key_covenants": [
+          "Revolving credit B undrawn — maintains liquidity buffer",
+          "Senior notes covenanted — no material financial covenant breaches expected"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "iprd": {
+    "current": {
+      "section": "iprd",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 10-Q Q2",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000073/adbe-20250530.htm"
+        },
+        {
+          "title": "Adobe Firefly commercially safe AI",
+          "url": "https://www.financialcontent.com/article/finterra-2026-3-12-adobe-adbe-deep-dive-can-firefly-ai-monetisation-save-the-legacy-king"
+        }
+      ],
+      "data": {
+        "rd_investment": ".29B in FY2025 (18% of .77B revenue). Consistent 17-19% R&D intensity over 5 years.",
+        "key_innovations": [
+          {
+            "name": "Adobe Firefly",
+            "description": "Family of commercially safe generative AI models — Imaging, Vector, Design, Video (beta). Trained exclusively on Adobe Stock licensed content and public domain materials. Used by 15M+ creators. AI-first ARR >M Q2 FY2026.",
+            "stage": "Live, monetising"
+          },
+          {
+            "name": "Firefly Foundry",
+            "description": "Enterprise platform enabling brands to train custom generative AI models on their own brand assets. Solves IP provenance for large enterprises (agencies, CPG companies, media).",
+            "stage": "GA, early enterprise rollout"
+          },
+          {
+            "name": "Adobe GenStudio",
+            "description": "End-to-end agentic content supply chain — connects brand intelligence, AI agents, creation, activation, delivery and analytics in one platform.",
+            "stage": "Expanding, April 2026 major update"
+          },
+          {
+            "name": "Acrobat AI Assistant",
+            "description": "AI-powered document intelligence — summarise, Q&A, extract data from PDFs. Driving 15% YoY growth in Document Cloud.",
+            "stage": "Live, monetising"
+          },
+          {
+            "name": "Firefly Video Model",
+            "description": "Commercially safe text-to-video generation, competing with OpenAI Sora. Unique advantage: IP-safe, trained on licensed content.",
+            "stage": "Beta 2025, monetisation pending"
+          }
+        ],
+        "ip_moat": "Adobe holds thousands of patents across creative tools, document processing, digital marketing and AI. PDF format is an ISO standard (ISO 32000). Key IP: Firefly training dataset (Adobe Stock + licensed), Content Authenticity Initiative provenance technology.",
+        "content_authenticity_initiative": "Adobe leads the CAI — an industry coalition (including Microsoft, Google, BBC, AP) to embed content provenance metadata so AI-generated content can be identified. Positions Adobe as the trusted standard-setter for responsible AI content.",
+        "ip_risks": [
+          "Ongoing patent infringement litigation risk (mentioned in 10-K as recurring)",
+          "Open-source AI model releases could erode Firefly differentiation over time",
+          "Competitors could license similar training datasets from Getty, Shutterstock etc."
+        ],
+        "technology_partnerships": [
+          "AWS (primary cloud infrastructure partner)",
+          "HUMAIN (strategic alliance for generative AI model development, 2025)",
+          "Microsoft (CAI, Azure integrations)",
+          "Google (Workspace integrations, CAI)"
+        ]
+      }
+    },
+    "versions": []
+  },
+  "supply_chain": {
+    "current": {
+      "section": "supply_chain",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe AWS partnership - Adobe Blog",
+          "url": "https://blog.adobe.com/en/publish/2024/10/23/accelerating-your-content-supply-chain-adobe-aws"
+        },
+        {
+          "title": "Adobe GenStudio content supply chain",
+          "url": "https://news.adobe.com/news/2025/03/adobe-expands-genstudio-content-supply-chain"
+        }
+      ],
+      "data": {
+        "business_model_note": "Adobe is a software company — it has no physical supply chain. Supply chain risk is primarily about technology vendor concentration and cloud infrastructure dependencies.",
+        "key_dependencies": [
+          {
+            "vendor": "Amazon Web Services (AWS)",
+            "dependency": "Primary cloud infrastructure partner. Adobe runs significant workloads on AWS. Strategic ISV partner for GenStudio content supply chain.",
+            "risk_level": "Medium — cloud concentration risk, but AWS is highly reliable and Adobe likely has multi-cloud redundancy"
+          },
+          {
+            "vendor": "Microsoft Azure",
+            "dependency": "Integration partner for Office/Teams workflows. Some AI compute workloads.",
+            "risk_level": "Low"
+          },
+          {
+            "vendor": "NVIDIA",
+            "dependency": "GPU compute for training Firefly AI models. Critical for AI development.",
+            "risk_level": "Medium — NVIDIA supply constraints or pricing could affect AI model development costs"
+          },
+          {
+            "vendor": "Adobe Stock contributors",
+            "dependency": "Licensed content used to train Firefly models. ~200M+ licensed assets.",
+            "risk_level": "Low — diversified contributor base, contractual relationships"
+          },
+          {
+            "vendor": "Distribution channels",
+            "dependency": "App stores (Apple, Google) for mobile Creative Cloud. Website direct.",
+            "risk_level": "Low — direct-to-customer dominant"
+          }
+        ],
+        "operational_resilience": "High. Pure software/SaaS business with no manufacturing, logistics, or physical inventory. Business continuity risk is primarily cybersecurity and cloud outages.",
+        "cybersecurity_posture": "Adobe has experienced no major disclosed breaches recently. Significant investment in security given enterprise data custodianship (customer data in Experience Platform). ISO 27001 certified.",
+        "key_suppliers": [
+          "AWS",
+          "Microsoft",
+          "NVIDIA",
+          "Salesforce (some integrations)",
+          "Content contributors (Adobe Stock)"
+        ],
+        "concentration_risks": "AWS dependency is the primary single-vendor concentration risk. A prolonged AWS outage would impact Creative Cloud and Experience Cloud availability."
+      }
+    },
+    "versions": []
+  },
+  "forensic": {
+    "current": {
+      "section": "forensic",
+      "symbol": "ADBE",
+      "updated_at": "2026-06-16",
+      "sources": [
+        {
+          "title": "Adobe FY2025 Form 10-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000003/adbeex211fy25.htm"
+        },
+        {
+          "title": "Adobe FY2025 Form 10-Q Q2",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000796343/000079634325000073/adbe-20250530.htm"
+        }
+      ],
+      "data": {
+        "overall_assessment": "Clean. Adobe is a high-quality SaaS company with straightforward subscription revenue recognition. No major forensic red flags. Big 4 auditor (KPMG). Consistent FCF conversion from reported earnings.",
+        "revenue_recognition": "Subscription revenue recognised ratably over contract term — conservative, standard SaaS approach. No aggressive upfront recognition. Remaining performance obligations (.7B backlog) are disclosed transparently.",
+        "fcf_vs_net_income": "FCF ~B vs Net Income ~.1B in FY2025. FCF exceeds net income (SBC add-back is large). Positive FCF conversion is a green flag — no signs of earnings inflation relative to cash.",
+        "sbc_concern": "Stock-based compensation is ~.5B/yr (~10.5% of revenue). High but typical for US enterprise software. SBC dilution is partially offset by aggressive buybacks.",
+        "receivables_growth": "Receivables .1B vs quarterly revenue .4B — ~33 days sales outstanding. In-line with historical norms, no sign of channel stuffing.",
+        "debt_transparency": "All debt (senior notes, revolver) clearly disclosed. No off-balance-sheet financing concerns.",
+        "auditor": "KPMG LLP — Big 4, no recent auditor changes.",
+        "red_flags": [],
+        "green_flags": [
+          "FCF exceeds GAAP net income consistently",
+          "Transparent RPO (backlog) disclosure gives revenue visibility",
+          "No off-balance-sheet vehicles or complex financial instruments",
+          "No auditor changes or qualifications in recent years",
+          "Operating cash flow >B record in FY2025 — hard to fake cash"
+        ],
+        "related_party_transactions": "None material disclosed in recent filings.",
+        "summary": "Adobe passes forensic checks with a clean bill of health. The primary caution is high SBC, but this is industry-standard and offset by buybacks."
+      }
+    },
+    "versions": []
+  }
+}

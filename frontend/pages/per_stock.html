@@ -1,0 +1,1756 @@
+      <div x-show="page === 'per_stock'" x-cloak class="space-y-4">
+        <div class="flex flex-col gap-4">
+          <div class="flex gap-3 items-end flex-wrap">
+            <div class="flex-1 min-w-[240px] max-w-xl">
+              <div class="relative" x-data x-on:click.outside="symbolPickerState.per_stock.open = false">
+                <input type="text"
+                       x-model="symbolPickerState.per_stock.query"
+                       @focus="symbolPickerState.per_stock.open = true"
+                       @keydown.enter.prevent="symbolPickerCommit('per_stock')"
+                       @keydown.escape="symbolPickerState.per_stock.open = false"
+                       placeholder="Search by symbol or company name..."
+                       class="rounded-lg border border-slate-200 px-3 py-2 pr-9 text-sm w-full focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">⌘</span>
+                <div x-show="symbolPickerState.per_stock.open && (symbolPickerState.per_stock.query.length >= 1 || symbolPickerMatches('per_stock').length)"
+                     x-transition
+                     class="absolute z-20 mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 shadow-xl max-h-60 overflow-y-auto">
+                  <template x-for="sym in symbolPickerMatches('per_stock').slice(0, 12)" :key="sym">
+                    <button type="button"
+                            @click="symbolPickerCommit('per_stock', sym)"
+                            class="w-full text-left px-3 py-2.5 text-sm hover:bg-slate-700 flex justify-between items-center gap-2 transition">
+                      <span class="font-medium text-slate-100" x-text="sym"></span>
+                      <span class="text-slate-400 truncate text-xs" x-text="symbolOptionSecondaryLabel(sym)"></span>
+                    </button>
+                  </template>
+                  <p x-show="symbolPickerState.per_stock.query.length >= 1 && symbolPickerMatches('per_stock').length === 0" class="px-3 py-2 text-sm text-slate-400">No matches. Press Enter to try the typed symbol.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center justify-between">
+            <div class="flex flex-wrap gap-2 items-center">
+              <span class="text-xs font-medium text-slate-500">Selected:</span>
+              <template x-if="perStockSymbol">
+                <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 text-teal-800 px-3 py-1 text-sm font-medium border border-teal-200">
+                  <span x-text="perStockSymbol"></span>
+                  <button type="button" @click="clearPerStockSymbol()" class="rounded-full p-0.5 hover:bg-teal-200 text-teal-600 hover:text-teal-800" aria-label="Remove">×</button>
+                </span>
+              </template>
+              <template x-if="perStockSymbol">
+                <button @click="openResearchModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 transition shadow-sm">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  Run AI Research
+                </button>
+              </template>
+              <p x-show="!perStockSymbol" class="text-slate-400 text-sm">Search above to load a symbol.</p>
+            </div>
+            <!-- Learning Mode toggle -->
+            <button @click="learningMode = !learningMode"
+                    :class="learningMode ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-500 border-slate-200 hover:border-amber-400 hover:text-amber-600'"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition shadow-sm">
+              <span>🎓</span>
+              <span x-text="learningMode ? 'Learning Mode ON' : 'Learning Mode'"></span>
+            </button>
+          </div>
+
+          <!-- Research section picker modal -->
+          <div x-show="researchModalOpen" x-cloak @keydown.escape.window="researchModalOpen = false"
+               class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div @click.outside="researchModalOpen = false"
+                 class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-semibold text-slate-800">Run AI Research</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Select sections to research for <span class="font-medium text-teal-700" x-text="perStockSymbol"></span></p>
+                </div>
+                <button @click="researchModalOpen = false" class="text-slate-400 hover:text-slate-600 p-1 rounded">✕</button>
+              </div>
+
+              <!-- Research (AI) group -->
+              <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Research <span class="text-teal-500">(AI)</span></span>
+                  <div class="flex gap-2">
+                    <button @click="selectAllResearch()" class="text-[10px] text-teal-600 hover:underline font-medium">All</button>
+                    <button @click="deselectAllResearch()" class="text-[10px] text-slate-400 hover:underline">None</button>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <template x-for="s in researchAISections" :key="s">
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                      <input type="checkbox" :value="s" x-model="researchModalSelected" class="accent-teal-600 w-3.5 h-3.5">
+                      <span class="text-xs text-slate-700 capitalize" x-text="researchSectionLabels[s] || s"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+
+              <!-- More (AI) group -->
+              <div class="mb-5">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">More <span class="text-teal-500">(AI)</span></span>
+                  <div class="flex gap-2">
+                    <button @click="selectAllMore()" class="text-[10px] text-teal-600 hover:underline font-medium">All</button>
+                    <button @click="deselectAllMore()" class="text-[10px] text-slate-400 hover:underline">None</button>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <template x-for="s in moreAISections" :key="s">
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                      <input type="checkbox" :value="s" x-model="researchModalSelected" class="accent-violet-600 w-3.5 h-3.5">
+                      <span class="text-xs text-slate-500 capitalize" x-text="researchSectionLabels[s] || s"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Selection count + confirm -->
+              <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-xs text-slate-500"><span class="font-semibold text-slate-700" x-text="researchModalSelected.length"></span> sections selected</span>
+                <div class="flex gap-2">
+                  <button @click="researchModalOpen = false" class="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                  <button @click="confirmRunResearch()" :disabled="researchModalSelected.length === 0"
+                          class="px-4 py-2 rounded-lg text-sm bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    Run Research
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Research run banner -->
+        <div x-show="researchRunBannerVisible" x-cloak
+             class="flex items-start gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 text-sm">
+          <svg class="w-4 h-4 text-violet-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <div class="flex-1 min-w-0">
+            <p class="font-medium text-violet-800">AI Research queued for <span x-text="researchRunSymbol"></span></p>
+            <p class="text-violet-600 text-xs mt-0.5">Sections: <span x-text="researchRunSections.map(s => researchSectionLabels[s] || s).join(', ')"></span></p>
+            <p class="text-violet-500 text-xs mt-1">Command copied to clipboard — run it in your terminal or ask Claude to execute it.</p>
+          </div>
+          <button @click="researchRunBannerVisible = false" class="text-violet-400 hover:text-violet-600 text-lg leading-none">×</button>
+        </div>
+
+        <!-- Tab navigation — grouped into categories -->
+        <div class="space-y-2 pb-2 border-b border-slate-200">
+          <!-- Category: Core Data (yfinance-backed) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Data</span>
+            <template x-for="t in ['overview','market','financials','valuation']" :key="t">
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']"
+                      x-text="perStockTabLabels[t]"></button>
+            </template>
+            <button @click="perStockTab = 'charts'; fetchMetricsHistoryIfNeeded()"
+                    :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === 'charts' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']">
+              📈 Charts
+            </button>
+            <button @click="perStockTab = 'scorecard'; fetchScorecard(perStockSymbol)"
+                    :class="['px-3 py-1.5 rounded-full text-xs font-medium transition', perStockTab === 'scorecard' ? 'bg-violet-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200']">
+              🎯 Scorecard
+            </button>
+          </div>
+          <!-- Category: Research (web-research-backed) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">Research <span class="text-teal-400">(AI)</span></span>
+            <template x-for="t in ['thesis','industry','business','management','esg','estimates','revenue','catalysts','cyclical']" :key="t">
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-teal-50 text-teal-700 border border-teal-300 hover:bg-teal-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
+                <span x-text="perStockTabLabels[t]"></span>
+              </button>
+            </template>
+          </div>
+          <!-- Category: Advanced (future) -->
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-2 shrink-0">More <span class="text-teal-400">(AI)</span></span>
+            <template x-for="t in ['ma','value','faq','credit','geofx','capital','forensic','iprd','supply_chain']" :key="t">
+              <button @click="perStockTab = t; sessionSet('perStockTab', t); fetchSectionDataIfNeeded(t)"
+                      :class="['px-3 py-1.5 rounded-full text-xs font-medium transition relative', perStockTab === t ? 'bg-teal-600 text-white shadow-sm' : (hasResearchData(t) ? 'bg-violet-50 text-violet-700 border border-violet-300 hover:bg-violet-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')]">
+                <span x-text="perStockTabLabels[t]"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Tab content -->
+        <div class="space-y-6">
+          <!-- Overview -->
+          <div x-show="perStockTab === 'overview'" x-cloak class="space-y-6">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2"><span class="text-slate-500">🏛</span> Company Overview</h2>
+                <button @click="fetchSectionData('overview', true)" :disabled="isSectionLoading('overview')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Refresh">↻</button>
+              </div>
+              <div x-show="isSectionLoading('overview')" class="text-slate-500 text-sm">Loading…</div>
+              <p x-show="!isSectionLoading('overview')" class="text-slate-600 text-sm leading-relaxed bg-slate-50 rounded-lg p-4" x-text="(getSectionData('overview')?.longBusinessSummary) || (perStockRow?.name ? 'Loading company description…' : 'Select a symbol to load company overview.')"></p>
+              <p x-show="getSectionData('overview')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('overview')?.error"></p>
+            </section>
+            <div class="grid md:grid-cols-2 gap-6">
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Corporate Identity</h3>
+                <dl class="space-y-2 text-sm">
+                  <div class="flex justify-between"><dt class="text-slate-500">Founded</dt><dd x-text="(getSectionData('overview')?.founded) || perStockRow?.founded || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Headquarters</dt><dd class="text-right max-w-[60%]" x-text="getSectionData('overview')?.headquarters || [getSectionData('overview')?.city, getSectionData('overview')?.state, getSectionData('overview')?.country].filter(Boolean).join(', ') || perStockRow?.headquarters || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Employees</dt><dd x-text="(getSectionData('overview')?.fullTimeEmployees != null ? getSectionData('overview').fullTimeEmployees.toLocaleString() : null) || perStockRow?.employees || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Fiscal Year End</dt><dd x-text="getSectionData('overview')?.fiscalYearEnd || perStockRow?.fiscal_year_end || '—'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Listing</dt><dd x-text="getSectionData('overview')?.exchange || perStockRow?.listing || 'NSE'"></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">ISIN</dt><dd x-text="getSectionData('overview')?.isin || perStockRow?.isin || '—'"></dd></div>
+                </dl>
+              </section>
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Promoter & Ownership</h3>
+                <dl class="space-y-2 text-sm">
+                  <div class="flex justify-between"><dt class="text-slate-500">Insiders / Promoter</dt><dd x-text="getSectionData('overview')?.heldPercentInsiders != null ? formatPct(getSectionData('overview').heldPercentInsiders) : (perStockRow?.promoter_holding ?? '—')"></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Pledged Shares</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.pledged_shares ?? '—'"></span><span x-show="isFieldGap('overview','pledgedSharesPct') && !perStockRow?.pledged_shares" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
+                  <div class="flex justify-between"><dt class="text-slate-500">Institutional</dt><dd x-text="getSectionData('overview')?.heldPercentInstitutions != null ? formatPct(getSectionData('overview').heldPercentInstitutions) : (perStockRow?.institutional ?? '—')"></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Board Size</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.board_size ?? '—'"></span><span x-show="isFieldGap('overview','boardSize') && !perStockRow?.board_size" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
+                  <div class="flex justify-between items-center"><dt class="text-slate-500">Board Independence</dt><dd class="flex items-center gap-1"><span x-text="perStockRow?.board_independence ?? '—'"></span><span x-show="isFieldGap('overview','boardIndependencePct') && !perStockRow?.board_independence" class="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-violet-100 text-violet-600 cursor-help" title="Not available from yfinance. Run AI Research → Management to fill this gap.">✦ AI</span></dd></div>
+                  <div class="flex flex-col gap-1"><dt class="text-slate-500 mb-1">Top holders</dt><dd class="text-slate-600 text-xs space-y-0.5" x-show="(getSectionData('overview')?.majorHolders || []).length"><template x-for="h in (getSectionData('overview')?.majorHolders || [])" :key="h.label"><div class="flex justify-between" x-text="formatMajorHolder(h)"></div></template></dd><dd x-show="!(getSectionData('overview')?.majorHolders || []).length" x-text="perStockRow?.top_holders ?? '—'"></dd></div>
+                </dl>
+              </section>
+              <!-- Company Links -->
+              <section x-show="getSectionData('overview')?.website || perStockRow?.symbol" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Company Links</h3>
+                <dl class="space-y-2 text-sm">
+                  <div x-show="getSectionData('overview')?.website" class="flex justify-between items-center">
+                    <dt class="text-slate-500">Website</dt>
+                    <dd><a :href="getSectionData('overview')?.website" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline truncate max-w-[180px] inline-block" x-text="(getSectionData('overview')?.website || '').replace(/^https?:\/\//, '')"></a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Investor Relations</dt>
+                    <dd><a :href="'https://www.bseindia.com/stock-share-price/' + (perStockSymbol || '').replace('.NS','').replace('.BO','').toLowerCase() + '/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">BSE Filing Page ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">NSE Filings</dt>
+                    <dd><a :href="'https://www.nseindia.com/get-quotes/equity?symbol=' + (perStockSymbol || '').replace('.NS','').replace('.BO','')" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">NSE Quote ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Annual Reports</dt>
+                    <dd><a :href="'https://www.screener.in/company/' + (perStockSymbol || '').replace('.NS','').replace('.BO','') + '/annual-report/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">Screener.in ↗</a></dd>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <dt class="text-slate-500">Quarterly Results</dt>
+                    <dd><a :href="'https://www.screener.in/company/' + (perStockSymbol || '').replace('.NS','').replace('.BO','') + '/'" target="_blank" rel="noopener" class="text-teal-600 hover:text-teal-800 hover:underline text-xs" x-show="perStockSymbol">Screener.in ↗</a></dd>
+                  </div>
+                </dl>
+              </section>
+            </div>
+            <div x-show="perStockRow" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sharia Status</h3>
+              <p class="text-sm font-medium" x-text="'Sharia: ' + (perStockRow?.Sharia ?? '—')"></p>
+              <div x-show="perStockRow?.debt_to_equity_ratio != null" class="mt-4 pt-4 border-t border-slate-100">
+                <p class="text-xs font-medium text-slate-500 mb-2">Key ratios (latest period)</p>
+                <ul class="text-sm space-y-1">
+                  <li>Debt/Equity <button x-show="learningMode" @mouseenter="showExplainer('debt_to_equity', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtNum(perStockRow?.debt_to_equity_ratio, 4)"></span></li>
+                  <li>Cash/Assets % <button x-show="learningMode" @mouseenter="showExplainer('cash_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.cash_to_assets_pct, 2)"></span></li>
+                  <li>Other Rev/Revenue % <button x-show="learningMode" @mouseenter="showExplainer('other_rev_pct', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.other_revenue_to_revenue_pct, 2)"></span></li>
+                  <li>Receivables/Assets % <button x-show="learningMode" @mouseenter="showExplainer('receivables_to_assets', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button>: <span x-text="fmtPctRaw(perStockRow?.receivables_to_assets_pct, 2)"></span></li>
+                </ul>
+              </div>
+            </div>
+            <div x-show="perStockPeriodRows.length" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <div class="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">All Periods</h3>
+                <button @click="columnModalTable = 'per_stock_periods'" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition" title="Table columns">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+              </div>
+              <div id="per-stock-periods-table" style="min-height: 100px;"></div>
+            </div>
+          </div>
+
+          <!-- Market -->
+          <div x-show="perStockTab === 'market'" x-cloak class="space-y-6">
+            <section>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Market Data</h3>
+                <button @click="fetchSectionData('market', true)" :disabled="isSectionLoading('market')" class="text-slate-400 hover:text-slate-600 p-1 rounded text-xs" title="Refresh">↻</button>
+              </div>
+              <div x-show="isSectionLoading('market')" class="text-slate-500 text-sm mb-2">Loading…</div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.currentPrice != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').currentPrice).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Current Price <button x-show="learningMode" @mouseenter="showExplainer('current_price', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekHigh != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekHigh).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W High <button x-show="learningMode" @mouseenter="showExplainer('52w_high', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.fiftyTwoWeekLow != null ? (market === 'us' ? '$' : '₹') + Number(getSectionData('market').fiftyTwoWeekLow).toLocaleString(undefined,{maximumFractionDigits:2}) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">52W Low <button x-show="learningMode" @mouseenter="showExplainer('52w_low', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.beta != null ? Number(getSectionData('market').beta).toFixed(2) : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Beta (5Y Monthly) <button x-show="learningMode" @mouseenter="showExplainer('beta', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.dividendYield != null ? (Number(getSectionData('market').dividendYield).toFixed(2) + '%') : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">Dividend Yield <button x-show="learningMode" @mouseenter="showExplainer('dividend_yield', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('market')?.vs200DMA != null ? (getSectionData('market').vs200DMA > 0 ? '+' : '') + Number(getSectionData('market').vs200DMA).toFixed(2) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1">VS 200 DMA <button x-show="learningMode" @mouseenter="showExplainer('vs_200dma', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 text-[9px] font-bold ml-1 leading-none align-middle transition" title="Explain this metric">?</button></p></div>
+              </div>
+              <p x-show="getSectionData('market')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('market')?.error"></p>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Technical Positioning & Short Interest</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Short Interest %</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Days to Cover</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">IV Percentile</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 col-span-2 sm:col-span-1"><p class="text-sm text-slate-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Relative Strength</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Dividend Quality & Total Shareholder Return</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Yield</h4><p class="text-sm text-slate-600" x-text="getSectionData('market')?.dividendYield != null ? Number(getSectionData('market').dividendYield).toFixed(2) + '%' : '—'"></p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Payout Ratio</h4><p class="text-sm text-slate-600" x-text="(getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) != null ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) <= 1 ? ((getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio) * 100).toFixed(1) : (getSectionData('market')?.payoutRatio ?? getSectionData('valuation')?.payoutRatio).toFixed(1)) + '%' : '—'"></p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Dividend Sustainability</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+              <p class="text-sm text-slate-600 mt-4">Total Capital Return Yield: <span x-text="getSectionData('market')?.dividendYield != null ? Number(getSectionData('market').dividendYield).toFixed(2) + '%' : '—'"></span></p>
+            </section>
+          </div>
+
+          <!-- Thesis (research-backed) -->
+          <div x-show="perStockTab === 'thesis'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'thesis') fetchSectionDataIfNeeded('thesis'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Investment Thesis <button x-show="learningMode" @mouseenter="showExplainer('section_thesis', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition" title="What is this analysis?">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('thesis')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('thesis')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('thesis')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('thesis')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('thesis') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('thesis')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('thesis')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('thesis')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('thesis')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('thesis', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('thesis', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('thesis', true)" :disabled="isSectionLoading('thesis')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('thesis')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('thesis') && !isSectionLoading('thesis')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section thesis</code>
+              </div>
+              <template x-if="hasResearchData('thesis')">
+                <div>
+                  <p class="text-slate-700 mb-4" x-text="getSectionData('thesis')?.data?.summary"></p>
+                  <div x-show="getSectionData('thesis')?.data?.verdict" class="mb-4">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Verdict:</span>
+                    <span class="ml-1 font-bold" :class="{'text-emerald-600': getSectionData('thesis')?.data?.verdict === 'Buy', 'text-amber-600': getSectionData('thesis')?.data?.verdict === 'Hold', 'text-rose-600': getSectionData('thesis')?.data?.verdict === 'Sell'}" x-text="getSectionData('thesis')?.data?.verdict"></span>
+                  </div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-emerald-500">
+                      <h4 class="text-sm font-semibold text-emerald-600 mb-2">Bull Case (<span x-text="getSectionData('thesis')?.data?.bull_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-emerald-600" x-text="getSectionData('thesis')?.data?.bull_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.bull_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.bull_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-amber-500">
+                      <h4 class="text-sm font-semibold text-amber-700 mb-2">Base Case (<span x-text="getSectionData('thesis')?.data?.base_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-amber-700" x-text="getSectionData('thesis')?.data?.base_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.base_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.base_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-rose-400">
+                      <h4 class="text-sm font-semibold text-rose-600 mb-2">Bear Case (<span x-text="getSectionData('thesis')?.data?.bear_case?.probability || '?'"></span>% prob)</h4>
+                      <p class="text-2xl font-bold text-rose-600" x-text="getSectionData('thesis')?.data?.bear_case?.target || '—'"></p>
+                      <p class="text-sm text-slate-600 mt-2" x-text="getSectionData('thesis')?.data?.bear_case?.narrative || ''"></p>
+                      <ul class="mt-2 space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.bear_case?.drivers || [])"><li class="text-xs text-slate-600" x-text="'• ' + d"></li></template></ul>
+                    </div>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div><h4 class="text-sm font-semibold text-slate-700 mb-2">Key Drivers</h4><ul class="space-y-1"><template x-for="d in (getSectionData('thesis')?.data?.key_drivers || [])"><li class="text-sm text-slate-600" x-text="'• ' + d"></li></template></ul></div>
+                    <div><h4 class="text-sm font-semibold text-slate-700 mb-2">Key Risks</h4><ul class="space-y-1"><template x-for="r in (getSectionData('thesis')?.data?.key_risks || [])"><li class="text-sm text-slate-600" x-text="'• ' + r"></li></template></ul></div>
+                  </div>
+                  <div x-show="getSectionData('thesis')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100">
+                    <h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4>
+                    <template x-for="s in (getSectionData('thesis')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template>
+                  </div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Financials -->
+          <div x-show="perStockTab === 'financials'" x-cloak class="space-y-6">
+            <section>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Financial Highlights</h3>
+                <button @click="fetchSectionData('financials', true)" :disabled="isSectionLoading('financials')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">↻</button>
+              </div>
+              <div x-show="isSectionLoading('financials')" class="text-slate-500 text-sm mb-2">Loading...</div>
+              <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                      <th class="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase w-1/3">Metric</th>
+                      <th class="text-right px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase w-1/4">Value</th>
+                      <th class="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <!-- Income Statement -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Income Statement</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Revenue</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.revenue != null ? finCurrencySymbol() + (getSectionData('financials').revenue / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Total income from all business activities</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Net Income</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.netIncome != null ? finCurrencySymbol() + (getSectionData('financials').netIncome / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Profit after all expenses and taxes</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Gross Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.grossMargins != null ? (getSectionData('financials').grossMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Revenue minus COGS as % of revenue</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Operating Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.operatingMargins != null ? (getSectionData('financials').operatingMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">After COGS and operating expenses, before interest/taxes</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">EBITDA Margin</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.ebitdaMargins != null ? (getSectionData('financials').ebitdaMargins * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Approximates operating cash profitability</td>
+                    </tr>
+                    <!-- Balance Sheet -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance Sheet</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Cash &amp; Equivalents</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalCash != null ? finCurrencySymbol() + (getSectionData('financials').totalCash / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Cash and short-term liquid assets</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Debt</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalDebt != null ? finCurrencySymbol() + (getSectionData('financials').totalDebt / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">All short-term and long-term borrowings</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Debt / Equity</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.debtToEquity != null ? getSectionData('financials').debtToEquity.toFixed(2) + 'x' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Higher = more leverage and risk</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Current Ratio</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.currentRatio != null ? getSectionData('financials').currentRatio.toFixed(2) + 'x' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">&gt;1 means can cover short-term obligations</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Working Capital</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.workingCapital != null ? finCurrencySymbol() + (getSectionData('financials').workingCapital / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Current assets minus current liabilities</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Assets</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalAssets != null ? finCurrencySymbol() + (getSectionData('financials').totalAssets / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Everything the company owns or controls</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Total Equity</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.totalEquity != null ? finCurrencySymbol() + (getSectionData('financials').totalEquity / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net book value owned by shareholders</td>
+                    </tr>
+                    <!-- Cash Flow & Returns -->
+                    <tr class="bg-slate-50"><td colspan="3" class="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Cash Flow &amp; Returns</td></tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Operating Cash Flow</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.operatingCashFlow != null ? finCurrencySymbol() + (getSectionData('financials').operatingCashFlow / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Cash from core business operations</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">Free Cash Flow</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.freeCashFlow != null ? finCurrencySymbol() + (getSectionData('financials').freeCashFlow / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Operating CF minus capital expenditures</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">CapEx</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.capitalExpenditure != null ? finCurrencySymbol() + (Math.abs(getSectionData('financials').capitalExpenditure) / 1e9).toFixed(2) + ' B' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Investment in property, plant &amp; equipment</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">ROE</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.returnOnEquity != null ? (getSectionData('financials').returnOnEquity * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net income / shareholders' equity</td>
+                    </tr>
+                    <tr>
+                      <td class="px-4 py-2 text-slate-700">ROA</td>
+                      <td class="px-4 py-2 text-right font-medium text-slate-800" x-text="getSectionData('financials')?.returnOnAssets != null ? (getSectionData('financials').returnOnAssets * 100).toFixed(1) + '%' : '—'"></td>
+                      <td class="px-4 py-2 text-xs text-slate-400">Net income / total assets</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p x-show="getSectionData('financials')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('financials')?.error"></p>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Return & Quality Ratios</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnEquity != null ? (getSectionData('financials').returnOnEquity * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROE<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net income ÷ shareholders' equity. Measures profitability relative to equity invested.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnCapital != null ? (getSectionData('financials').returnOnCapital * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROCE<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">EBIT ÷ capital employed. Measures how efficiently capital generates operating profit.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROIC<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net operating profit ÷ invested capital. Includes both debt and equity; a key measure of value creation.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.returnOnAssets != null ? (getSectionData('financials').returnOnAssets * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">ROA<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Net income ÷ total assets. Measures how efficiently assets generate profit.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.grossMargins != null ? (getSectionData('financials').grossMargins * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Gross Margin<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Revenue minus cost of goods sold as % of revenue.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-slate-800" x-text="getSectionData('financials')?.operatingMargins != null ? (getSectionData('financials').operatingMargins * 100).toFixed(1) + '%' : '—'"></p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">EBIT Margin<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-48 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Earnings before interest &amp; taxes as % of revenue.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Altman Z-Score<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-52 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">Bankruptcy prediction model. &gt;2.99 = safe zone, 1.81–2.99 = grey zone, &lt;1.81 = distress zone.</span></span></p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1 flex items-center justify-center gap-1">Piotroski F-Score<span class="relative group/tip inline-block"><svg class="w-3 h-3 text-slate-400 cursor-help" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg><span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 z-20 w-52 rounded bg-slate-800 px-2 py-1.5 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity shadow-lg whitespace-normal font-normal normal-case">0–9 score measuring financial strength across profitability, leverage, and efficiency. &gt;6 = strong, &lt;3 = weak.</span></span></p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Working Capital Efficiency</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">DSO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p><h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">DPO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p><h4 class="text-sm font-medium text-slate-700 mt-4 mb-2">DIO</h4><p class="text-xs text-slate-500">Latest FY: —</p><p class="text-sm text-slate-600 mt-2">3-year trend: —</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Working Capital Quality</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Earnings Quality</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Cash Conversion Ratio</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Sloan Accruals Ratio</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Beneish M-Score</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Normalized vs Reported EPS</h4><p class="text-sm text-slate-600">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Non-Recurring Items</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">Revenue Recognition</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Tax Analysis</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4"><dl class="space-y-3 text-sm"><div><dt class="font-medium text-slate-700">Effective Tax Rate</dt><dd class="text-slate-600 mt-1" x-text="getSectionData('financials')?.effectiveTaxRate != null ? (getSectionData('financials').effectiveTaxRate <= 1 ? (getSectionData('financials').effectiveTaxRate * 100).toFixed(1) : getSectionData('financials').effectiveTaxRate) + '%' : '—'"></dd></div><div><dt class="font-medium text-slate-700">Statutory Tax Rate</dt><dd class="text-slate-600 mt-1">—</dd></div><div><dt class="font-medium text-slate-700">Deferred Tax Liability</dt><dd class="text-slate-600 mt-1">—</dd></div></dl></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Rate Gap Explanation</h4><p class="text-sm text-slate-600">—</p><h4 class="text-sm font-medium text-slate-700 mt-3 mb-2">International Tax Notes</h4><p class="text-sm text-slate-600">—</p></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Valuation -->
+          <div x-show="perStockTab === 'valuation'" x-cloak class="space-y-6"
+               x-init="$watch('perStockTab', v => { if (v === 'valuation') $nextTick(() => initDcf()); })">
+            <div class="grid md:grid-cols-2 gap-6">
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Trading Multiples</h3>
+                  <button @click="fetchSectionData('valuation', true)" :disabled="isSectionLoading('valuation')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50">↻</button>
+                </div>
+                <div x-show="isSectionLoading('valuation')" class="text-slate-500 text-sm mb-2">Loading…</div>
+                <table class="w-full text-sm"><thead><tr class="border-b border-slate-200"><th class="text-left py-2 text-slate-500 font-medium">Metric</th><th class="text-right py-2 text-slate-500 font-medium">Value</th></tr></thead><tbody>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/E TTM</td><td class="text-right" x-text="getSectionData('valuation')?.trailingPE != null ? getSectionData('valuation').trailingPE.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/E NTM (Fwd)</td><td class="text-right" x-text="getSectionData('valuation')?.forwardPE != null ? getSectionData('valuation').forwardPE.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">EV/EBITDA</td><td class="text-right" x-text="getSectionData('valuation')?.enterpriseToEbitda != null ? getSectionData('valuation').enterpriseToEbitda.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">EV/Revenue</td><td class="text-right" x-text="getSectionData('valuation')?.enterpriseToRevenue != null ? getSectionData('valuation').enterpriseToRevenue.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/FCF TTM</td><td class="text-right" x-text="getSectionData('valuation')?.priceToFreeCashFlow != null ? getSectionData('valuation').priceToFreeCashFlow.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">P/S (TTM)</td><td class="text-right" x-text="getSectionData('valuation')?.priceToSalesTrailing12Months != null ? getSectionData('valuation').priceToSalesTrailing12Months.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">Price/Book</td><td class="text-right" x-text="getSectionData('valuation')?.priceToBook != null ? getSectionData('valuation').priceToBook.toFixed(1) + 'x' : '—'"></td></tr>
+                  <tr class="border-b border-slate-100"><td class="py-2">PEG Ratio</td><td class="text-right" x-text="getSectionData('valuation')?.pegRatio != null ? getSectionData('valuation').pegRatio.toFixed(1) : '—'"></td></tr>
+                  <tr><td class="py-2">Earnings Yield</td><td class="text-right text-emerald-400" x-text="getSectionData('valuation')?.earningsYield != null ? Number(getSectionData('valuation').earningsYield).toFixed(2) + '%' : '—'"></td></tr>
+                </tbody></table>
+                <div class="mt-4 p-3 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-slate-300">Qualitative commentary: —</div>
+                <p class="text-xs text-slate-500 mt-2">Peers: —</p>
+                <p x-show="getSectionData('valuation')?.error" class="text-rose-600 text-sm mt-2" x-text="getSectionData('valuation')?.error"></p>
+              </section>
+              <!-- DCF Interactive Calculator -->
+              <section class="bg-slate-900 rounded-xl border border-slate-700 p-5 shadow-sm col-span-full">
+
+                <div class="flex items-center justify-between mb-5">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider">DCF Calculator</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Two-stage discounted cash flow · adjust inputs to explore fair value</p>
+                  </div>
+                  <button @click="initDcf()" class="text-xs text-teal-400 hover:text-teal-300 border border-slate-600 rounded-lg px-3 py-1.5 transition">↻ Refresh from data</button>
+                </div>
+
+                <!-- Input grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                  <!-- FCF -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Base FCF (₹ Cr)</label>
+                    <input type="number" x-model="dcfFcfInput" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 7713" />
+                    <p class="text-[9px] text-slate-500 mt-1">Last 12 months free cash flow</p>
+                  </div>
+                  <!-- Shares -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Shares (Lakh)</label>
+                    <input type="number" x-model="dcfSharesInput" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 3023" />
+                    <p class="text-[9px] text-slate-500 mt-1">Outstanding shares in lakhs</p>
+                  </div>
+                  <!-- Cash -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Net Cash (₹ Cr)</label>
+                    <div class="flex gap-1">
+                      <input type="number" x-model="dcfCashInput" class="w-1/2 bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="Cash" />
+                      <input type="number" x-model="dcfDebtInput" class="w-1/2 bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="Debt" />
+                    </div>
+                    <p class="text-[9px] text-slate-500 mt-1">Cash / Debt in ₹ Cr</p>
+                  </div>
+                  <!-- Current price -->
+                  <div class="bg-slate-800 rounded-lg p-3">
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Current Price (₹)</label>
+                    <input type="number" x-model="dcf.price" class="w-full bg-slate-700 text-slate-100 text-sm rounded px-2 py-1.5 border border-slate-600 focus:border-teal-500 focus:outline-none" placeholder="e.g. 13022" />
+                    <p class="text-[9px] text-slate-500 mt-1">For margin of safety calc</p>
+                  </div>
+                </div>
+
+                <!-- Sliders -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                      <span class="font-medium">Phase 1 Growth</span>
+                      <span class="font-bold text-teal-400" x-text="dcf.g1 + '%'"></span>
+                    </div>
+                    <input type="range" x-model.number="dcf.g1" min="0" max="40" step="0.5" class="w-full accent-teal-500" />
+                    <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>0%</span><span x-text="'First ' + dcf.years1 + ' yrs'"></span><span>40%</span></div>
+                    <div class="flex items-center gap-2 mt-1.5">
+                      <label class="text-[10px] text-slate-500">Years:</label>
+                      <select x-model.number="dcf.years1" class="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600">
+                        <option>5</option><option>7</option><option>10</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                      <span class="font-medium">Phase 2 Growth</span>
+                      <span class="font-bold text-violet-400" x-text="dcf.g2 + '%'"></span>
+                    </div>
+                    <input type="range" x-model.number="dcf.g2" min="0" max="25" step="0.5" class="w-full accent-violet-500" />
+                    <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>0%</span><span x-text="'Next ' + dcf.years2 + ' yrs'"></span><span>25%</span></div>
+                    <div class="flex items-center gap-2 mt-1.5">
+                      <label class="text-[10px] text-slate-500">Years:</label>
+                      <select x-model.number="dcf.years2" class="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600">
+                        <option>3</option><option>5</option><option>7</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="space-y-3">
+                    <div>
+                      <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span class="font-medium">Terminal Growth</span>
+                        <span class="font-bold text-amber-400" x-text="dcf.gT + '%'"></span>
+                      </div>
+                      <input type="range" x-model.number="dcf.gT" min="1" max="7" step="0.5" class="w-full accent-amber-500" />
+                      <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>1%</span><span>Perpetuity rate</span><span>7%</span></div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span class="font-medium">Discount Rate (WACC)</span>
+                        <span class="font-bold text-rose-400" x-text="dcf.wacc + '%'"></span>
+                      </div>
+                      <input type="range" x-model.number="dcf.wacc" min="8" max="20" step="0.5" class="w-full accent-rose-500" />
+                      <div class="flex justify-between text-[9px] text-slate-500 mt-0.5"><span>8%</span><span>Required return</span><span>20%</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Results: 3 scenarios -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                  <!-- Bear -->
+                  <div class="rounded-xl border border-rose-800/60 bg-rose-950/30 p-4 text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-rose-400 mb-2">Bear Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + Math.max(0,dcf.g1-7).toFixed(1) + '% · g₂=' + Math.max(0,dcf.g2-5).toFixed(1) + '% · r=' + (dcf.wacc+2).toFixed(1) + '%'"></p>
+                    <p class="text-2xl font-bold text-rose-300" x-text="dcfFmt(dcfBear)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBear)" x-text="dcfMosFmt(dcfBear)"></p>
+                  </div>
+                  <!-- Base -->
+                  <div class="rounded-xl border border-teal-700/60 bg-teal-950/40 p-4 text-center ring-1 ring-teal-600/30">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-teal-400 mb-2">Base Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + dcf.g1 + '% · g₂=' + dcf.g2 + '% · r=' + dcf.wacc + '%'"></p>
+                    <p class="text-2xl font-bold text-teal-300" x-text="dcfFmt(dcfBase)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBase)" x-text="dcfMosFmt(dcfBase)"></p>
+                  </div>
+                  <!-- Bull -->
+                  <div class="rounded-xl border border-emerald-800/60 bg-emerald-950/30 p-4 text-center">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-2">Bull Case</p>
+                    <p class="text-xs text-slate-500 mb-2" x-text="'g₁=' + (dcf.g1+5) + '% · g₂=' + (dcf.g2+3) + '% · r=' + Math.max(8,dcf.wacc-2) + '%'"></p>
+                    <p class="text-2xl font-bold text-emerald-300" x-text="dcfFmt(dcfBull)"></p>
+                    <p class="text-sm mt-1 font-semibold" :class="dcfMosColor(dcfBull)" x-text="dcfMosFmt(dcfBull)"></p>
+                  </div>
+                </div>
+
+                <!-- Sensitivity matrix -->
+                <div>
+                  <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Sensitivity — Intrinsic Value per Share</h4>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse">
+                      <thead>
+                        <tr>
+                          <th class="text-slate-500 text-left pb-2 pr-3 whitespace-nowrap">WACC ↓ / Growth →</th>
+                          <template x-for="g in sensGrowths()" :key="g">
+                            <th class="pb-2 px-2 text-center whitespace-nowrap font-medium"
+                                :class="Math.abs(g - dcf.g1) < 0.1 ? 'text-teal-400' : 'text-slate-400'"
+                                x-text="g.toFixed(1) + '%'"></th>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template x-for="w in sensWaccs()" :key="w">
+                          <tr>
+                            <td class="py-1.5 pr-3 whitespace-nowrap font-medium"
+                                :class="Math.abs(w - dcf.wacc) < 0.1 ? 'text-rose-400' : 'text-slate-400'"
+                                x-text="w.toFixed(1) + '%'"></td>
+                            <template x-for="g in sensGrowths()" :key="g">
+                              <td class="py-1.5 px-2 text-center rounded font-medium"
+                                  :class="[sensColor(sensVal(w, g)), (Math.abs(w - dcf.wacc) < 0.1 && Math.abs(g - dcf.g1) < 0.1) ? 'ring-1 ring-teal-400' : '']"
+                                  x-text="dcfFmt(sensVal(w, g))"></td>
+                            </template>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p class="text-[10px] text-slate-500 mt-2">Green = undervalued · Amber = near fair value · Red = overvalued vs current price</p>
+                </div>
+
+                <!-- Assumptions note -->
+                <div class="mt-4 bg-slate-800/50 rounded-lg p-3">
+                  <p class="text-[10px] text-slate-500 leading-relaxed">
+                    <span class="font-semibold text-slate-400">Model:</span> Two-stage FCF-to-equity DCF.
+                    Phase 1 (<span x-text="dcf.years1"></span> yrs at <span x-text="dcf.g1"></span>%) → Phase 2 (<span x-text="dcf.years2"></span> yrs at <span x-text="dcf.g2"></span>%) → Terminal at <span x-text="dcf.gT"></span>% growth.
+                    Enterprise value + cash − debt ÷ shares. Bear/bull vary g₁±5–7pp, WACC±2pp.
+                    <span class="text-amber-400">FCF inputs in ₹ Cr · Shares in lakh.</span>
+                  </p>
+                </div>
+              </section>
+            </div>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Sum-of-the-Parts (SOTP) Valuation</h3>
+              <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                <table class="w-full text-sm"><thead><tr class="bg-slate-50 border-b border-slate-200"><th class="text-left py-3 px-4 font-medium text-slate-600">Segment</th><th class="text-right py-3 px-4 font-medium text-slate-600">Revenue (USD M)</th><th class="text-right py-3 px-4 font-medium text-slate-600">EBITDA (USD M)</th><th class="text-right py-3 px-4 font-medium text-slate-600">Multiple</th><th class="text-right py-3 px-4 font-medium text-slate-600">EV (USD M)</th></tr></thead><tbody><tr class="border-b border-slate-100"><td class="py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td><td class="text-right py-3 px-4">—</td></tr></tbody></table>
+              </div>
+              <div class="grid md:grid-cols-3 gap-4 mt-4">
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-2xl font-bold text-emerald-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">SOTP Value / Share</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-2xl font-bold text-rose-600">—</p><p class="text-xs text-slate-500 uppercase mt-1">Discount / Premium to Market</p></div>
+                <div class="bg-slate-50 rounded-lg p-4"><h4 class="text-sm font-medium text-slate-700 mb-2">Key Assumptions</h4><ol class="text-sm text-slate-600 list-decimal list-inside space-y-1">—</ol></div>
+              </div>
+            </section>
+            <section>
+              <h3 class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Scenario Analysis</h3>
+              <p class="text-sm text-slate-600 mb-4">Prob-Weighted Target: (Bear × P<sub>bear</sub>) + (Base × P<sub>base</sub>) + (Bull × P<sub>bull</sub>) = —</p>
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-rose-400"><h4 class="text-sm font-semibold text-rose-600 mb-2">Bear Case (20% prob)</h4><p class="text-2xl font-bold text-rose-600">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-amber-500"><h4 class="text-sm font-semibold text-amber-700 mb-2">Base Case (60% prob)</h4><p class="text-2xl font-bold text-amber-700">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+                <div class="bg-slate-50 rounded-lg p-4 border-l-4 border-emerald-500"><h4 class="text-sm font-semibold text-emerald-600 mb-2">Bull Case (20% prob)</h4><p class="text-2xl font-bold text-emerald-600">—</p><p class="text-sm text-slate-600 mt-2">—</p></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Charts tab -->
+          <div x-show="perStockTab === 'charts'" x-cloak class="space-y-6"
+               x-init="$watch('perStockTab', t => { if (t === 'charts') {
+                         fetchMetricsHistoryIfNeeded();
+                         if (!priceHistory && perStockSymbol) fetchPriceHistory();
+                         if (metricsHistory && !metricsHistory.error) $nextTick(() => renderMetricCharts(metricsHistory));
+                         if (priceHistory && !priceHistory.error) $nextTick(() => renderPriceCharts(priceHistory));
+                       }});
+                       $watch('metricsHistory', d => { if (perStockTab === 'charts' && d && !d.error) $nextTick(() => renderMetricCharts(d)); });
+                       $watch('priceHistory',   d => { if (perStockTab === 'charts' && d && !d.error) $nextTick(() => renderPriceCharts(d)); })">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-800">Charts</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Price · Moving averages · Annual fundamental metrics</p>
+              </div>
+              <button @click="metricsHistory = null; priceHistory = null; fetchMetricsHistory(); fetchPriceHistory()"
+                      :disabled="metricsHistoryLoading || priceHistoryLoading"
+                      class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Refresh">↻</button>
+            </div>
+
+            <!-- Loading / error states -->
+            <div x-show="metricsHistoryLoading || priceHistoryLoading" class="text-slate-500 text-sm py-4 text-center">Loading…</div>
+            <div x-show="metricsHistory?.error" class="text-rose-600 text-sm" x-text="metricsHistory?.error"></div>
+            <div x-show="!metricsHistoryLoading && !priceHistoryLoading && !metricsHistory && !perStockSymbol" class="text-slate-400 text-sm">Select a symbol to load charts.</div>
+
+            <!-- Price / DMA section -->
+            <template x-if="priceHistory && !priceHistory.error">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Price & Moving Averages</h3>
+                  <!-- DMA summary chips -->
+                  <div class="flex gap-2 text-xs">
+                    <span class="px-2 py-1 rounded-full font-medium"
+                          :class="(priceHistory.summary?.vs_sma50_pct ?? 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+                          x-text="'vs 50 DMA: ' + ((priceHistory.summary?.vs_sma50_pct ?? 0) >= 0 ? '+' : '') + (priceHistory.summary?.vs_sma50_pct?.toFixed(1) ?? '—') + '%'">
+                    </span>
+                    <span class="px-2 py-1 rounded-full font-medium"
+                          :class="(priceHistory.summary?.vs_sma200_pct ?? 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+                          x-text="'vs 200 DMA: ' + ((priceHistory.summary?.vs_sma200_pct ?? 0) >= 0 ? '+' : '') + (priceHistory.summary?.vs_sma200_pct?.toFixed(1) ?? '—') + '%'">
+                    </span>
+                  </div>
+                </div>
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Price vs 50 & 200 DMA</h3>
+                    <p class="text-xs text-slate-400">2-year daily — trend context for fundamental entry</p>
+                  </div>
+                  <div class="h-64"><canvas id="chart-price-dma"></canvas></div>
+                </section>
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Volume</h3>
+                    <p class="text-xs text-slate-400">Green = up day · Red = down day</p>
+                  </div>
+                  <div class="h-36"><canvas id="chart-volume"></canvas></div>
+                </section>
+              </div>
+            </template>
+
+            <!-- Fundamental metrics section -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div>
+                <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4 pt-2 border-t border-slate-200">Fundamental Metrics — Annual</h3>
+              </div>
+            </template>
+
+            <!-- Chart grid -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Margins -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Profit Margins</h3>
+                    <p class="text-xs text-slate-400">Gross · Operating · Net — pricing power & cost discipline</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-margins"></canvas></div>
+                </section>
+
+                <!-- Returns -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Capital Returns</h3>
+                    <p class="text-xs text-slate-400">ROE · ROA · ROIC — quality of capital allocation</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-returns"></canvas></div>
+                </section>
+
+                <!-- Revenue & Net Income -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Revenue & Earnings</h3>
+                    <p class="text-xs text-slate-400">Annual revenue and net income (billions)</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-revenue"></canvas></div>
+                </section>
+
+                <!-- FCF Quality -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Cash Quality & Capital Spend</h3>
+                    <p class="text-xs text-slate-400">FCF conversion · Capex/Rev · R&D/Rev — earnings quality</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-fcf"></canvas></div>
+                </section>
+
+                <!-- Leverage -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Leverage & Coverage</h3>
+                    <p class="text-xs text-slate-400">D/E · Net Debt/EBITDA · Interest Coverage — balance sheet stress</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-leverage"></canvas></div>
+                </section>
+
+                <!-- Historical Valuation -->
+                <section class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                  <div class="mb-1">
+                    <h3 class="text-sm font-semibold text-slate-700">Valuation History</h3>
+                    <p class="text-xs text-slate-400">P/E · P/B · P/S — cheap or expensive vs. own history</p>
+                  </div>
+                  <div class="h-56"><canvas id="chart-valuation-hist"></canvas></div>
+                </section>
+
+              </div>
+            </template>
+
+            <!-- Insight callouts -->
+            <template x-if="metricsHistory && !metricsHistory.error">
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-1">Gross Margin Trend</p>
+                  <p class="text-sm text-slate-600">Rising gross margin = pricing power compounding. Falling = competition or input cost pressure.</p>
+                </div>
+                <div class="bg-teal-50 border border-teal-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">ROIC vs. Cost of Capital</p>
+                  <p class="text-sm text-slate-600">ROIC expanding above ~10–12% WACC signals a compounding machine. Contracting ROIC = value destruction.</p>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                  <p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">FCF Conversion</p>
+                  <p class="text-sm text-slate-600">&gt;90% FCF/Net Income = high-quality earnings. Diverging downward flags accruals or capex catch-up.</p>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Industry (research-backed) -->
+          <div x-show="perStockTab === 'industry'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'industry') fetchSectionDataIfNeeded('industry'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Industry Analysis <button x-show="learningMode" @mouseenter="showExplainer('section_industry', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition" title="What is this analysis?">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('industry')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('industry')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('industry')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('industry')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('industry') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('industry')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('industry')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('industry')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('industry')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('industry', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('industry', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('industry', true)" :disabled="isSectionLoading('industry')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('industry')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('industry') && !isSectionLoading('industry')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section industry</code>
+              </div>
+              <template x-if="hasResearchData('industry')">
+                <div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Industry</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.industry_name || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Market Size</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.market_size || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Growth Rate</p><p class="text-lg font-bold text-slate-800" x-text="getSectionData('industry')?.data?.growth_rate || '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.data?.trends?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Industry Trends</h4>
+                    <div class="space-y-2"><template x-for="t in (getSectionData('industry')?.data?.trends || [])"><div class="bg-slate-50 rounded p-3"><span class="font-medium text-sm text-slate-800" x-text="t.title"></span><p class="text-xs text-slate-600 mt-1" x-text="t.description"></p></div></template></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.data?.competitive_landscape?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Competitive Landscape</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Company</th><th class="pb-2">Market Share</th><th class="pb-2">Notes</th></tr></thead><tbody><template x-for="c in (getSectionData('industry')?.data?.competitive_landscape || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="c.company"></td><td class="py-2" x-text="c.market_share"></td><td class="py-2 text-slate-600" x-text="c.notes"></td></tr></template></tbody></table>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div x-show="getSectionData('industry')?.data?.barriers_to_entry?.length"><h4 class="text-sm font-semibold text-slate-700 mb-2">Barriers to Entry</h4><ul class="space-y-1"><template x-for="b in (getSectionData('industry')?.data?.barriers_to_entry || [])"><li class="text-sm text-slate-600" x-text="'• ' + b"></li></template></ul></div>
+                    <div x-show="getSectionData('industry')?.data?.regulatory_environment"><h4 class="text-sm font-semibold text-slate-700 mb-2">Regulatory Environment</h4><p class="text-sm text-slate-600" x-text="getSectionData('industry')?.data?.regulatory_environment"></p></div>
+                  </div>
+                  <div x-show="getSectionData('industry')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('industry')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Business (research-backed) -->
+          <div x-show="perStockTab === 'business'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'business') fetchSectionDataIfNeeded('business'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Business Model <button x-show="learningMode" @mouseenter="showExplainer('section_business', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition" title="What is this analysis?">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('business')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('business')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('business')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('business')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('business') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('business')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('business')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('business')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('business')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('business', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('business', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('business', true)" :disabled="isSectionLoading('business')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('business')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('business') && !isSectionLoading('business')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section business</code>
+              </div>
+              <template x-if="hasResearchData('business')">
+                <div>
+                  <p class="text-slate-700 mb-4" x-text="getSectionData('business')?.data?.model_summary"></p>
+                  <div class="flex items-center gap-3 mb-4">
+                    <span x-show="getSectionData('business')?.data?.moat_type" class="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700" x-text="'Moat: ' + getSectionData('business')?.data?.moat_type"></span>
+                    <span x-show="getSectionData('business')?.data?.pricing_power" class="px-3 py-1 rounded-full text-xs font-semibold" :class="{'bg-emerald-100 text-emerald-700': getSectionData('business')?.data?.pricing_power === 'High', 'bg-amber-100 text-amber-700': getSectionData('business')?.data?.pricing_power === 'Medium', 'bg-rose-100 text-rose-700': getSectionData('business')?.data?.pricing_power === 'Low'}" x-text="'Pricing Power: ' + getSectionData('business')?.data?.pricing_power"></span>
+                  </div>
+                  <div x-show="getSectionData('business')?.data?.moat_description" class="mb-4 bg-slate-50 rounded-lg p-4"><p class="text-sm text-slate-700" x-text="getSectionData('business')?.data?.moat_description"></p></div>
+                  <div x-show="getSectionData('business')?.data?.revenue_streams?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Revenue Streams</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Stream</th><th class="pb-2">% Revenue</th><th class="pb-2">Growth</th><th class="pb-2">Description</th></tr></thead><tbody><template x-for="rs in (getSectionData('business')?.data?.revenue_streams || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="rs.name"></td><td class="py-2" x-text="rs.pct_of_revenue ? rs.pct_of_revenue + '%' : '—'"></td><td class="py-2" x-text="rs.growth || '—'"></td><td class="py-2 text-slate-600" x-text="rs.description"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('business')?.data?.competitive_advantages?.length" class="mb-4"><h4 class="text-sm font-semibold text-slate-700 mb-2">Competitive Advantages</h4><ul class="space-y-1"><template x-for="a in (getSectionData('business')?.data?.competitive_advantages || [])"><li class="text-sm text-slate-600" x-text="'• ' + a"></li></template></ul></div>
+                  <p x-show="getSectionData('business')?.data?.customer_concentration" class="text-sm text-slate-600"><span class="font-medium">Customer Concentration:</span> <span x-text="getSectionData('business')?.data?.customer_concentration"></span></p>
+                  <div x-show="getSectionData('business')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('business')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Management (research-backed) -->
+          <div x-show="perStockTab === 'management'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'management') fetchSectionDataIfNeeded('management'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Management <button x-show="learningMode" @mouseenter="showExplainer('section_management', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('management')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('management')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('management')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('management')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('management') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('management')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('management')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('management')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('management')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('management', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('management', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('management', true)" :disabled="isSectionLoading('management')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('management')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('management') && !isSectionLoading('management')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section management</code>
+              </div>
+              <template x-if="hasResearchData('management')">
+                <div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <template x-for="exec in [getSectionData('management')?.data?.ceo, getSectionData('management')?.data?.cfo].filter(Boolean)">
+                      <div class="bg-slate-50 rounded-lg p-4">
+                        <p class="text-lg font-bold text-slate-800" x-text="exec.name"></p>
+                        <p class="text-xs text-teal-600 font-semibold uppercase" x-text="exec === getSectionData('management')?.data?.ceo ? 'CEO' : 'CFO'"></p>
+                        <p x-show="exec.since" class="text-xs text-slate-500 mt-1" x-text="'Since ' + exec.since"></p>
+                        <p class="text-sm text-slate-600 mt-2" x-text="exec.background"></p>
+                        <p x-show="exec.compensation" class="text-xs text-slate-500 mt-1" x-text="'Compensation: ' + exec.compensation"></p>
+                      </div>
+                    </template>
+                  </div>
+                  <div x-show="getSectionData('management')?.data?.other_key_executives?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Other Key Executives</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Name</th><th class="pb-2">Title</th><th class="pb-2">Since</th><th class="pb-2">Background</th></tr></thead><tbody><template x-for="e in (getSectionData('management')?.data?.other_key_executives || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.name"></td><td class="py-2" x-text="e.title"></td><td class="py-2" x-text="e.since || '—'"></td><td class="py-2 text-slate-600" x-text="e.background"></td></tr></template></tbody></table>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-50 rounded-lg p-3 text-center"><p class="text-xs text-slate-500">Board Independence</p><p class="text-lg font-bold" x-text="getSectionData('management')?.data?.board_independence_pct != null ? getSectionData('management')?.data?.board_independence_pct + '%' : '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-3 text-center"><p class="text-xs text-slate-500">Insider Ownership</p><p class="text-lg font-bold" x-text="getSectionData('management')?.data?.insider_ownership_pct != null ? getSectionData('management')?.data?.insider_ownership_pct + '%' : '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('management')?.data?.track_record" class="mb-4"><h4 class="text-sm font-semibold text-slate-700 mb-2">Track Record</h4><p class="text-sm text-slate-600" x-text="getSectionData('management')?.data?.track_record"></p></div>
+                  <div x-show="getSectionData('management')?.data?.red_flags?.length" class="mb-4"><h4 class="text-sm font-semibold text-rose-600 mb-2">Red Flags</h4><ul class="space-y-1"><template x-for="f in (getSectionData('management')?.data?.red_flags || [])"><li class="text-sm text-rose-600" x-text="'• ' + f"></li></template></ul></div>
+                  <div x-show="getSectionData('management')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('management')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- ESG (research-backed) -->
+          <div x-show="perStockTab === 'esg'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'esg') fetchSectionDataIfNeeded('esg'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">ESG <button x-show="learningMode" @mouseenter="showExplainer('section_esg', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('esg')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('esg')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('esg')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('esg')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('esg') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('esg')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('esg')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('esg')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('esg')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('esg', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('esg', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('esg', true)" :disabled="isSectionLoading('esg')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('esg')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('esg') && !isSectionLoading('esg')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section esg</code>
+              </div>
+              <template x-if="hasResearchData('esg')">
+                <div>
+                  <div class="flex items-center gap-4 mb-6">
+                    <div class="bg-teal-50 rounded-lg px-4 py-3 text-center"><p class="text-xs text-slate-500">Overall Rating</p><p class="text-2xl font-bold text-teal-700" x-text="getSectionData('esg')?.data?.overall_rating || '—'"></p><p class="text-xs text-slate-500" x-text="getSectionData('esg')?.data?.rating_provider || ''"></p></div>
+                  </div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <template x-for="pillar in ['environmental', 'social', 'governance']">
+                      <div class="bg-slate-50 rounded-lg p-4">
+                        <h4 class="text-sm font-semibold text-slate-700 capitalize mb-2" x-text="pillar"></h4>
+                        <p x-show="getSectionData('esg')?.data?.[pillar]?.score" class="text-lg font-bold text-slate-800 mb-2" x-text="getSectionData('esg')?.data?.[pillar]?.score"></p>
+                        <div x-show="getSectionData('esg')?.data?.[pillar]?.highlights?.length"><p class="text-xs font-semibold text-emerald-600 mb-1">Highlights</p><ul><template x-for="h in (getSectionData('esg')?.data?.[pillar]?.highlights || [])"><li class="text-xs text-slate-600" x-text="'• ' + h"></li></template></ul></div>
+                        <div x-show="getSectionData('esg')?.data?.[pillar]?.controversies?.length" class="mt-2"><p class="text-xs font-semibold text-rose-600 mb-1">Controversies</p><ul><template x-for="c in (getSectionData('esg')?.data?.[pillar]?.controversies || [])"><li class="text-xs text-rose-600" x-text="'• ' + c"></li></template></ul></div>
+                      </div>
+                    </template>
+                  </div>
+                  <div x-show="getSectionData('esg')?.data?.notable_initiatives?.length"><h4 class="text-sm font-semibold text-slate-700 mb-2">Notable Initiatives</h4><ul class="space-y-1"><template x-for="i in (getSectionData('esg')?.data?.notable_initiatives || [])"><li class="text-sm text-slate-600" x-text="'• ' + i"></li></template></ul></div>
+                  <div x-show="getSectionData('esg')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('esg')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Estimates (research-backed) -->
+          <div x-show="perStockTab === 'estimates'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'estimates') fetchSectionDataIfNeeded('estimates'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Analyst Estimates <button x-show="learningMode" @mouseenter="showExplainer('section_estimates', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition" title="What is this analysis?">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('estimates')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('estimates')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('estimates')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('estimates')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('estimates') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('estimates')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('estimates')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('estimates')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('estimates')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('estimates', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('estimates', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('estimates', true)" :disabled="isSectionLoading('estimates')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('estimates')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('estimates') && !isSectionLoading('estimates')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section estimates</code>
+              </div>
+              <template x-if="hasResearchData('estimates')">
+                <div>
+                  <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Consensus</p><p class="text-xl font-bold" :class="{'text-emerald-600': getSectionData('estimates')?.data?.consensus_rating === 'Buy', 'text-amber-600': getSectionData('estimates')?.data?.consensus_rating === 'Hold', 'text-rose-600': getSectionData('estimates')?.data?.consensus_rating === 'Sell'}" x-text="getSectionData('estimates')?.data?.consensus_rating || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Analysts</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('estimates')?.data?.analyst_count || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Price Target</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('estimates')?.data?.price_target?.mean || '—'"></p><p class="text-xs text-slate-500" x-text="getSectionData('estimates')?.data?.price_target ? getSectionData('estimates')?.data?.price_target?.low + ' — ' + getSectionData('estimates')?.data?.price_target?.high : ''"></p></div>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.eps_estimates?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">EPS Estimates</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Period</th><th class="pb-2">Consensus</th><th class="pb-2">Low</th><th class="pb-2">High</th></tr></thead><tbody><template x-for="e in (getSectionData('estimates')?.data?.eps_estimates || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.period"></td><td class="py-2" x-text="e.consensus"></td><td class="py-2 text-slate-500" x-text="e.low"></td><td class="py-2 text-slate-500" x-text="e.high"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.revenue_estimates?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Revenue Estimates</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Period</th><th class="pb-2">Consensus</th><th class="pb-2">Low</th><th class="pb-2">High</th></tr></thead><tbody><template x-for="e in (getSectionData('estimates')?.data?.revenue_estimates || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="e.period"></td><td class="py-2" x-text="e.consensus"></td><td class="py-2 text-slate-500" x-text="e.low"></td><td class="py-2 text-slate-500" x-text="e.high"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('estimates')?.data?.estimate_revisions"><h4 class="text-sm font-semibold text-slate-700 mb-1">Estimate Revisions</h4><p class="text-sm text-slate-600" x-text="getSectionData('estimates')?.data?.estimate_revisions?.detail || getSectionData('estimates')?.data?.estimate_revisions?.direction"></p></div>
+                  <div x-show="getSectionData('estimates')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('estimates')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Revenue (research-backed) -->
+          <div x-show="perStockTab === 'revenue'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'revenue') fetchSectionDataIfNeeded('revenue'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Revenue Breakdown <button x-show="learningMode" @mouseenter="showExplainer('section_revenue', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('revenue')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('revenue')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('revenue')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('revenue')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('revenue') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('revenue')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('revenue')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('revenue')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('revenue')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('revenue', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('revenue', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('revenue', true)" :disabled="isSectionLoading('revenue')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('revenue')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('revenue') && !isSectionLoading('revenue')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section revenue</code>
+              </div>
+              <template x-if="hasResearchData('revenue')">
+                <div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Total Revenue</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('revenue')?.data?.total_revenue || '—'"></p></div>
+                    <div class="bg-slate-50 rounded-lg p-4 text-center"><p class="text-xs text-slate-500 uppercase">Recurring Revenue</p><p class="text-xl font-bold text-slate-800" x-text="getSectionData('revenue')?.data?.recurring_pct != null ? getSectionData('revenue')?.data?.recurring_pct + '%' : '—'"></p></div>
+                  </div>
+                  <div x-show="getSectionData('revenue')?.data?.by_segment?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">By Segment</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Segment</th><th class="pb-2">Revenue</th><th class="pb-2">%</th><th class="pb-2">YoY Growth</th></tr></thead><tbody><template x-for="seg in (getSectionData('revenue')?.data?.by_segment || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="seg.name"></td><td class="py-2" x-text="seg.revenue || '—'"></td><td class="py-2" x-text="seg.pct != null ? seg.pct + '%' : '—'"></td><td class="py-2" x-text="seg.yoy_growth || '—'"></td></tr></template></tbody></table>
+                  </div>
+                  <div x-show="getSectionData('revenue')?.data?.by_geography?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">By Geography</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-left text-xs text-slate-500 uppercase"><th class="pb-2">Region</th><th class="pb-2">Revenue</th><th class="pb-2">%</th><th class="pb-2">YoY Growth</th></tr></thead><tbody><template x-for="geo in (getSectionData('revenue')?.data?.by_geography || [])"><tr class="border-t border-slate-100"><td class="py-2 font-medium" x-text="geo.region"></td><td class="py-2" x-text="geo.revenue || '—'"></td><td class="py-2" x-text="geo.pct != null ? geo.pct + '%' : '—'"></td><td class="py-2" x-text="geo.yoy_growth || '—'"></td></tr></template></tbody></table>
+                  </div>
+                  <p x-show="getSectionData('revenue')?.data?.revenue_quality" class="text-sm text-slate-600"><span class="font-medium">Revenue Quality:</span> <span x-text="getSectionData('revenue')?.data?.revenue_quality"></span></p>
+                  <div x-show="getSectionData('revenue')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('revenue')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Catalysts (research-backed) -->
+          <div x-show="perStockTab === 'catalysts'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'catalysts') fetchSectionDataIfNeeded('catalysts'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Catalysts <button x-show="learningMode" @mouseenter="showExplainer('section_catalysts', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('catalysts')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('catalysts')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('catalysts')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('catalysts')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('catalysts') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('catalysts')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('catalysts')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('catalysts')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('catalysts')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('catalysts', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('catalysts', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('catalysts', true)" :disabled="isSectionLoading('catalysts')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('catalysts')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('catalysts') && !isSectionLoading('catalysts')">
+                <p class="text-slate-500 text-sm">No research data yet. Run the investment skill research command to generate.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section catalysts</code>
+              </div>
+              <template x-if="hasResearchData('catalysts')">
+                <div>
+                  <div x-show="getSectionData('catalysts')?.data?.upcoming?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Upcoming Events</h4>
+                    <div class="space-y-2"><template x-for="ev in (getSectionData('catalysts')?.data?.upcoming || [])">
+                      <div class="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                        <div class="text-xs text-slate-500 min-w-[80px] font-mono" x-text="ev.date || ''"></div>
+                        <div class="flex-1"><p class="text-sm font-medium text-slate-800" x-text="ev.event"></p><p class="text-xs text-slate-600 mt-1" x-text="ev.description"></p></div>
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold" :class="{'bg-rose-100 text-rose-700': ev.impact === 'High', 'bg-amber-100 text-amber-700': ev.impact === 'Medium', 'bg-slate-200 text-slate-600': ev.impact === 'Low'}" x-text="ev.impact"></span>
+                      </div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.data?.recent?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Recent Events</h4>
+                    <div class="space-y-2"><template x-for="ev in (getSectionData('catalysts')?.data?.recent || [])">
+                      <div class="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                        <div class="text-xs text-slate-500 min-w-[80px] font-mono" x-text="ev.date || ''"></div>
+                        <div class="flex-1"><p class="text-sm font-medium text-slate-800" x-text="ev.event"></p><p class="text-xs text-slate-600 mt-1" x-text="ev.description"></p></div>
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold" :class="{'bg-rose-100 text-rose-700': ev.impact === 'High', 'bg-amber-100 text-amber-700': ev.impact === 'Medium', 'bg-slate-200 text-slate-600': ev.impact === 'Low'}" x-text="ev.impact"></span>
+                      </div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.data?.long_term?.length">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-2">Long-Term Catalysts</h4>
+                    <div class="space-y-2"><template x-for="cat in (getSectionData('catalysts')?.data?.long_term || [])">
+                      <div class="bg-slate-50 rounded-lg p-3"><p class="text-sm font-medium text-slate-800" x-text="cat.catalyst"></p><p class="text-xs text-slate-500" x-text="cat.timeframe"></p><p class="text-xs text-slate-600 mt-1" x-text="cat.description"></p></div>
+                    </template></div>
+                  </div>
+                  <div x-show="getSectionData('catalysts')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100"><h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4><template x-for="s in (getSectionData('catalysts')?.sources || [])"><a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a></template></div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+          <!-- Cyclicality (research-backed) -->
+          <div x-show="perStockTab === 'cyclical'" x-cloak class="space-y-6" x-init="$watch('perStockTab', v => { if (v === 'cyclical') fetchSectionDataIfNeeded('cyclical'); })">
+            <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Cyclicality Analysis <button x-show="learningMode" @mouseenter="showExplainer('section_cyclical', $event)" @mouseleave="hideExplainer()" @click.stop="pinExplainer()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-[10px] font-medium transition">🎓 What's this?</button></h2>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1.5 relative" x-data>
+                    <span x-show="hasResearchData('cyclical')" class="text-xs text-slate-400" x-text="formatResearchDate(getSectionData('cyclical')?.updated_at)"></span>
+                    <!-- History button -->
+                    <template x-if="hasResearchData('cyclical')">
+                      <div class="relative">
+                        <button @click="toggleResearchVersions('cyclical')" title="Version history"
+                          :class="researchVersionOpen === researchVersionKey('cyclical') ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'"
+                          class="p-1 rounded text-sm leading-none">🕐</button>
+                        <!-- Versions dropdown -->
+                        <div x-show="researchVersionOpen === researchVersionKey('cyclical')"
+                             @click.outside="researchVersionOpen = null"
+                             x-cloak
+                             class="absolute right-0 top-7 z-30 w-72 rounded-xl border border-slate-200 bg-white shadow-xl p-3 space-y-2">
+                          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Version History</p>
+                          <template x-if="(researchVersions[researchVersionKey('cyclical')] || []).length === 0">
+                            <p class="text-xs text-slate-400 text-center py-2">No previous versions</p>
+                          </template>
+                          <template x-for="(v, i) in (researchVersions[researchVersionKey('cyclical')] || [])" :key="i">
+                            <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-slate-50">
+                              <div>
+                                <p class="text-xs text-slate-600 font-medium" x-text="formatResearchDate(v.updated_at)"></p>
+                                <p class="text-[10px] text-slate-400">version <span x-text="(researchVersions[researchVersionKey('cyclical')] || []).length - i"></span></p>
+                              </div>
+                              <div class="flex gap-1 shrink-0">
+                                <button @click="restoreResearchVersion('cyclical', v.idx)" title="Restore this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium">Restore</button>
+                                <button @click="deleteResearchVersion('cyclical', v.idx)" title="Delete this version"
+                                  class="px-2 py-1 rounded text-[10px] bg-rose-50 text-rose-600 hover:bg-rose-100 font-medium">✕</button>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                    <button @click="fetchSectionData('cyclical', true)" :disabled="isSectionLoading('cyclical')" class="text-slate-400 hover:text-slate-600 p-1 rounded disabled:opacity-50" title="Re-run research">&#8635;</button>
+                  </div>
+                </div>
+              </div>
+              <div x-show="isSectionLoading('cyclical')" class="text-slate-500 text-sm">Loading...</div>
+              <div x-show="!hasResearchData('cyclical') && !isSectionLoading('cyclical')">
+                <p class="text-slate-500 text-sm">No cyclicality data yet.</p>
+                <code class="text-xs bg-slate-100 px-2 py-1 rounded mt-2 inline-block">research <span x-text="perStockSymbol"></span> --section cyclical</code>
+              </div>
+              <template x-if="hasResearchData('cyclical')">
+                <div>
+                  <!-- Verdict banner -->
+                  <div class="flex items-center gap-4 mb-6">
+                    <span class="px-4 py-2 rounded-full text-sm font-bold"
+                      :class="{
+                        'bg-rose-100 text-rose-700':    getSectionData('cyclical')?.data?.verdict === 'Cyclical',
+                        'bg-emerald-100 text-emerald-700': getSectionData('cyclical')?.data?.verdict === 'Defensive',
+                        'bg-amber-100 text-amber-700':  getSectionData('cyclical')?.data?.verdict === 'Semi-Cyclical'
+                      }"
+                      x-text="getSectionData('cyclical')?.data?.verdict || '—'"></span>
+                    <span class="text-xs text-slate-500">Confidence: <span class="font-semibold text-slate-700" x-text="getSectionData('cyclical')?.data?.confidence || '—'"></span></span>
+                  </div>
+                  <!-- Summary -->
+                  <p class="text-slate-700 mb-6" x-text="getSectionData('cyclical')?.data?.reason"></p>
+                  <!-- Quantitative signals table -->
+                  <div x-show="getSectionData('cyclical')?.data?.quantitative_signals?.length" class="mb-6">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-3">Quantitative Signals</h4>
+                    <table class="w-full text-sm">
+                      <thead><tr class="text-left text-xs text-slate-500 uppercase border-b border-slate-100">
+                        <th class="pb-2">Metric</th><th class="pb-2">Value</th><th class="pb-2">Signal</th><th class="pb-2">Note</th>
+                      </tr></thead>
+                      <tbody>
+                        <template x-for="sig in (getSectionData('cyclical')?.data?.quantitative_signals || [])">
+                          <tr class="border-t border-slate-100">
+                            <td class="py-2 font-medium text-slate-700" x-text="sig.metric"></td>
+                            <td class="py-2 font-mono text-slate-800" x-text="sig.value"></td>
+                            <td class="py-2">
+                              <span class="px-2 py-0.5 rounded text-xs font-semibold"
+                                :class="{
+                                  'bg-rose-100 text-rose-700':    sig.signal === 'Cyclical',
+                                  'bg-emerald-100 text-emerald-700': sig.signal === 'Defensive',
+                                  'bg-amber-100 text-amber-700':  sig.signal === 'Semi-Cyclical' || sig.signal === 'Neutral'
+                                }"
+                                x-text="sig.signal"></span>
+                            </td>
+                            <td class="py-2 text-xs text-slate-500" x-text="sig.note"></td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- Sector basis -->
+                  <div x-show="getSectionData('cyclical')?.data?.sector_basis" class="mb-6 bg-slate-50 rounded-lg p-4">
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase mb-1">Sector Classification Basis</h4>
+                    <p class="text-sm text-slate-700" x-text="getSectionData('cyclical')?.data?.sector_basis"></p>
+                  </div>
+                  <!-- Cycle drivers + defensive factors side by side -->
+                  <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div x-show="getSectionData('cyclical')?.data?.cycle_drivers?.length">
+                      <h4 class="text-sm font-semibold text-rose-600 mb-2">Cyclical Drivers</h4>
+                      <ul class="space-y-1">
+                        <template x-for="d in (getSectionData('cyclical')?.data?.cycle_drivers || [])">
+                          <li class="text-sm text-slate-600" x-text="'• ' + d"></li>
+                        </template>
+                      </ul>
+                    </div>
+                    <div x-show="getSectionData('cyclical')?.data?.defensive_factors?.length">
+                      <h4 class="text-sm font-semibold text-emerald-600 mb-2">Defensive / Stabilising Factors</h4>
+                      <ul class="space-y-1">
+                        <template x-for="d in (getSectionData('cyclical')?.data?.defensive_factors || [])">
+                          <li class="text-sm text-slate-600" x-text="'• ' + d"></li>
+                        </template>
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- Historical cycle note -->
+                  <div x-show="getSectionData('cyclical')?.data?.historical_cycle" class="mb-4 border-l-4 border-amber-300 pl-4">
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase mb-1">Historical Cycle Evidence</h4>
+                    <p class="text-sm text-slate-700" x-text="getSectionData('cyclical')?.data?.historical_cycle"></p>
+                  </div>
+                  <!-- Investor implication -->
+                  <div x-show="getSectionData('cyclical')?.data?.investor_implication" class="bg-teal-50 rounded-lg p-4">
+                    <h4 class="text-xs font-semibold text-teal-700 uppercase mb-1">Investor Implication</h4>
+                    <p class="text-sm text-teal-800" x-text="getSectionData('cyclical')?.data?.investor_implication"></p>
+                  </div>
+                  <div x-show="getSectionData('cyclical')?.sources?.length" class="mt-4 pt-4 border-t border-slate-100">
+                    <h4 class="text-xs font-semibold text-slate-500 mb-1">Sources</h4>
+                    <template x-for="s in (getSectionData('cyclical')?.sources || [])">
+                      <a :href="s.url" target="_blank" class="text-xs text-teal-600 hover:underline mr-3" x-text="s.title"></a>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </section>
+          </div>
+
+
+          <!-- ── SCORECARD TAB ─────────────────────────────────────────────── -->
+          <div x-show="perStockTab === 'scorecard'" x-cloak class="space-y-5"
+               x-init="$watch('perStockTab', v => { if (v === 'scorecard' && perStockSymbol) fetchScorecard(perStockSymbol); })">
+
+            <!-- Loading -->
+            <div x-show="scorecardLoading" class="text-center py-10 text-slate-400 text-sm">Running scorecard…</div>
+            <div x-show="!scorecardLoading && !scorecardData && perStockSymbol" class="text-center py-10 text-slate-400 text-sm">
+              <button @click="fetchScorecard(perStockSymbol)" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm rounded-lg transition">Run Scorecard</button>
+            </div>
+
+            <template x-if="scorecardData">
+              <div class="space-y-5">
+
+                <!-- Composite banner -->
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 p-5">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <p class="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Composite Score</p>
+                      <div class="flex items-baseline gap-3">
+                        <span class="text-4xl font-bold" :class="scoreTextClass(scorecardData.composite_color)"
+                              x-text="scorecardData.composite_score != null ? scorecardData.composite_score + '/100' : '—'"></span>
+                        <span class="text-lg font-semibold" :class="scoreTextClass(scorecardData.composite_color)"
+                              x-text="scorecardData.composite_label"></span>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs text-slate-500" x-text="scorecardData.dimensions_scored + ' / ' + scorecardData.dimensions_total + ' dimensions scored'"></p>
+                      <button @click="fetchScorecard(perStockSymbol)" class="mt-2 text-xs text-teal-400 hover:text-teal-300">↻ Refresh</button>
+                    </div>
+                  </div>
+                  <!-- Full progress bar -->
+                  <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500" :class="scoreColorClass(scorecardData.composite_color)"
+                         :style="'width:' + scoreBarWidth(scorecardData.composite_score)"></div>
+                  </div>
+                  <!-- Thematic tags -->
+                  <div x-show="scorecardData.thematic_tags && scorecardData.thematic_tags.length" class="flex flex-wrap gap-2 mt-3">
+                    <template x-for="tag in scorecardData.thematic_tags" :key="tag.id">
+                      <span class="text-xs px-2 py-0.5 bg-teal-900/50 border border-teal-700 text-teal-300 rounded-full"
+                            x-text="(tag.emoji||'🏷️') + ' ' + tag.name"></span>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- Composite dimensions -->
+                <div class="space-y-3">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dimensions</p>
+                  <template x-for="dim in scorecardData.composite_dimensions" :key="dim.lens_id">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-4" x-data="{ open: false }">
+                      <div class="flex items-center gap-3 cursor-pointer" @click="open = !open">
+                        <span class="text-lg" x-text="dim.emoji || '📊'"></span>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-sm font-semibold text-slate-200" x-text="dim.lens_name"></span>
+                            <div class="flex items-center gap-2">
+                              <span class="text-xs font-mono" :class="scoreTextClass(dim.color)"
+                                    x-text="dim.score != null ? dotBar(dim.score) : '— no data'"></span>
+                              <span class="text-xs font-bold tabular-nums" :class="scoreTextClass(dim.color)"
+                                    x-text="dim.score != null ? dim.score + '/100' : '—'"></span>
+                              <span class="text-xs px-1.5 py-0.5 rounded border text-xs"
+                                    :class="'border-' + (dim.color||'slate') + '-700 text-' + (dim.color||'slate') + '-400'"
+                                    x-text="dim.label"></span>
+                            </div>
+                          </div>
+                          <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all" :class="scoreColorClass(dim.color)"
+                                 :style="'width:' + scoreBarWidth(dim.score)"></div>
+                          </div>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-500 flex-shrink-0 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      </div>
+                      <!-- Component breakdown -->
+                      <div x-show="open" class="mt-3 pt-3 border-t border-slate-700 space-y-2">
+                        <!-- Quantitative components -->
+                        <template x-for="comp in (dim.components||[])" :key="comp.screen">
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500" x-text="comp.screen + (comp.invert ? ' (inverted)' : '')"></span>
+                            <div class="flex items-center gap-3">
+                              <span class="text-slate-400" x-text="comp.available ? comp.effective_pct + '%' : 'no data'"></span>
+                              <span class="text-slate-500 w-16 text-right" x-text="'×' + Math.round(comp.weight * 100) + '%'"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <!-- Governance signals -->
+                        <template x-for="sig in (dim.signals||[])" :key="sig.field">
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500" x-text="sig.field"></span>
+                            <div class="flex items-center gap-2">
+                              <span x-show="sig.ai_needed && sig.value == null" class="text-xs text-violet-400">✦ AI needed</span>
+                              <span x-show="sig.value != null" :class="(sig.score||0) >= 70 ? 'text-emerald-400' : (sig.score||0) >= 40 ? 'text-amber-400' : 'text-red-400'"
+                                    x-text="sig.value"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <p x-show="dim.coverage_pct < 100" class="text-xs text-amber-400 mt-1">
+                          ⚠ <span x-text="dim.coverage_pct + '%'"></span> data coverage — run screener to compute missing screens.
+                        </p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Custom lenses -->
+                <div x-show="scorecardData.custom_lenses && scorecardData.custom_lenses.length" class="space-y-3">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Custom Lenses</p>
+                  <template x-for="cl in scorecardData.custom_lenses" :key="cl.id">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span x-text="cl.emoji || '🔧'"></span>
+                        <span class="text-sm text-slate-200" x-text="cl.name"></span>
+                        <span class="text-xs text-slate-500 font-mono" x-text="cl.expression"></span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span x-show="cl.error" class="text-xs text-red-400" x-text="cl.error"></span>
+                        <span x-show="!cl.error && cl.type === 'filter'"
+                              class="text-xs font-semibold px-2 py-0.5 rounded"
+                              :class="cl.passed ? 'bg-emerald-900/50 text-emerald-300' : 'bg-red-900/50 text-red-300'"
+                              x-text="cl.passed ? '✓ Pass' : '✗ Fail'"></span>
+                        <span x-show="!cl.error && cl.type === 'score'"
+                              class="text-xs font-bold" :class="(cl.score||0) >= 65 ? 'text-emerald-400' : 'text-amber-400'"
+                              x-text="cl.score + '/100'"></span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Raw screen scores reference -->
+                <div class="space-y-2">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Individual Screens</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <template x-for="[k, v] in Object.entries(scorecardData.raw_screens)" :key="k">
+                      <div class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2">
+                        <p class="text-xs text-slate-500 capitalize" x-text="k.replace('_', ' ')"></p>
+                        <p class="text-sm font-semibold mt-0.5"
+                           :class="(v.passed) ? 'text-emerald-400' : 'text-amber-400'"
+                           x-text="v.score != null ? (v.pct != null ? v.pct.toFixed(0) + '%' : v.score) : '—'"></p>
+                        <p class="text-xs text-slate-600" x-text="v.label || ''"></p>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+              </div>
+            </template>
+          </div>
+
+          <!-- More (AI) tabs — generic renderer for all extended research sections -->
+          <template x-for="t in moreAISections" :key="t">
+            <div x-show="perStockTab === t" x-cloak x-init="$watch('perStockTab', v => { if (v === t) fetchSectionDataIfNeeded(t); })">
+              <section class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                <!-- Header row -->
+                <div class="flex items-start justify-between mb-5">
+                  <div>
+                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2" x-text="perStockTabLabels[t]"></h3>
+                    <span x-show="hasResearchData(t)" class="text-xs text-slate-400 mt-0.5 block" x-text="'Last researched ' + formatResearchDate(getSectionData(t)?.updated_at)"></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <!-- Version pill -->
+                    <button x-show="hasResearchData(t)"
+                      @click="toggleResearchVersions(t)"
+                      class="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border transition"
+                      :class="researchVersionOpen === researchVersionKey(t) ? 'bg-teal-50 border-teal-300 text-teal-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300'">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      History
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Version history drawer -->
+                <div x-show="researchVersionOpen === researchVersionKey(t)" x-collapse class="mb-4 bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  <p class="text-xs text-slate-500 mb-2">Previous versions</p>
+                  <template x-if="(researchVersions[researchVersionKey(t)] || []).length === 0">
+                    <p class="text-xs text-slate-400">No previous versions.</p>
+                  </template>
+                  <template x-for="(v, idx) in (researchVersions[researchVersionKey(t)] || [])" :key="idx">
+                    <div class="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0 text-xs">
+                      <span class="text-slate-600" x-text="formatResearchDate(v.updated_at)"></span>
+                      <div class="flex gap-2">
+                        <button @click="restoreResearchVersion(t, idx)" class="text-teal-600 hover:text-teal-800">Restore</button>
+                        <button @click="deleteResearchVersion(t, idx)" class="text-rose-500 hover:text-rose-700">Delete</button>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Loading -->
+                <div x-show="isSectionLoading(t)" class="text-slate-500 text-sm flex items-center gap-2">
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                  Loading…
+                </div>
+
+                <!-- No data state -->
+                <div x-show="!hasResearchData(t) && !isSectionLoading(t)" class="text-center py-8">
+                  <p class="text-slate-400 text-sm mb-3">No AI research yet for <span class="font-medium" x-text="perStockTabLabels[t]"></span>.</p>
+                  <p class="text-xs text-slate-400 mb-4">Run AI Research and select this section to populate it.</p>
+                  <code class="text-xs bg-slate-100 px-2 py-1 rounded" x-text="'research ' + (perStockSymbol||'') + ' --section ' + t"></code>
+                </div>
+
+                <!-- Rendered data -->
+                <div x-show="hasResearchData(t) && !isSectionLoading(t)" x-html="renderMoreAISection(t)"></div>
+              </section>
+            </div>
+          </template>
+        </div>
+
+        <p x-show="page === 'per_stock' && !perStockRow && !loading && perStockSymbol" class="text-slate-500">Load Sharia data for this symbol to see overview.</p>
+      </div>
+
+      <!-- Stock Comparison -->

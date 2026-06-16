@@ -2,11 +2,17 @@
 """
 Yahoo Finance service: fetch per-company data by section.
 Caches results in memory; force=True bypasses cache.
+Market-section (live prices) also persisted to SQLite with a 15-minute TTL
+so prices survive uvicorn reloads.
 """
 
 from __future__ import annotations
 
+import json
 import math
+import sqlite3
+import time
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yfinance as yf
@@ -15,6 +21,45 @@ import numpy as np
 
 # In-memory cache: (symbol, section) -> data
 _YF_CACHE: Dict[tuple, Dict[str, Any]] = {}
+
+# SQLite price cache — persists across reloads
+_PRICE_CACHE_TTL = 15 * 60  # 15 minutes
+_PRICE_DB_PATH = Path(__file__).parent.parent.parent / "raw_data" / "price_cache.db"
+
+
+def _price_db() -> sqlite3.Connection:
+    _PRICE_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(_PRICE_DB_PATH)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS price_cache "
+        "(key TEXT PRIMARY KEY, data TEXT, ts REAL)"
+    )
+    conn.commit()
+    return conn
+
+
+def _price_cache_get(key: str) -> Optional[Dict]:
+    try:
+        with _price_db() as conn:
+            row = conn.execute(
+                "SELECT data, ts FROM price_cache WHERE key=?", (key,)
+            ).fetchone()
+        if row and (time.time() - row[1]) < _PRICE_CACHE_TTL:
+            return json.loads(row[0])
+    except Exception:
+        pass
+    return None
+
+
+def _price_cache_set(key: str, data: Dict) -> None:
+    try:
+        with _price_db() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO price_cache(key, data, ts) VALUES(?,?,?)",
+                (key, json.dumps(data), time.time()),
+            )
+    except Exception:
+        pass
 
 
 def _ensure_ticker(symbol: str, market: str = "india") -> str:
@@ -390,12 +435,23 @@ def get_section_data(symbol: str, section: str, force: bool = False, market: str
     Sections: overview, market, financials, valuation.
     Results are cached unless force=True.
     market: 'india' (default) or 'us' — controls ticker suffix handling.
+
+    'market' section is also persisted to SQLite (raw_data/price_cache.db) with a
+    15-minute TTL so live prices survive uvicorn --reload cycles.
     """
     ticker_str = _ensure_ticker(symbol, market)
     cache_key = (ticker_str, section)
 
-    if not force and cache_key in _YF_CACHE:
-        return _YF_CACHE[cache_key].copy()
+    if not force:
+        # 1. Hot in-memory cache (fastest)
+        if cache_key in _YF_CACHE:
+            return _YF_CACHE[cache_key].copy()
+        # 2. Warm SQLite disk cache for market (price) data
+        if section == "market":
+            cached = _price_cache_get(ticker_str)
+            if cached is not None:
+                _YF_CACHE[cache_key] = cached  # promote to memory
+                return cached.copy()
 
     try:
         ticker = yf.Ticker(ticker_str)
@@ -417,6 +473,8 @@ def get_section_data(symbol: str, section: str, force: bool = False, market: str
         data["symbol"] = symbol
         data["_ticker"] = ticker_str
         _YF_CACHE[cache_key] = data.copy()
+        if section == "market":
+            _price_cache_set(ticker_str, data.copy())
         # Track which enrichable fields are missing from this provider
         try:
             from modules.market.field_gaps import record_field_gaps

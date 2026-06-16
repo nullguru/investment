@@ -80,6 +80,7 @@ DEFAULT_SETTINGS = {
     "portfolioInvestedSince": "",
     "computeN": 50,
     "computeWorkers": 5,
+    "holdingMarkets": {},
 }
 
 # Default portfolio text per market (for first-time settings)
@@ -212,6 +213,7 @@ class SettingsBody(BaseModel):
     portfolioInvestedSince: str = ""
     computeN: int = 50
     computeWorkers: int = 5
+    holdingMarkets: dict = {}
 
 
 @app.get("/api/settings")
@@ -881,6 +883,79 @@ class ReplacementBody(BaseModel):
     exclude_symbols: list[str] = []
     market: str = "india"
     top_n: int = 5
+
+
+class PolicyAnalysisBody(BaseModel):
+    holdings: list[dict] = []
+    market: str = "india"
+
+
+@app.post("/api/portfolio/policy-analysis")
+def api_portfolio_policy_analysis(body: PolicyAnalysisBody):
+    """
+    Run policy-aware gap analysis + find universe candidates for each gap.
+
+    Returns: summary, cap_allocation, sector_weights, gaps, candidates (with Sharia tags).
+    This is the backbone for the theory→diagnosis→prescription chain in the portfolio page.
+    """
+    from modules.portfolio.policy import analyze_portfolio, find_gap_candidates
+
+    if not body.holdings:
+        return {"error": "No holdings provided"}
+
+    result = analyze_portfolio(body.holdings, market=body.market)
+    if result.get("error"):
+        return result
+
+    existing_symbols = {h.get("symbol", "") for h in body.holdings}
+    result["candidates"] = find_gap_candidates(
+        result.get("gaps", []),
+        existing_symbols,
+        market=body.market,
+    )
+    return result
+
+
+class DeploymentScenariosBody(BaseModel):
+    holdings: list[dict] = []
+    amounts: list[int] = [25_000, 50_000, 75_000, 100_000]
+    market: str = "india"
+
+
+@app.post("/api/portfolio/deployment-scenarios")
+def api_deployment_scenarios(body: DeploymentScenariosBody):
+    """
+    Compute deployment scenarios for a set of new-money amounts.
+
+    Runs a full policy analysis first, then models how to allocate each amount
+    across: replace non-Sharia → fill sector gaps → top up underweights → remainder.
+
+    Skips any buy where the allocated slice is less than one unit price.
+    """
+    from modules.portfolio.policy import analyze_portfolio, find_gap_candidates
+    from modules.portfolio.scenarios import compute_deployment_scenarios
+
+    if not body.holdings:
+        return {"error": "No holdings provided"}
+
+    result = analyze_portfolio(body.holdings, market=body.market)
+    if result.get("error"):
+        return result
+
+    existing_symbols = {h.get("symbol", "") for h in body.holdings}
+    result["candidates"] = find_gap_candidates(
+        result.get("gaps", []),
+        existing_symbols,
+        market=body.market,
+    )
+
+    scenarios = compute_deployment_scenarios(
+        holdings=result.get("stock_weights", []),
+        policy_result=result,
+        amounts=body.amounts,
+        market=body.market,
+    )
+    return {"scenarios": scenarios}
 
 
 @app.post("/api/portfolio/replacements")
@@ -1687,6 +1762,44 @@ async def api_trades_import_upload(file: UploadFile = File(...)):
     import tempfile, shutil
     from pathlib import Path
     from modules.trades.importer import import_from_xlsx
+
+    suffix = Path(file.filename or "upload.xlsx").suffix or ".xlsx"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        tmp_path = Path(tmp.name)
+
+    try:
+        result = import_from_xlsx(tmp_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+    return result
+
+
+# ── Mutual Fund Holdings ───────────────────────────────────────────────────────
+
+@app.get("/api/mf/holdings")
+def api_mf_holdings():
+    """Return stored MF holdings snapshot (auto-imports from default file if needed)."""
+    from modules.trades.mf_importer import get_holdings
+    data = get_holdings()
+    if not data:
+        return {"holdings": [], "summary": {}, "as_of_date": "", "imported_at": ""}
+    return data
+
+
+@app.post("/api/mf/import")
+def api_mf_import():
+    """Re-import MF holdings from the default Excel file."""
+    from modules.trades.mf_importer import import_from_xlsx
+    return import_from_xlsx()
+
+
+@app.post("/api/mf/upload")
+async def api_mf_upload(file: UploadFile = File(...)):
+    """Upload a Mutual Funds Excel file and import holdings from it."""
+    import tempfile, shutil
+    from modules.trades.mf_importer import import_from_xlsx
 
     suffix = Path(file.filename or "upload.xlsx").suffix or ".xlsx"
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:

@@ -1,0 +1,590 @@
+      <div x-show="page === 'trades'" x-cloak class="space-y-6">
+
+        <!-- Header row -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 class="text-xl font-semibold text-slate-100">Trade Journal</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Every decision — with the reasoning, the risks, and the emotional temperature at the time.</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button @click="openTradeForm()"
+                    class="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium rounded-lg transition">
+              + Record Trade
+            </button>
+            <button @click="openImportModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium rounded-lg transition border border-slate-600">
+              📥 Import from Broker
+            </button>
+          </div>
+        </div>
+
+        <!-- Broker Import Modal -->
+        <div x-show="importModalOpen" x-cloak
+             class="fixed inset-0 bg-black/60 z-50 flex items-start justify-center pt-16 px-4"
+             @keydown.escape.window="importModalOpen = false">
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 flex-shrink-0">
+              <div>
+                <h2 class="text-base font-semibold text-slate-100">📥 Import Broker Order History</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Preview and import executed orders from your broker export</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <label class="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg cursor-pointer border border-slate-600 transition">
+                  📂 Upload File
+                  <input type="file" accept=".xlsx,.xls" class="hidden" @change="handleImportFile($event)">
+                </label>
+                <button @click="importModalOpen = false" class="text-slate-500 hover:text-slate-300 text-xl leading-none">&times;</button>
+              </div>
+            </div>
+
+            <!-- Stats bar -->
+            <div x-show="importRows.length > 0" class="flex items-center gap-6 px-6 py-3 bg-slate-800/60 border-b border-slate-700 text-xs flex-shrink-0">
+              <span class="text-slate-300"><span class="font-semibold text-slate-100" x-text="importRows.length"></span> rows</span>
+              <span class="text-emerald-400"><span class="font-semibold" x-text="importRows.filter(r => !r.already_imported).length"></span> new</span>
+              <span class="text-slate-500"><span class="font-semibold" x-text="importRows.filter(r => r.already_imported).length"></span> already imported</span>
+              <label class="ml-auto flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" x-model="importHideExisting" class="rounded">
+                <span class="text-slate-400">Hide already imported</span>
+              </label>
+            </div>
+
+            <!-- Loading -->
+            <div x-show="importLoading" class="flex items-center justify-center py-12 text-slate-400 text-sm flex-shrink-0">
+              <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+              Loading preview…
+            </div>
+
+            <!-- Error -->
+            <div x-show="importError" class="px-6 py-3 bg-red-900/30 border-b border-red-700 text-red-300 text-xs flex-shrink-0" x-text="importError"></div>
+
+            <!-- Preview table -->
+            <div x-show="!importLoading && importRows.length > 0" class="overflow-y-auto flex-1">
+              <table class="w-full text-xs">
+                <thead class="sticky top-0 bg-slate-800 z-10">
+                  <tr class="text-slate-400 text-left">
+                    <th class="px-4 py-2 font-medium">Symbol</th>
+                    <th class="px-4 py-2 font-medium">Action</th>
+                    <th class="px-4 py-2 font-medium text-right">Qty</th>
+                    <th class="px-4 py-2 font-medium text-right">Price</th>
+                    <th class="px-4 py-2 font-medium text-right">Value</th>
+                    <th class="px-4 py-2 font-medium">Exchange</th>
+                    <th class="px-4 py-2 font-medium">Date</th>
+                    <th class="px-4 py-2 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="row in importRowsFiltered()" :key="row.order_id">
+                    <tr :class="row.already_imported ? 'opacity-40' : 'hover:bg-slate-800/50'"
+                        class="border-t border-slate-800 transition-colors">
+                      <td class="px-4 py-2 font-mono text-slate-200" x-text="row.symbol"></td>
+                      <td class="px-4 py-2">
+                        <span :class="row.action === 'BUY' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-red-900/60 text-red-300'"
+                              class="px-1.5 py-0.5 rounded text-xs font-semibold" x-text="row.action"></span>
+                      </td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="row.quantity"></td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="'₹' + row.price.toFixed(2)"></td>
+                      <td class="px-4 py-2 text-right text-slate-300" x-text="'₹' + row.value.toLocaleString('en-IN', {maximumFractionDigits:2})"></td>
+                      <td class="px-4 py-2 text-slate-400" x-text="row.exchange"></td>
+                      <td class="px-4 py-2 text-slate-400" x-text="row.date"></td>
+                      <td class="px-4 py-2">
+                        <span x-show="row.already_imported" class="text-slate-500 text-xs">✓ imported</span>
+                        <span x-show="!row.already_imported" class="text-emerald-400 text-xs">new</span>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty state -->
+            <div x-show="!importLoading && importRows.length === 0 && !importError" class="flex flex-col items-center justify-center py-16 text-slate-500 text-sm flex-shrink-0">
+              <p class="text-2xl mb-2">📂</p>
+              <p>Click "Load default file" or upload a broker Excel export</p>
+              <button @click="loadImportPreview()" class="mt-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg border border-slate-600 transition">
+                Load default file
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between px-6 py-4 border-t border-slate-700 flex-shrink-0">
+              <div x-show="importResult" class="text-xs">
+                <span class="text-emerald-400">✓ <span x-text="importResult && importResult.imported"></span> imported</span>
+                <span x-show="importResult && importResult.duplicate > 0" class="text-slate-400 ml-3">
+                  <span x-text="importResult && importResult.duplicate"></span> duplicates skipped
+                </span>
+                <span x-show="importResult && importResult.errors && importResult.errors.length > 0" class="text-red-400 ml-3">
+                  <span x-text="importResult && importResult.errors.length"></span> errors
+                </span>
+              </div>
+              <div x-show="!importResult" class="text-xs text-slate-500">All prices derived as value ÷ quantity from broker data</div>
+              <div class="flex items-center gap-3">
+                <button @click="importModalOpen = false" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm rounded-lg border border-slate-600 transition">
+                  Close
+                </button>
+                <button @click="runImport()"
+                        x-show="importRows.filter(r => !r.already_imported).length > 0 && !importResult"
+                        :disabled="importRunning"
+                        class="px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition flex items-center gap-2">
+                  <span x-show="importRunning" class="animate-spin text-xs">⟳</span>
+                  Import <span x-text="importRows.filter(r => !r.already_imported).length"></span> trades
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open Positions strip -->
+        <div x-show="tradePositions.length > 0">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Open Positions (from ledger)</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            <template x-for="pos in tradePositions" :key="pos.symbol">
+              <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-1">
+                <p class="text-sm font-bold text-slate-100" x-text="pos.symbol.replace('.NS','').replace('.BO','')"></p>
+                <p class="text-xs text-slate-400"><span class="text-slate-300" x-text="pos.units"></span> units @ <span class="text-slate-300" x-text="'₹' + (pos.avg_cost||0).toFixed(2)"></span></p>
+                <template x-if="pos.current_price">
+                  <div>
+                    <p class="text-xs" :class="(pos.unrealized_pnl||0) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+                       x-text="((pos.unrealized_pnl||0) >= 0 ? '+' : '') + '₹' + (pos.unrealized_pnl||0).toLocaleString(undefined,{maximumFractionDigits:0}) + ' (' + (pos.unrealized_pnl_pct||0).toFixed(1) + '%)'"></p>
+                    <p class="text-xs text-slate-500" x-text="'CMP ₹' + (pos.current_price||0).toFixed(2)"></p>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Realized P&L summary -->
+        <div x-show="tradePnl.realized_trades && tradePnl.realized_trades.length > 0"
+             class="bg-slate-800 border border-slate-700 rounded-xl px-5 py-3 flex items-center gap-6 text-sm">
+          <div>
+            <p class="text-xs text-slate-500 uppercase tracking-wide">Total Realized P&amp;L</p>
+            <p class="text-lg font-bold" :class="(tradePnl.total_realized_pnl||0) >= 0 ? 'text-emerald-400' : 'text-red-400'"
+               x-text="((tradePnl.total_realized_pnl||0) >= 0 ? '+' : '') + '₹' + (tradePnl.total_realized_pnl||0).toLocaleString(undefined,{maximumFractionDigits:0})"></p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 uppercase tracking-wide">Closed Trades</p>
+            <p class="text-lg font-bold text-slate-200" x-text="(tradePnl.realized_trades||[]).length"></p>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex gap-2 flex-wrap">
+          <template x-for="[val, label] in [['all','All'],['BUY','Buys'],['SELL','Sells'],['planned','Planned'],['executed','Executed']]" :key="val">
+            <button @click="tradeFilter = val"
+                    :class="tradeFilter === val ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+                    x-text="label"></button>
+          </template>
+        </div>
+
+        <!-- Empty state -->
+        <div x-show="!tradesLoading && filteredTrades().length === 0"
+             class="text-center py-16 text-slate-500 text-sm">
+          <p class="text-3xl mb-3">📒</p>
+          <p class="font-medium text-slate-300">No trades recorded yet</p>
+          <p class="mt-1">Click <strong>+ Record Trade</strong> to log your first decision.</p>
+        </div>
+
+        <!-- Trade cards -->
+        <div class="space-y-4">
+          <template x-for="trade in filteredTrades()" :key="trade.id">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden"
+                 x-data="{ expanded: false }">
+
+              <!-- Card header -->
+              <div class="px-5 py-4 flex items-start justify-between gap-4 cursor-pointer"
+                   @click="expanded = !expanded">
+                <div class="flex items-center gap-3 min-w-0">
+                  <!-- Action badge -->
+                  <span class="text-xs font-bold px-2 py-0.5 rounded border"
+                        :class="trade.action === 'BUY' ? 'border-emerald-700 bg-emerald-900/40 text-emerald-300' : 'border-red-700 bg-red-900/40 text-red-300'"
+                        x-text="trade.action"></span>
+                  <!-- Symbol -->
+                  <span class="font-bold text-slate-100" x-text="(trade.symbol||'').replace('.NS','').replace('.BO','')"></span>
+                  <!-- Units × Price -->
+                  <span class="text-sm text-slate-400"
+                        x-text="trade.units + ' × ₹' + Number(trade.price).toLocaleString(undefined,{maximumFractionDigits:2})"></span>
+                  <!-- Total -->
+                  <span class="text-sm font-semibold text-slate-200"
+                        x-text="'= ₹' + Number(trade.total_value||trade.units*trade.price).toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+                </div>
+                <div class="flex items-center gap-3 flex-shrink-0">
+                  <span class="text-xs text-slate-500" x-text="trade.date"></span>
+                  <span class="text-xs px-2 py-0.5 rounded border" :class="tradeStatusBadge(trade.status)" x-text="trade.status"></span>
+                  <span class="text-lg" :title="trade.emotion_check" x-text="emotionEmoji(trade.emotion_check)"></span>
+                  <span class="text-xs" :class="convictionColor(trade.conviction)" x-text="({high:'⬆ High',medium:'➡ Med',low:'⬇ Low'})[trade.conviction]||''"></span>
+                  <svg class="w-4 h-4 text-slate-500 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+
+              <!-- Reasoning preview (always visible) -->
+              <div x-show="trade.reasoning && !expanded" class="px-5 pb-3">
+                <p class="text-xs text-slate-400 italic line-clamp-2" x-text="trade.reasoning"></p>
+              </div>
+
+              <!-- Expanded body -->
+              <div x-show="expanded" class="border-t border-slate-700">
+                <div class="grid md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-700">
+
+                  <!-- Left: Decision context -->
+                  <div class="p-5 space-y-4">
+                    <!-- Reasoning -->
+                    <div x-show="trade.reasoning">
+                      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Reasoning</p>
+                      <p class="text-sm text-slate-300 leading-relaxed" x-text="trade.reasoning"></p>
+                    </div>
+                    <!-- Risks -->
+                    <div x-show="trade.risks_acknowledged && trade.risks_acknowledged.length">
+                      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Risks Acknowledged</p>
+                      <ul class="space-y-1">
+                        <template x-for="risk in (trade.risks_acknowledged||[])" :key="risk">
+                          <li class="text-xs text-amber-300 flex gap-1.5"><span class="text-amber-500 mt-0.5">⚠</span><span x-text="risk"></span></li>
+                        </template>
+                      </ul>
+                    </div>
+                    <!-- Exit plan -->
+                    <div x-show="trade.exit_plan && (trade.exit_plan.target_price || trade.exit_plan.stop_loss)">
+                      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Exit Plan</p>
+                      <div class="flex gap-4 text-xs">
+                        <span x-show="trade.exit_plan.target_price" class="text-emerald-400">🎯 ₹<span x-text="trade.exit_plan.target_price"></span></span>
+                        <span x-show="trade.exit_plan.stop_loss" class="text-red-400">🛑 ₹<span x-text="trade.exit_plan.stop_loss"></span></span>
+                        <span x-show="trade.exit_plan.horizon" class="text-slate-400">⏳ <span x-text="trade.exit_plan.horizon"></span></span>
+                      </div>
+                      <p x-show="trade.exit_plan.exit_trigger" class="text-xs text-slate-500 mt-1 italic" x-text="trade.exit_plan.exit_trigger"></p>
+                    </div>
+                  </div>
+
+                  <!-- Right: Pre-trade health check -->
+                  <div class="p-5 space-y-3">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pre-Trade Health Check</p>
+                    <template x-if="trade.pre_trade_check && Object.keys(trade.pre_trade_check).length">
+                      <div class="space-y-2">
+                        <!-- Sharia -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">Sharia</span>
+                          <span class="text-xs font-semibold px-2 py-0.5 rounded"
+                                :class="trade.pre_trade_check.sharia_status==='Compliant' ? 'bg-emerald-900/50 text-emerald-300' : trade.pre_trade_check.sharia_status==='Doubtful' ? 'bg-amber-900/50 text-amber-300' : 'bg-red-900/50 text-red-300'"
+                                x-text="trade.pre_trade_check.sharia_status || '—'"></span>
+                        </div>
+                        <!-- Quality -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">Quality Score</span>
+                          <span class="text-xs font-semibold"
+                                :class="(trade.pre_trade_check.quality_score||0) >= 65 ? 'text-emerald-400' : (trade.pre_trade_check.quality_score||0) >= 50 ? 'text-amber-400' : 'text-red-400'"
+                                x-text="trade.pre_trade_check.quality_score != null ? trade.pre_trade_check.quality_score + '/100 ' + (trade.pre_trade_check.quality_label||'') : '—'"></span>
+                        </div>
+                        <!-- Red flags -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">Red Flags</span>
+                          <span class="text-xs font-semibold"
+                                :class="(trade.pre_trade_check.red_flag_count||0) <= 1 ? 'text-emerald-400' : (trade.pre_trade_check.red_flag_count||0) <= 2 ? 'text-amber-400' : 'text-red-400'"
+                                x-text="trade.pre_trade_check.red_flag_count != null ? trade.pre_trade_check.red_flag_count + ' / 8' : '—'"></span>
+                        </div>
+                        <!-- Piotroski -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">Piotroski F-Score</span>
+                          <span class="text-xs font-semibold"
+                                :class="(trade.pre_trade_check.piotroski_score||0) >= 7 ? 'text-emerald-400' : (trade.pre_trade_check.piotroski_score||0) >= 5 ? 'text-amber-400' : 'text-red-400'"
+                                x-text="trade.pre_trade_check.piotroski_score != null ? trade.pre_trade_check.piotroski_score + ' / 9' : '—'"></span>
+                        </div>
+                        <!-- vs 200 DMA -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">vs 200 DMA</span>
+                          <span class="text-xs font-semibold"
+                                :class="(trade.pre_trade_check.vs_200dma_pct||0) < 0 ? 'text-emerald-400' : (trade.pre_trade_check.vs_200dma_pct||0) < 10 ? 'text-amber-400' : 'text-red-400'"
+                                x-text="trade.pre_trade_check.vs_200dma_pct != null ? (trade.pre_trade_check.vs_200dma_pct > 0 ? '+' : '') + trade.pre_trade_check.vs_200dma_pct.toFixed(1) + '%' : '—'"></span>
+                        </div>
+                        <!-- DCF MOS -->
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs text-slate-400">DCF Margin of Safety</span>
+                          <span class="text-xs font-semibold"
+                                :class="(trade.pre_trade_check.dcf_mos_pct||0) > 15 ? 'text-emerald-400' : (trade.pre_trade_check.dcf_mos_pct||0) > 0 ? 'text-amber-400' : 'text-red-400'"
+                                x-text="trade.pre_trade_check.dcf_mos_pct != null ? (trade.pre_trade_check.dcf_mos_pct > 0 ? '+' : '') + trade.pre_trade_check.dcf_mos_pct.toFixed(1) + '%' : '—'"></span>
+                        </div>
+                        <!-- Warnings -->
+                        <template x-if="trade.pre_trade_check.warnings && trade.pre_trade_check.warnings.length">
+                          <div class="pt-2 space-y-1">
+                            <template x-for="w in trade.pre_trade_check.warnings" :key="w">
+                              <p class="text-xs text-amber-400 flex gap-1.5"><span>⚠</span><span x-text="w"></span></p>
+                            </template>
+                          </div>
+                        </template>
+                        <!-- Blocks -->
+                        <template x-if="trade.pre_trade_check.blocks && trade.pre_trade_check.blocks.length">
+                          <div class="pt-1 space-y-1">
+                            <template x-for="b in trade.pre_trade_check.blocks" :key="b">
+                              <p class="text-xs text-red-400 font-medium flex gap-1.5"><span>🛑</span><span x-text="b"></span></p>
+                            </template>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                    <p x-show="!trade.pre_trade_check || !Object.keys(trade.pre_trade_check).length" class="text-xs text-slate-600 italic">No health check recorded</p>
+                  </div>
+                </div>
+
+                <!-- Footer actions -->
+                <div class="px-5 py-3 border-t border-slate-700 flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex gap-2">
+                    <template x-if="trade.status === 'planned'">
+                      <button @click="updateTradeStatus(trade.id, 'executed')"
+                              class="text-xs px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition">
+                        ✓ Mark Executed
+                      </button>
+                    </template>
+                    <template x-if="trade.status === 'planned'">
+                      <button @click="updateTradeStatus(trade.id, 'cancelled')"
+                              class="text-xs px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition">
+                        Cancel
+                      </button>
+                    </template>
+                  </div>
+                  <button @click="deleteTrade(trade.id)"
+                          class="text-xs text-red-500 hover:text-red-400 transition">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- ── RECORD TRADE MODAL ─────────────────────────────────────────── -->
+        <div x-show="tradeFormOpen"
+             class="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-4 px-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
+             @keydown.escape.window="tradeFormOpen = false">
+          <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl">
+
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+              <h2 class="text-base font-semibold text-slate-100">Record Trade Decision</h2>
+              <button @click="tradeFormOpen = false" class="text-slate-500 hover:text-slate-300 text-xl leading-none">&times;</button>
+            </div>
+
+            <div class="px-6 py-5 space-y-5">
+
+              <!-- Symbol + Action + Price -->
+              <div class="grid grid-cols-3 gap-3">
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Symbol</label>
+                  <input x-model="tradeForm.symbol" @change="tradeCheckResult = null"
+                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 uppercase"
+                         placeholder="INFY.NS" />
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Action</label>
+                  <select x-model="tradeForm.action" @change="tradeCheckResult = null"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="BUY">BUY</option>
+                    <option value="SELL">SELL</option>
+                    <option value="PARTIAL_SELL">PARTIAL SELL</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Price (₹)</label>
+                  <input x-model="tradeForm.price" type="number" @change="tradeCheckResult = null"
+                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                         placeholder="0.00" />
+                </div>
+              </div>
+
+              <!-- Units + Date + Status -->
+              <div class="grid grid-cols-3 gap-3">
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Units</label>
+                  <input x-model="tradeForm.units" type="number"
+                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                         placeholder="10" />
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Date</label>
+                  <input x-model="tradeForm.date" type="date"
+                         class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500" />
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Status</label>
+                  <select x-model="tradeForm.status"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="executed">Executed</option>
+                    <option value="planned">Planned</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Run pre-trade check -->
+              <div class="bg-slate-800 rounded-xl border border-slate-700 p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-semibold text-slate-300 uppercase tracking-wide">🔍 Pre-Trade Health Check</p>
+                  <button @click="runPretradeCheck()"
+                          :disabled="tradeCheckRunning || !tradeForm.symbol || !tradeForm.price"
+                          class="text-xs px-3 py-1.5 bg-teal-700 hover:bg-teal-600 disabled:opacity-40 text-white rounded-lg transition flex items-center gap-1.5">
+                    <span x-show="tradeCheckRunning" class="animate-spin">⟳</span>
+                    <span x-text="tradeCheckRunning ? 'Running…' : 'Run Check'"></span>
+                  </button>
+                </div>
+                <!-- Results -->
+                <template x-if="tradeCheckResult">
+                  <div>
+                    <!-- Blocks -->
+                    <template x-if="tradeCheckResult.blocks && tradeCheckResult.blocks.length">
+                      <div class="mb-3 space-y-1">
+                        <template x-for="b in tradeCheckResult.blocks" :key="b">
+                          <p class="text-xs text-red-400 font-semibold flex gap-2 bg-red-950/40 rounded-lg px-3 py-2 border border-red-800">
+                            <span>🛑</span><span x-text="b"></span>
+                          </p>
+                        </template>
+                      </div>
+                    </template>
+                    <!-- Signal grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2">
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Sharia</span>
+                        <span class="font-semibold"
+                              :class="tradeCheckResult.sharia_status==='Compliant' ? 'text-emerald-400' : tradeCheckResult.sharia_status==='Doubtful' ? 'text-amber-400' : 'text-red-400'"
+                              x-text="tradeCheckResult.sharia_status || '—'"></span>
+                      </div>
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Quality</span>
+                        <span class="font-semibold"
+                              :class="(tradeCheckResult.quality_score||0) >= 65 ? 'text-emerald-400' : 'text-amber-400'"
+                              x-text="tradeCheckResult.quality_score != null ? tradeCheckResult.quality_score + '/100' : '—'"></span>
+                      </div>
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Red Flags</span>
+                        <span class="font-semibold"
+                              :class="(tradeCheckResult.red_flag_count||0) <= 1 ? 'text-emerald-400' : 'text-red-400'"
+                              x-text="tradeCheckResult.red_flag_count != null ? tradeCheckResult.red_flag_count + ' / 8' : '—'"></span>
+                      </div>
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Piotroski</span>
+                        <span class="font-semibold"
+                              :class="(tradeCheckResult.piotroski_score||0) >= 5 ? 'text-emerald-400' : 'text-amber-400'"
+                              x-text="tradeCheckResult.piotroski_score != null ? tradeCheckResult.piotroski_score + ' / 9' : '—'"></span>
+                      </div>
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">vs 200 DMA</span>
+                        <span class="font-semibold"
+                              :class="(tradeCheckResult.vs_200dma_pct||0) <= 0 ? 'text-emerald-400' : 'text-amber-400'"
+                              x-text="tradeCheckResult.vs_200dma_pct != null ? (tradeCheckResult.vs_200dma_pct > 0 ? '+' : '') + tradeCheckResult.vs_200dma_pct.toFixed(1) + '%' : '—'"></span>
+                      </div>
+                      <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">DCF MOS</span>
+                        <span class="font-semibold"
+                              :class="(tradeCheckResult.dcf_mos_pct||0) > 0 ? 'text-emerald-400' : 'text-red-400'"
+                              x-text="tradeCheckResult.dcf_mos_pct != null ? (tradeCheckResult.dcf_mos_pct > 0 ? '+' : '') + tradeCheckResult.dcf_mos_pct.toFixed(1) + '%' : '—'"></span>
+                      </div>
+                    </div>
+                    <!-- Warnings -->
+                    <template x-if="tradeCheckResult.warnings && tradeCheckResult.warnings.length">
+                      <div class="mt-3 space-y-1">
+                        <template x-for="w in tradeCheckResult.warnings" :key="w">
+                          <p class="text-xs text-amber-400 flex gap-1.5"><span>⚠</span><span x-text="w"></span></p>
+                        </template>
+                      </div>
+                    </template>
+                    <!-- Thesis snippet -->
+                    <template x-if="tradeCheckResult.thesis_snippet">
+                      <div class="mt-3 pt-3 border-t border-slate-700">
+                        <p class="text-xs font-semibold text-slate-400 mb-1">Research Thesis</p>
+                        <p class="text-xs text-slate-400 italic leading-relaxed" x-text="tradeCheckResult.thesis_snippet"></p>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+                <p x-show="!tradeCheckResult && !tradeCheckRunning" class="text-xs text-slate-600 italic">
+                  Enter symbol &amp; price above, then run check to see Sharia, quality, red flags, and DCF signals.
+                </p>
+                <p x-show="tradeCheckError" class="text-xs text-red-400" x-text="tradeCheckError"></p>
+              </div>
+
+              <!-- Conviction + Emotion -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Conviction</label>
+                  <select x-model="tradeForm.conviction"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="high">⬆ High</option>
+                    <option value="medium">➡ Medium</option>
+                    <option value="low">⬇ Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-slate-400 block mb-1">Emotional State</label>
+                  <select x-model="tradeForm.emotion_check"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-teal-500">
+                    <option value="patient">🧘 Patient</option>
+                    <option value="uncertain">🤔 Uncertain</option>
+                    <option value="fearful">😰 Fearful</option>
+                    <option value="greedy">🤑 Greedy (FOMO)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Reasoning -->
+              <div>
+                <label class="text-xs font-medium text-slate-400 block mb-1">Why this trade? <span class="text-slate-600">(reasoning, catalysts, thesis)</span></label>
+                <textarea x-model="tradeForm.reasoning" rows="3"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          placeholder="e.g. Entering after Q3 beat, buying below 200 DMA, long-term moat intact…"></textarea>
+              </div>
+
+              <!-- Risks -->
+              <div>
+                <label class="text-xs font-medium text-slate-400 block mb-1">Risks acknowledged <span class="text-slate-600">(one per line)</span></label>
+                <textarea x-model="tradeForm.risks_acknowledged" rows="2"
+                          class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                          placeholder="USD/INR headwind&#10;Regulatory risk in key market"></textarea>
+              </div>
+
+              <!-- Exit plan -->
+              <div>
+                <p class="text-xs font-medium text-slate-400 mb-2">Exit Plan</p>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-xs text-slate-500 block mb-1">Target Price (₹)</label>
+                    <input x-model="tradeForm.exit_target" type="number"
+                           class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                           placeholder="2000" />
+                  </div>
+                  <div>
+                    <label class="text-xs text-slate-500 block mb-1">Stop Loss (₹)</label>
+                    <input x-model="tradeForm.exit_stop" type="number"
+                           class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                           placeholder="1200" />
+                  </div>
+                  <div>
+                    <label class="text-xs text-slate-500 block mb-1">Time Horizon</label>
+                    <input x-model="tradeForm.exit_horizon"
+                           class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                           placeholder="18-24 months" />
+                  </div>
+                  <div>
+                    <label class="text-xs text-slate-500 block mb-1">Exit Trigger</label>
+                    <input x-model="tradeForm.exit_trigger"
+                           class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                           placeholder="If D/E > 0.5 or Sharia fails" />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">
+              <button @click="tradeFormOpen = false"
+                      class="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition">Cancel</button>
+              <button @click="submitTrade()"
+                      :disabled="!tradeForm.symbol || !tradeForm.units || !tradeForm.price"
+                      class="px-5 py-2 text-sm font-medium bg-teal-600 hover:bg-teal-500 disabled:opacity-40 text-white rounded-lg transition">
+                Save Trade
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /trades -->
+
+      <!-- ════════════════════════════════════════════════════════════════
+           MF HOLDINGS
+           ════════════════════════════════════════════════════════════════ -->

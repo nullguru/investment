@@ -628,5 +628,602 @@
         "filled_at": null
       }
     }
+  },
+  "EICHERMOT.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:01:58.276492+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:01:58.276492+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "financials": {
+      "returnOnCapitalEmployed": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:18.768638+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "freeCashFlowYield": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:18.768638+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "workingCapitalDays": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:18.768638+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "overview": {
+      "pledgedSharesPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardSize": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardIndependencePct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "promoterHolding": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "managementTurnoverRisk": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "relatedPartyTransactions": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:42:19+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "HYUNDAI.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:01:59.162874+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:01:59.162874+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "financials": {
+      "returnOnCapitalEmployed": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.193985+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "freeCashFlowYield": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.193985+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "workingCapitalDays": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.193985+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "overview": {
+      "pledgedSharesPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardSize": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardIndependencePct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "promoterHolding": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "managementTurnoverRisk": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "relatedPartyTransactions": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:31:14.581822+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "LINDEINDIA.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:00.440748+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:00.440748+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "BERGEPAINT.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:01.417826+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:01.417826+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "FLUOROCHEM.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:02.257627+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:02.257627+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "DIVISLAB.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:04.126039+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:04.126039+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "DRREDDY.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:05.087902+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:05.087902+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "CGPOWER.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:05.928919+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:05.928919+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "ETERNAL.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:07.469902+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:07.469902+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "SAILIFE.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:08.827144+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:08.827144+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "SYNGENE.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:09.618689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:09.618689+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "METROPOLIS.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:10.574658+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:10.574658+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "GVT&D.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:39.633506+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:02:39.633506+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "TECHM.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:17.059859+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:17.059859+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "NESTLEIND.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:19.009422+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:19.009422+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "DMART.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:19.088941+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:40:19.088941+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "TCS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:08.041357+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:08.041357+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "INFY": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:08.707371+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:08.707371+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "HCLTECH": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:09.308842+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T20:49:09.308842+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "VMM.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:12:10.634361+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:12:10.634361+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "INDHOTEL.NS": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:12:11.116753+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:12:11.116753+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
+  },
+  "ADBE": {
+    "market": {
+      "shortInterestPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:16:09.410124+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "institutionalOwnershipChange": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-15T21:16:09.410124+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "overview": {
+      "pledgedSharesPct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardSize": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "boardIndependencePct": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "promoterHolding": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "managementTurnoverRisk": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "relatedPartyTransactions": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:08:54.536879+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    },
+    "financials": {
+      "returnOnCapitalEmployed": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:13:33.969718+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "freeCashFlowYield": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:13:33.969718+00:00",
+        "filled_by": null,
+        "filled_at": null
+      },
+      "workingCapitalDays": {
+        "status": "not_found_in_api",
+        "provider": "yfinance",
+        "checked_at": "2026-06-16T07:13:33.969718+00:00",
+        "filled_by": null,
+        "filled_at": null
+      }
+    }
   }
 }

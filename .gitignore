@@ -47,3 +47,6 @@ output/
 # Logs
 *.log
 logs/
+
+# Local offline backups (may contain financial data)
+investment-local-backup*.zip

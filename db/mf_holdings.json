@@ -1,0 +1,39 @@
+{
+  "imported_at": "2026-06-15T19:01:50.598516+00:00",
+  "as_of_date": "2026-06-15",
+  "summary": {
+    "total_invested": 253988.0,
+    "current_value": 230225.85,
+    "profit_loss": -23762.15,
+    "profit_loss_pct": -9.36,
+    "xirr_pct": -7.23
+  },
+  "holdings": [
+    {
+      "scheme_name": "Tata Ethical Direct Plan Growth",
+      "amc": "Tata Mutual Fund",
+      "category": "Equity",
+      "sub_category": "Thematic",
+      "folio_no": "11372837",
+      "source": "Groww",
+      "units": 507.046,
+      "invested_value": 228989.32,
+      "current_value": 206662.37,
+      "returns": -22326.953,
+      "xirr_pct": -7.37
+    },
+    {
+      "scheme_name": "Tata Ethical Direct Plan Growth",
+      "amc": "Tata Mutual Fund",
+      "category": "Equity",
+      "sub_category": "Thematic",
+      "folio_no": "13439366",
+      "source": "Groww",
+      "units": 57.813,
+      "invested_value": 24998.68,
+      "current_value": 23563.49,
+      "returns": -1435.1962,
+      "xirr_pct": -5.59
+    }
+  ]
+}
