@@ -619,17 +619,100 @@
         },
 
         advisorData() {
+          const mktOf = sym => (this.holdingMarkets || {})[sym] === 'US' ? 'US' : 'IN';
+          const rows = this.personalIndexInputRows || [];
+          const fx = this.usdInrRate || 84;
+          const inRows = rows.filter(r => mktOf(r.symbol) === 'IN');
+          const usRows = rows.filter(r => mktOf(r.symbol) === 'US');
+          const inStocksINR = inRows.reduce((s, r) => { const v = this.holdingCurrentValue(r); return s + (v ?? 0); }, 0);
+          const usStocksUSD = usRows.reduce((s, r) => { const v = this.holdingCurrentValue(r); return s + (v ?? 0); }, 0);
+          const usStocksINR = usStocksUSD * fx;
+          const mfINR = (this.mfSummary || {}).current_value || 0;
+          const mfInvested = (this.mfSummary || {}).total_invested || 0;
+          const stocksINR = inStocksINR + usStocksINR;
+          const totalINR = stocksINR + mfINR;
+          // Cost basis per bucket
+          const inStocksCost = inRows.reduce((s, r) => { const v = this.holdingCostBasis(r); return s + (v ?? 0); }, 0);
+          const usStocksCostINR = usRows.reduce((s, r) => { const v = this.holdingCostBasis(r); return s + (v ?? 0); }, 0) * fx;
+          const totalCost = inStocksCost + usStocksCostINR + mfInvested;
+          const totalPnL = totalCost > 0 ? totalINR - totalCost : null;
+          const totalPnLPct = totalCost > 0 ? (totalINR - totalCost) / totalCost * 100 : null;
+          const inPnL = inStocksCost > 0 ? inStocksINR - inStocksCost : null;
+          const inPnLPct = inStocksCost > 0 ? (inStocksINR - inStocksCost) / inStocksCost * 100 : null;
+          const usPnLINR = usStocksCostINR > 0 ? usStocksINR - usStocksCostINR : null;
+          const usPnLPct = usStocksCostINR > 0 ? (usStocksINR - usStocksCostINR) / usStocksCostINR * 100 : null;
+          const mfPnL = mfInvested > 0 ? mfINR - mfInvested : null;
+          const mfPnLPct = mfInvested > 0 ? (mfINR - mfInvested) / mfInvested * 100 : null;
+          // Allocation percentages
+          const pct = (v, t) => t > 0 ? Math.round(v / t * 1000) / 10 : 0;
+          const stocksPct = pct(stocksINR, totalINR);
+          const mfPct = pct(mfINR, totalINR);
+          const inStocksPct = pct(inStocksINR, totalINR);
+          const inGeo = pct(inStocksINR + mfINR, totalINR);
+          const usGeo = pct(usStocksINR, totalINR);
+          // Stocks vs MF signal
+          let sMfSignal = '', sMfAction = '', sMfColor = 'text-slate-300', sMfBg = 'bg-slate-700/30';
+          let sMfBorder = 'border-slate-600/30', sMfBadge = 'bg-slate-700/50 text-slate-300', sMfVerdict = 'No data';
+          if (totalINR > 0) {
+            if (mfPct > 55) {
+              sMfVerdict = 'Shift to Direct Equity';
+              sMfColor = 'text-amber-300'; sMfBg = 'bg-amber-900/20'; sMfBorder = 'border-amber-700/30'; sMfBadge = 'bg-amber-900/30 text-amber-300';
+              sMfSignal = 'MF is ' + mfPct.toFixed(0) + '% of wealth — well above the 10–30% buffer band.';
+              sMfAction = 'Redeploy new SIP money into direct equity. Exit thematic/underperforming MF folios first. The expense drag and limited Sharia fund universe make a large MF position inefficient at this portfolio size.';
+            } else if (mfPct < 5 && totalINR > 300000) {
+              sMfVerdict = 'Add MF as Buffer';
+              sMfColor = 'text-blue-300'; sMfBg = 'bg-blue-900/20'; sMfBorder = 'border-blue-700/30'; sMfBadge = 'bg-blue-900/30 text-blue-300';
+              sMfSignal = 'MF allocation is very low (' + mfPct.toFixed(0) + '%) for a portfolio of this size.';
+              sMfAction = 'Consider a small SIP into a Sharia-compliant equity MF to maintain diversification during deployment gaps. Target 10–15% MF as a cash deployment buffer.';
+            } else if (mfPct >= 10 && mfPct <= 35) {
+              sMfVerdict = 'Balanced — Maintain';
+              sMfColor = 'text-emerald-300'; sMfBg = 'bg-emerald-900/20'; sMfBorder = 'border-emerald-700/30'; sMfBadge = 'bg-emerald-900/30 text-emerald-300';
+              sMfSignal = 'MF at ' + mfPct.toFixed(0) + '% — within the ideal 10–30% buffer band.';
+              sMfAction = 'No rebalancing needed on this axis. Continue direct equity for new additions unless you need a sector you can not access with compliant individual stocks.';
+            } else {
+              sMfVerdict = 'Monitor';
+              sMfColor = 'text-slate-300'; sMfBg = 'bg-slate-700/30'; sMfBorder = 'border-slate-600/30'; sMfBadge = 'bg-slate-700/50 text-slate-300';
+              sMfSignal = 'MF at ' + mfPct.toFixed(0) + '% — acceptable, watch for drift.';
+              sMfAction = 'Borderline range. Bias new money toward direct equity to gradually move within the 10–30% target band.';
+            }
+          }
+          // IN vs US signal
+          let iUSignal = '', iUAction = '', iUColor = 'text-slate-300', iUBg = 'bg-slate-700/30';
+          let iUBorder = 'border-slate-600/30', iUBadge = 'bg-slate-700/50 text-slate-300', iUVerdict = 'No data';
+          if (totalINR > 0) {
+            if (usGeo < 5) {
+              iUVerdict = 'Add US Exposure';
+              iUColor = 'text-rose-300'; iUBg = 'bg-rose-900/20'; iUBorder = 'border-rose-700/30'; iUBadge = 'bg-rose-900/30 text-rose-300';
+              iUSignal = 'US is only ' + usGeo.toFixed(0) + '% of portfolio — INR depreciation erodes 3–4% of real returns annually.';
+              iUAction = 'Start a small US position. Sharia-compliant US tech stocks (ADBE, MSFT) offer low correlation with India (~0.3). Target 15–25% via LRS remittance — verify each stock on Musaffa.';
+            } else if (usGeo < 15) {
+              iUVerdict = 'Build US Position';
+              iUColor = 'text-amber-300'; iUBg = 'bg-amber-900/20'; iUBorder = 'border-amber-700/30'; iUBadge = 'bg-amber-900/30 text-amber-300';
+              iUSignal = 'US at ' + usGeo.toFixed(0) + '% — below the 15–25% ideal band.';
+              iUAction = 'Gradually add US exposure with each new deployment cycle. Prefer profitable tech with low debt ratios. Remember TCS applies above ₹7L LRS remittance annually.';
+            } else if (usGeo <= 30) {
+              iUVerdict = 'Ideal Balance';
+              iUColor = 'text-emerald-300'; iUBg = 'bg-emerald-900/20'; iUBorder = 'border-emerald-700/30'; iUBadge = 'bg-emerald-900/30 text-emerald-300';
+              iUSignal = 'US at ' + usGeo.toFixed(0) + '% — within the 15–30% sweet spot.';
+              iUAction = 'Maintain current mix. Rebalance annually. Let India equity grow relatively — do not chase US just to maintain a fixed ratio.';
+            } else {
+              iUVerdict = 'Pause US Additions';
+              iUColor = 'text-amber-300'; iUBg = 'bg-amber-900/20'; iUBorder = 'border-amber-700/30'; iUBadge = 'bg-amber-900/30 text-amber-300';
+              iUSignal = 'US at ' + usGeo.toFixed(0) + '% — above 30%, asymmetric FX risk now applies.';
+              iUAction = 'Pause new US additions. Redirect capital to Indian equity or MF until US dips below 25% of total. Avoid force-selling US positions for rebalancing — let it drift naturally.';
+            }
+          }
+          const nonSharia = (this.policyAnalysis?.non_sharia_holdings || []).length;
+          const mfXirr = (this.mfSummary || {}).xirr_pct || 0;
           return {
-            hasPortfolio: (this.personalIndexInputRows || []).length > 0,
-            hasPrices: (this.personalIndexHoldingsRows || []).length > 0,
-            policyAnalysis: this.policyAnalysis,
-            policyAnalysisLoading: this.policyAnalysisLoading,
-            policyAnalysisError: this.policyAnalysisError,
-            gaps: this.policyAnalysis?.gaps || [],
-            candidates: this.policyAnalysis?.candidates || [],
-            concentrationFlags: this.policyAnalysis?.concentration_flags || [],
-            scenarios: this.deploymentScenariosData || [],
-            scenariosLoading: this.deploymentScenariosLoading,
+            inStocksINR, usStocksINR, usStocksUSD, mfINR, stocksINR, totalINR,
+            totalCost, totalPnL, totalPnLPct,
+            inPnL, inPnLPct, usPnLINR, usPnLPct, mfPnL, mfPnLPct,
+            stocksPct, mfPct, inStocksPct, inGeo, usGeo, fx,
+            sMfSignal, sMfAction, sMfColor, sMfBg, sMfBorder, sMfBadge, sMfVerdict,
+            iUSignal, iUAction, iUColor, iUBg, iUBorder, iUBadge, iUVerdict,
+            nonSharia, mfXirr,
+            hasData: totalINR > 0,
           };
         },
 
