@@ -8,6 +8,18 @@ description: Investment analysis platform and decision framework — stock scree
 This is the canonical shared agent skill for this repository.
 Platform-specific wrappers in `.claude/skills/investment.md` and `.codex/skills/investment/SKILL.md` should refer here instead of duplicating workflow instructions.
 
+## UI Pages (for context)
+
+The web app (`./cli.py serve`) has these pages relevant to investment decisions:
+
+| Page | URL hash | What it does |
+|---|---|---|
+| **⬡ Recommendations** | `#recommendations` | Combined portfolio dashboard — total wealth across IN stocks + US stocks + MF, Stocks vs MF allocation advice, India vs US geographic mix advice, priority actions, Sharia status. Client-side only (Phase 1). |
+| **Portfolio** | `#portfolio` | Personal Sharia Index — holdings input, benchmark gap analysis (powered by `modules/portfolio/policy.py`), diagnosis, deployment scenarios. |
+| **MF Holdings** | `#mf` | Mutual fund snapshot imported from Groww XLSX (`modules/trades/mf_importer.py`), per-fund XIRR, Fund Diagnosis section with SIP/lumpsum/hold recommendation. |
+
+**⬡ Recommendations vs Advisor Council:** These are different things. The Recommendations page is a live UI dashboard showing portfolio allocation signals. The Advisor Council (described below) is a multi-viewpoint AI chat analysis mode triggered by investment decision questions. Do not confuse them.
+
 ## Setup
 
 ```bash

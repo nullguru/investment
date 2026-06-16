@@ -20,6 +20,7 @@ HERE = Path(__file__).parent
 
 PAGES = [
     'home',
+    'recommendations',
     'all_stocks',
     'per_stock',
     'comparison',

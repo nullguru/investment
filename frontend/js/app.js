@@ -9,7 +9,7 @@
         reportPeriods: ['All periods', '31st March 2025'],
         counts: {},
         tickers: [],
-        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', mf: 'MF Holdings', lenses: 'Lens Library', watchlist: 'Watchlist' },
+        navCards: { home: 'Home', recommendations: '⬡ Recommendations', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', mf: 'MF Holdings', lenses: 'Lens Library', watchlist: 'Watchlist' },
         tabulators: {},
         loading: false,
         allStocksRows: [],
@@ -147,6 +147,7 @@
         tradeCheckRunning: false,
         tradeCheckResult: null,
         tradeCheckError: '',
+        portfolioPricesLoading: false,
         // MF Holdings state
         mfHoldings: [],
         mfSummary: {},
@@ -560,6 +561,13 @@
           else if (this.page === 'lenses') {
             this.fetchLensLibrary();
           }
+          else if (this.page === 'recommendations') {
+            if (!this.personalIndexHoldingsRows.length && (this.personalIndexInputRows || []).length)
+              this.fetchPortfolioPrices();
+            if (!this.mfHoldings.length) this.fetchMfHoldings();
+            if (!this.usdInrRate) this.fetchUsdInrRate();
+            if (!this.policyAnalysis && !this.policyAnalysisLoading) this.fetchPolicyAnalysis();
+          }
         },
 
         // ── MF Holdings ──────────────────────────────────────────────────────
@@ -608,6 +616,21 @@
             total_current: g.folios.reduce((s, f) => s + f.current_value, 0),
             total_returns: g.folios.reduce((s, f) => s + f.returns, 0),
           }));
+        },
+
+        advisorData() {
+          return {
+            hasPortfolio: (this.personalIndexInputRows || []).length > 0,
+            hasPrices: (this.personalIndexHoldingsRows || []).length > 0,
+            policyAnalysis: this.policyAnalysis,
+            policyAnalysisLoading: this.policyAnalysisLoading,
+            policyAnalysisError: this.policyAnalysisError,
+            gaps: this.policyAnalysis?.gaps || [],
+            candidates: this.policyAnalysis?.candidates || [],
+            concentrationFlags: this.policyAnalysis?.concentration_flags || [],
+            scenarios: this.deploymentScenariosData || [],
+            scenariosLoading: this.deploymentScenariosLoading,
+          };
         },
 
         // ── Lens Library ─────────────────────────────────────────────────────
@@ -2891,6 +2914,7 @@
           // Silently fetch live prices via the analyze endpoint — populates personalIndexHoldingsRows
           const text = this.serializePersonalIndexRows('units');
           if (!text.trim()) return;
+          this.portfolioPricesLoading = true;
           try {
             const res = await fetch(API + '/personal-index/analyze', {
               method: 'POST',
@@ -2930,6 +2954,7 @@
               this.$nextTick(() => this.autoLoadReplacements());
             }
           } catch (_) {}
+          finally { this.portfolioPricesLoading = false; }
           // Run policy gap analysis in parallel — powers Diagnosis + Prescription sections
           this.fetchPolicyAnalysis();
         },

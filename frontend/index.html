@@ -265,6 +265,379 @@
 
       <!-- All Stocks -->
 
+      <!-- ⬡ Recommendations -->
+      <div x-show="page === 'recommendations'" x-cloak class="space-y-6">
+
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100">⬡ Recommendations</h1>
+          <div class="flex items-center gap-2">
+            <span x-show="portfolioPricesLoading" class="text-xs text-slate-400 animate-pulse">Loading prices…</span>
+            <span x-show="policyAnalysisLoading" class="text-xs text-slate-400 animate-pulse">Analysing portfolio…</span>
+            <span x-show="policyAnalysis && !policyAnalysisLoading"
+                  :class="policyAnalysis?.summary?.policy_met ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                  class="text-xs font-semibold px-2.5 py-1 rounded-full"
+                  x-text="policyAnalysis?.summary?.policy_met ? '✓ Policy met' : '⚠ Gaps found'"></span>
+          </div>
+        </div>
+
+        <!-- Empty state — no portfolio loaded -->
+        <template x-if="!personalIndexInputRows.length">
+          <div class="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-3xl">⬡</div>
+            <div>
+              <p class="text-slate-600 dark:text-slate-300 font-medium">No portfolio data yet</p>
+              <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Add holdings in Portfolio or import MF data to see recommendations.</p>
+            </div>
+            <div class="flex gap-3">
+              <button @click="go('portfolio')"
+                      class="px-4 py-2 rounded-xl bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition">
+                Go to Portfolio
+              </button>
+              <button @click="go('mf')"
+                      class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition">
+                Go to MF Holdings
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <!-- Diagnosis section — shown when portfolio is loaded -->
+        <template x-if="personalIndexInputRows.length">
+          <div class="space-y-6">
+
+            <!-- ② DIAGNOSIS -->
+            <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+              <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-bold uppercase tracking-widest text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">② Diagnosis</span>
+                  <h2 class="text-base font-semibold text-slate-800 dark:text-slate-100">Your Portfolio — Health Check</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span x-show="policyAnalysisLoading" class="text-xs text-slate-400 animate-pulse">Analysing…</span>
+                  <span x-show="policyAnalysisError && !policyAnalysisLoading" class="text-xs text-rose-500" x-text="policyAnalysisError"></span>
+                  <span x-show="policyAnalysis && !policyAnalysisLoading"
+                        :class="policyAnalysis?.summary?.policy_met ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+                        class="text-xs font-semibold px-2.5 py-1 rounded-full"
+                        x-text="policyAnalysis?.summary?.policy_met ? '✓ Policy met' : '⚠ Gaps found'"></span>
+                </div>
+              </div>
+
+              <template x-if="policyAnalysis">
+                <div>
+                  <!-- Scorecard chips -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <div class="rounded-xl border p-3"
+                         :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'">
+                      <p class="text-[10px] uppercase tracking-wider font-semibold"
+                         :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-600' : 'text-amber-600'">Stock Count</p>
+                      <p class="text-2xl font-bold mt-0.5"
+                         :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-700' : 'text-amber-700'"
+                         x-text="policyAnalysis.summary.stock_count"></p>
+                      <p class="text-[10px] mt-0.5"
+                         :class="(policyAnalysis.summary.stock_count >= 15 && policyAnalysis.summary.stock_count <= 18) ? 'text-emerald-600' : 'text-amber-600'"
+                         x-text="policyAnalysis.summary.stock_count < 15 ? 'Target 15–18, need ' + (15 - policyAnalysis.summary.stock_count) + ' more' : policyAnalysis.summary.stock_count > 18 ? 'Over ideal range' : 'Ideal range ✓'"></p>
+                    </div>
+                    <div class="rounded-xl border p-3"
+                         :class="policyAnalysis.summary.sector_count >= 8 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'">
+                      <p class="text-[10px] uppercase tracking-wider font-semibold"
+                         :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-600' : 'text-amber-600'">Sectors</p>
+                      <p class="text-2xl font-bold mt-0.5"
+                         :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-700' : 'text-amber-700'"
+                         x-text="policyAnalysis.summary.sector_count"></p>
+                      <p class="text-[10px] mt-0.5"
+                         :class="policyAnalysis.summary.sector_count >= 8 ? 'text-emerald-600' : 'text-amber-600'"
+                         x-text="policyAnalysis.summary.sector_count >= 8 ? 'Min 8 met ✓' : 'Need ' + (8 - policyAnalysis.summary.sector_count) + ' more'"></p>
+                    </div>
+                    <div class="rounded-xl border p-3"
+                         :class="policyAnalysis.gaps.length === 0 ? 'border-emerald-200 bg-emerald-50' : policyAnalysis.gaps.length <= 3 ? 'border-amber-200 bg-amber-50' : 'border-rose-200 bg-rose-50'">
+                      <p class="text-[10px] uppercase tracking-wider font-semibold"
+                         :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-600' : policyAnalysis.gaps.length <= 3 ? 'text-amber-600' : 'text-rose-600'">Sector Gaps</p>
+                      <p class="text-2xl font-bold mt-0.5"
+                         :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-700' : policyAnalysis.gaps.length <= 3 ? 'text-amber-700' : 'text-rose-700'"
+                         x-text="policyAnalysis.gaps.length"></p>
+                      <p class="text-[10px] mt-0.5"
+                         :class="policyAnalysis.gaps.length === 0 ? 'text-emerald-600' : policyAnalysis.gaps.length <= 3 ? 'text-amber-600' : 'text-rose-600'"
+                         x-text="policyAnalysis.gaps.length === 0 ? 'No gaps ✓' : policyAnalysis.gaps.filter(g=>g.status==='missing').length + ' missing, ' + policyAnalysis.gaps.filter(g=>g.status==='underweight').length + ' underweight'"></p>
+                    </div>
+                    <div class="rounded-xl border p-3"
+                         :class="policyAnalysis.concentration_flags.length === 0 ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'">
+                      <p class="text-[10px] uppercase tracking-wider font-semibold"
+                         :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-600' : 'text-rose-600'">Concentration</p>
+                      <p class="text-2xl font-bold mt-0.5"
+                         :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-700' : 'text-rose-700'"
+                         x-text="policyAnalysis.concentration_flags.length === 0 ? 'OK' : policyAnalysis.concentration_flags.length + ' flags'"></p>
+                      <p class="text-[10px] mt-0.5"
+                         :class="policyAnalysis.concentration_flags.length === 0 ? 'text-emerald-600' : 'text-rose-600'"
+                         x-text="policyAnalysis.concentration_flags.length === 0 ? 'All within limits ✓' : 'Over cap limits'"></p>
+                    </div>
+                  </div>
+
+                  <!-- Concentration flags -->
+                  <template x-if="policyAnalysis.concentration_flags.length">
+                    <div class="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200">
+                      <p class="text-xs font-semibold text-rose-700 mb-1.5">⚠ Concentration Flags</p>
+                      <div class="flex flex-wrap gap-2">
+                        <template x-for="flag in policyAnalysis.concentration_flags" :key="flag">
+                          <span class="text-[10px] px-2 py-1 rounded-full bg-rose-100 text-rose-700" x-text="flag"></span>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- Gap list -->
+                  <template x-if="policyAnalysis.gaps.length">
+                    <div class="space-y-2">
+                      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sector Gaps Detail</p>
+                      <template x-for="gap in policyAnalysis.gaps" :key="gap.sector">
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg"
+                             :class="gap.status === 'missing' ? 'bg-rose-50 border border-rose-200' : 'bg-amber-50 border border-amber-200'">
+                          <span class="text-sm font-medium"
+                                :class="gap.status === 'missing' ? 'text-rose-700' : 'text-amber-700'"
+                                x-text="gap.sector"></span>
+                          <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                                :class="gap.status === 'missing' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'"
+                                x-text="gap.status === 'missing' ? 'Missing' : 'Underweight (' + (gap.current_pct||0).toFixed(1) + '% / target ' + gap.target_min_pct + '–' + gap.target_max_pct + '%)'"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+
+                  <p x-show="!policyAnalysis.gaps.length && !policyAnalysis.concentration_flags.length"
+                     class="text-sm text-emerald-600 font-medium">✓ Portfolio meets all policy targets.</p>
+                </div>
+              </template>
+
+              <div x-show="!policyAnalysis && !policyAnalysisLoading"
+                   class="py-4 text-sm text-slate-400 text-center">
+                Diagnosis will appear after prices load.
+              </div>
+            </section>
+
+            <!-- ③ PRESCRIPTION -->
+            <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+              <div class="flex items-center gap-3 mb-5">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">③ Prescription</span>
+                <h2 class="text-base font-semibold text-slate-800 dark:text-slate-100">Where to Deploy New Money</h2>
+              </div>
+
+              <template x-if="policyAnalysis && policyAnalysis.candidates && policyAnalysis.candidates.length">
+                <div class="space-y-3 mb-6">
+                  <p class="text-xs text-slate-500">Candidates from the full NSE universe, ranked by market cap within Sharia status. Select stocks to compare them side-by-side.</p>
+                  <template x-for="cand in policyAnalysis.candidates" :key="cand.sector_gap">
+                    <div class="rounded-xl border overflow-hidden"
+                         :class="cand.priority === 'high' ? 'border-amber-500/40' : 'border-slate-600/40'">
+                      <button class="w-full text-left px-4 py-3 flex items-center justify-between gap-3 transition"
+                              style="background-color:#2d3748"
+                              @mouseenter="$el.style.backgroundColor='#374151'"
+                              @mouseleave="$el.style.backgroundColor='#2d3748'"
+                              @click="policyGapExpanded[cand.sector_gap] = !policyGapExpanded[cand.sector_gap]">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="font-semibold text-sm" style="color:#f8fafc" x-text="cand.sector_gap"></span>
+                          <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
+                                :class="cand.gap_status === 'missing' ? 'bg-rose-900 text-rose-300 border border-rose-700' : 'bg-amber-900 text-amber-300 border border-amber-700'"
+                                x-text="cand.gap_status"></span>
+                          <span x-show="cand.priority === 'high'" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-900 text-amber-300 border border-amber-600">HIGH PRIORITY</span>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0 text-xs" style="color:#94a3b8">
+                          <span x-text="'Current: ' + cand.current_weight_pct + '%'"></span>
+                          <span>Target: <span style="color:#cbd5e1" x-text="cand.target_min_pct + '–' + cand.target_max_pct + '%'"></span></span>
+                          <span x-text="(cand.options.filter(o=>o.sharia_status==='Yes').length) + ' compliant'"></span>
+                          <svg class="w-4 h-4 transition-transform" style="color:#94a3b8"
+                               :class="policyGapExpanded[cand.sector_gap] ? 'rotate-180' : ''"
+                               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                          </svg>
+                        </div>
+                      </button>
+
+                      <div x-show="policyGapExpanded[cand.sector_gap]" x-collapse class="border-t border-slate-700">
+                        <template x-if="cand.options.length === 0">
+                          <p class="px-4 py-4 text-xs text-slate-400">No candidates found in this sector from the universe cache.</p>
+                        </template>
+                        <template x-if="cand.options.length > 0">
+                          <div class="bg-slate-900 text-slate-100">
+                            <div class="px-4 py-1.5 grid gap-x-3 border-b border-slate-700 bg-slate-950/60"
+                                 style="grid-template-columns: 20px 1fr 80px 110px 100px 70px">
+                              <span></span>
+                              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Stock</span>
+                              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-center">Cap Tier</span>
+                              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-right">Mkt Cap</span>
+                              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-center">Sharia</span>
+                              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500 text-right">Price</span>
+                            </div>
+                            <template x-if="cand.options.filter(o=>o.sharia_status==='Yes').length">
+                              <div>
+                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400">Sharia Compliant</p>
+                                <div class="divide-y divide-slate-800/60">
+                                  <template x-for="opt in cand.options.filter(o=>o.sharia_status==='Yes')" :key="opt.symbol">
+                                    <div class="px-4 py-2 grid items-center gap-x-3 hover:bg-slate-800 transition cursor-pointer"
+                                         style="grid-template-columns: 20px 1fr 80px 110px 100px 70px"
+                                         @click="togglePrescriptionSelect(opt.symbol)">
+                                      <input type="checkbox" class="w-3.5 h-3.5 rounded accent-teal-500 cursor-pointer"
+                                             :checked="prescriptionSelected.includes(opt.symbol)"
+                                             @click.stop="togglePrescriptionSelect(opt.symbol)">
+                                      <div class="min-w-0">
+                                        <p class="font-semibold text-slate-100 text-xs truncate" x-text="opt.symbol.replace('.NS','').replace('.BO','')"></p>
+                                        <p class="text-[10px] text-slate-400 truncate" x-text="opt.name"></p>
+                                      </div>
+                                      <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-200 text-center"
+                                            x-text="(opt.cap_tier || 'unknown') + ' cap'"></span>
+                                      <span class="text-[10px] text-slate-400 text-right"
+                                            x-text="opt.market_cap ? '₹' + Math.round(opt.market_cap / 1e7).toLocaleString() + ' Cr' : '—'"></span>
+                                      <span class="px-1.5 py-0.5 rounded-full bg-emerald-900 text-emerald-300 text-[10px] font-semibold border border-emerald-700 text-center">✓ Compliant</span>
+                                      <span class="text-[10px] text-slate-300 font-mono text-right"
+                                            x-text="opt.current_price ? '₹' + opt.current_price.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'"></span>
+                                    </div>
+                                  </template>
+                                </div>
+                              </div>
+                            </template>
+                            <template x-if="cand.options.filter(o=>o.sharia_status==='Unknown').length">
+                              <div>
+                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">Unknown — Data Incomplete</p>
+                                <div class="divide-y divide-slate-800/60">
+                                  <template x-for="opt in cand.options.filter(o=>o.sharia_status==='Unknown')" :key="opt.symbol">
+                                    <div class="px-4 py-2 grid items-center gap-x-3 hover:bg-slate-800 transition"
+                                         style="grid-template-columns: 20px 1fr 80px 110px 100px 70px">
+                                      <span></span>
+                                      <div class="min-w-0">
+                                        <p class="font-semibold text-slate-200 text-xs truncate" x-text="opt.symbol.replace('.NS','').replace('.BO','')"></p>
+                                        <p class="text-[10px] text-slate-500 truncate" x-text="opt.name"></p>
+                                      </div>
+                                      <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-700 text-slate-300 text-center"
+                                            x-text="(opt.cap_tier || 'unknown') + ' cap'"></span>
+                                      <span class="text-[10px] text-slate-400 text-right"
+                                            x-text="opt.market_cap ? '₹' + Math.round(opt.market_cap / 1e7).toLocaleString() + ' Cr' : '—'"></span>
+                                      <span class="px-1.5 py-0.5 rounded-full bg-amber-900 text-amber-300 text-[10px] font-semibold border border-amber-700 text-center">? Unknown</span>
+                                      <span class="text-[10px] text-slate-600 text-right">—</span>
+                                    </div>
+                                  </template>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+
+              <!-- Sticky compare bar -->
+              <div x-show="prescriptionSelected.length > 0"
+                   x-cloak
+                   class="sticky bottom-4 z-10 mx-auto max-w-2xl mt-3">
+                <div class="rounded-2xl border border-teal-600/50 bg-slate-900/95 backdrop-blur shadow-xl px-4 py-3 flex items-center gap-3">
+                  <div class="flex-1 flex items-center gap-2 flex-wrap min-w-0">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-teal-400 shrink-0">Compare:</span>
+                    <template x-for="sym in prescriptionSelected" :key="sym">
+                      <span class="flex items-center gap-1 bg-slate-700 rounded-full px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                        <span x-text="sym.replace('.NS','').replace('.BO','')"></span>
+                        <button @click.stop="prescriptionSelected.splice(prescriptionSelected.indexOf(sym), 1)"
+                                class="text-slate-400 hover:text-slate-100 leading-none ml-0.5">×</button>
+                      </span>
+                    </template>
+                    <span class="text-[10px] text-slate-500" x-show="prescriptionSelected.length < 2">· select 1 more to compare</span>
+                  </div>
+                  <button @click="goCompareSelected()"
+                          :disabled="prescriptionSelected.length < 2"
+                          :class="prescriptionSelected.length < 2 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-teal-500'"
+                          class="shrink-0 px-4 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold transition">
+                    Compare →
+                  </button>
+                  <button @click="prescriptionSelected = []"
+                          class="shrink-0 text-slate-500 hover:text-slate-300 text-sm transition">✕</button>
+                </div>
+              </div>
+
+              <div x-show="policyAnalysisLoading" class="py-6 text-center text-sm text-slate-400 animate-pulse">Finding candidates across the universe…</div>
+
+              <template x-if="policyAnalysis && policyAnalysis.candidates && policyAnalysis.candidates.length === 0 && !policyAnalysisLoading">
+                <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 text-center">
+                  ✓ No sector gaps — portfolio meets all policy targets. Deploy new money to existing underweight positions.
+                </div>
+              </template>
+
+              <!-- Deployment scenarios -->
+              <template x-if="personalIndexInputRows.length">
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
+                  <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-1">Deployment Scenarios</h3>
+                  <p class="text-xs text-slate-500 mb-4">Assumes non-Sharia holdings are sold first. Proceeds + new money are redeployed following the 55/30/15 and 8% rules.</p>
+                  <template x-if="deploymentScenariosLoading">
+                    <p class="text-xs text-slate-400 animate-pulse">Computing scenarios…</p>
+                  </template>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <template x-for="scenario in deploymentScenariosData" :key="scenario.label">
+                      <div class="rounded-2xl border border-slate-700 overflow-hidden shadow-sm flex flex-col bg-slate-800">
+                        <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between"
+                             :class="{'bg-teal-900/60': scenario.idx===0, 'bg-violet-900/60': scenario.idx===1, 'bg-amber-900/60': scenario.idx===2, 'bg-rose-900/60': scenario.idx===3}">
+                          <div>
+                            <p class="text-[10px] font-bold uppercase tracking-wider"
+                               :class="{'text-teal-400': scenario.idx===0,'text-violet-400': scenario.idx===1,'text-amber-400': scenario.idx===2,'text-rose-400': scenario.idx===3}"
+                               x-text="'Scenario ' + (scenario.idx+1)"></p>
+                            <p class="text-lg font-bold text-white" x-text="scenario.label"></p>
+                          </div>
+                          <div class="text-right">
+                            <p class="text-[10px] text-slate-400">New total</p>
+                            <p class="text-sm font-bold text-slate-200" x-text="'₹' + scenario.newTotal.toLocaleString(undefined,{maximumFractionDigits:0})"></p>
+                          </div>
+                        </div>
+                        <template x-if="scenario.sells.length">
+                          <div class="px-4 py-2 border-b border-rose-900/50 bg-rose-950/30">
+                            <p class="text-[10px] font-bold uppercase text-rose-400 mb-1">Sell — Non-Sharia exits</p>
+                            <template x-for="s in scenario.sells" :key="s.symbol">
+                              <div class="flex justify-between text-xs py-0.5">
+                                <span class="font-medium text-rose-300" x-text="s.symbol.replace('.NS','')"></span>
+                                <span class="text-rose-400 font-mono" x-text="'₹' + s.amount.toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+                              </div>
+                            </template>
+                            <div class="flex justify-between text-xs pt-1 border-t border-rose-900/40 mt-1">
+                              <span class="text-slate-400">+ New money</span>
+                              <span class="font-mono text-slate-300" x-text="'₹' + scenario.newAmount.toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+                            </div>
+                            <div class="flex justify-between text-xs font-bold mt-0.5">
+                              <span class="text-slate-300">Deployable</span>
+                              <span class="text-teal-400 font-mono" x-text="'₹' + scenario.deployable.toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+                            </div>
+                          </div>
+                        </template>
+                        <div class="px-4 py-2 flex-1">
+                          <p class="text-[10px] font-bold uppercase text-emerald-400 mb-1">Buy — Deploy here</p>
+                          <div class="space-y-1">
+                            <template x-for="b in scenario.buys" :key="b.symbol + b.reason">
+                              <div class="flex items-start justify-between gap-1">
+                                <div class="min-w-0">
+                                  <span class="font-semibold text-white text-xs" x-text="b.symbol.replace('.NS','').replace('.BO','')"></span>
+                                  <span class="text-[10px] text-slate-400 ml-1" x-text="b.reason"></span>
+                                </div>
+                                <span class="text-xs font-mono text-emerald-400 shrink-0 font-bold" x-text="'₹' + b.amount.toLocaleString(undefined,{maximumFractionDigits:0})"></span>
+                              </div>
+                              <div class="h-1 rounded-full bg-slate-700 overflow-hidden mb-1">
+                                <div class="h-full rounded-full"
+                                     :class="b.newWeight > 8 ? 'bg-amber-400' : 'bg-emerald-500'"
+                                     :style="'width:' + Math.min(b.newWeight * 10, 100) + '%'"></div>
+                              </div>
+                              <p class="text-[10px] text-slate-500 -mt-1 mb-1"
+                                 x-text="b.currentWeight + '% → ' + b.newWeight + '% of portfolio'"></p>
+                            </template>
+                          </div>
+                        </div>
+                        <div class="px-4 py-2 bg-slate-900/50 border-t border-slate-700 text-[10px] text-slate-400 flex justify-between">
+                          <span x-text="scenario.buys.length + ' buy action' + (scenario.buys.length !== 1 ? 's' : '')"></span>
+                          <span x-text="scenario.sells.length + ' sell action' + (scenario.sells.length !== 1 ? 's' : '')"></span>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </template>
+            </section>
+
+          </div>
+        </template>
+
+      </div><!-- /advisor -->
+
       <div x-show="page === 'all_stocks'" x-cloak class="space-y-4">
         <div class="flex items-center justify-between">
           <h1 class="text-xl font-semibold text-slate-800">All Stocks</h1>
@@ -5119,7 +5492,7 @@
         reportPeriods: ['All periods', '31st March 2025'],
         counts: {},
         tickers: [],
-        navCards: { home: 'Home', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', mf: 'MF Holdings', lenses: 'Lens Library', watchlist: 'Watchlist' },
+        navCards: { home: 'Home', recommendations: '⬡ Recommendations', all_stocks: 'All Stocks', per_stock: 'Research', comparison: 'Stock Comparison', portfolio: 'Portfolio', trades: 'Trade Journal', mf: 'MF Holdings', lenses: 'Lens Library', watchlist: 'Watchlist' },
         tabulators: {},
         loading: false,
         allStocksRows: [],
@@ -5257,6 +5630,7 @@
         tradeCheckRunning: false,
         tradeCheckResult: null,
         tradeCheckError: '',
+        portfolioPricesLoading: false,
         // MF Holdings state
         mfHoldings: [],
         mfSummary: {},
@@ -5670,6 +6044,13 @@
           else if (this.page === 'lenses') {
             this.fetchLensLibrary();
           }
+          else if (this.page === 'recommendations') {
+            if (!this.personalIndexHoldingsRows.length && (this.personalIndexInputRows || []).length)
+              this.fetchPortfolioPrices();
+            if (!this.mfHoldings.length) this.fetchMfHoldings();
+            if (!this.usdInrRate) this.fetchUsdInrRate();
+            if (!this.policyAnalysis && !this.policyAnalysisLoading) this.fetchPolicyAnalysis();
+          }
         },
 
         // ── MF Holdings ──────────────────────────────────────────────────────
@@ -5718,6 +6099,21 @@
             total_current: g.folios.reduce((s, f) => s + f.current_value, 0),
             total_returns: g.folios.reduce((s, f) => s + f.returns, 0),
           }));
+        },
+
+        advisorData() {
+          return {
+            hasPortfolio: (this.personalIndexInputRows || []).length > 0,
+            hasPrices: (this.personalIndexHoldingsRows || []).length > 0,
+            policyAnalysis: this.policyAnalysis,
+            policyAnalysisLoading: this.policyAnalysisLoading,
+            policyAnalysisError: this.policyAnalysisError,
+            gaps: this.policyAnalysis?.gaps || [],
+            candidates: this.policyAnalysis?.candidates || [],
+            concentrationFlags: this.policyAnalysis?.concentration_flags || [],
+            scenarios: this.deploymentScenariosData || [],
+            scenariosLoading: this.deploymentScenariosLoading,
+          };
         },
 
         // ── Lens Library ─────────────────────────────────────────────────────
@@ -8001,6 +8397,7 @@
           // Silently fetch live prices via the analyze endpoint — populates personalIndexHoldingsRows
           const text = this.serializePersonalIndexRows('units');
           if (!text.trim()) return;
+          this.portfolioPricesLoading = true;
           try {
             const res = await fetch(API + '/personal-index/analyze', {
               method: 'POST',
@@ -8040,6 +8437,7 @@
               this.$nextTick(() => this.autoLoadReplacements());
             }
           } catch (_) {}
+          finally { this.portfolioPricesLoading = false; }
           // Run policy gap analysis in parallel — powers Diagnosis + Prescription sections
           this.fetchPolicyAnalysis();
         },

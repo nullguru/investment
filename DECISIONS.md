@@ -20,6 +20,22 @@ Read before: proposing architectural changes, adding major new features, or answ
 
 ---
 
+## [2026-06-16] ARCHITECTURE.md consolidated from LAYERS.md
+
+**Context**
+`LAYERS.md` at project root contained early-stage architecture docs (written before the build system, MF module, screener, and Recommendations page existed). It was stale and in the wrong location — agents loading context from `.agents/context/` would not find it.
+
+**Decision**
+- Created `.agents/context/ARCHITECTURE.md` as the single authoritative architecture document, covering: tech stack, frontend build system, dark theme palette, Alpine/FastAPI conventions, data model, module structure, page list, and pointers to key DECISIONS.md entries.
+- `LAYERS.md` replaced with a one-line stub pointing to `ARCHITECTURE.md`.
+- `README.md` context table updated to include `ARCHITECTURE.md`.
+- Both thin wrapper files (`.claude/skills/investment.md`, `.codex/skills/investment/SKILL.md`) updated to remove the deleted `portfolio_holdings.md` reference and point to `db/settings.json` instead.
+
+**Ruled out**
+- Keeping `LAYERS.md` as the live doc: wrong location for agent context, already stale, no enforcement mechanism to keep it current.
+
+---
+
 ## [2026-06-16] Agent context: single sources of truth
 
 **Context**
@@ -70,8 +86,8 @@ New top-level nav page `advisor` (second in nav, after Home) — a Phase 1 clien
 
 Return shown is simple P&L %, not XIRR. Labelled explicitly in the UI. True combined XIRR requires per-date cash flows from the trade ledger — deferred to Phase 2.
 
-**Naming note**
-The page is named "Advisor" but is a portfolio snapshot, not an "Advisor Council" in the `.agents/skills/investment.md` sense. The skill-file council pattern is a multi-viewpoint chat workflow. These are separate concepts; the naming overlap is accepted for now.
+**Naming**
+The page is named **⬡ Recommendations** (page id `recommendations`, URL hash `#recommendations`). It was briefly called "Advisor" but renamed to avoid confusion with the **Advisor Council** — the multi-viewpoint AI chat workflow defined in `.agents/skills/investment.md`. These are structurally different: Recommendations is a live UI dashboard; Advisor Council is a prompt-driven analysis mode. Keeping distinct names keeps them unambiguous in both conversation and code.
 
 **Ruled out**
 - Option A — combined card on Portfolio page: page already dense; MF data is structurally different (no Sharia screen, no per-stock breakdown)

@@ -12,7 +12,7 @@ Before doing substantive work, read:
 - `.agents/skills/investment.md` — canonical skill: setup, CLI, workflows, schemas
 - `.agents/context/investor_profile.md` — risk tolerance, horizon, behavioural notes
 - `.agents/context/portfolio_policy.md` — cap allocation, sector limits, SIP rules
-- `.agents/context/portfolio_holdings.md` — current holdings with buy prices
+- `db/settings.json` — live holdings (`personalIndexHoldingsText`) and market overrides (`holdingMarkets`)
 
 Treat `.agents/` as the single source of truth. Keep this wrapper lean.
 Update `.agents/` files instead of duplicating instructions here.
